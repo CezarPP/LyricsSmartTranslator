@@ -1,0 +1,34 @@
+/* Add the CSS rules for the Help page */
+main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.help-section {
+    margin-bottom: 40px;
+}
+
+.help-section h1,
+.help-section h2 {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.help-section h3 {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.help-section p {
+    font-size: 16px;
+    line-height: 1.5;
+    text-align: justify;
+    margin-bottom: 10px;
+}
+
+.help-section ul {
+    margin-bottom: 20px;
+}
