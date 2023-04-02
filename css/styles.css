@@ -10,6 +10,39 @@ body {
     font-family: montserrat, serif;
 }
 
+/*
+added new
+ */
+
+body {
+    min-height: 100vh;
+    margin: 0;
+}
+
+header {
+    min-height: 50px;
+    background: lightcyan;
+}
+
+footer {
+    min-height: 50px;
+    background: PapayaWhip;
+}
+
+/* The article fills all the space between header & footer */
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+article {
+    flex: 1;
+}
+
+/*
+finish
+ */
+
 .nav {
     font-family: Programme, sans-serif;
     display: flex;
@@ -118,11 +151,7 @@ nav ul li a {
     }
 }
 
-footer{
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+footer {
     background: #800080;
     height: auto;
     width: 100%;
@@ -136,7 +165,7 @@ footer{
     justify-content: space-between;
 }
 
-.footer-content .github-logo img{
+.footer-content .github-logo img {
     width: 50px;
     height: auto;
 }
