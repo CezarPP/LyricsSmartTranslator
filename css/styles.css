@@ -3,20 +3,13 @@
     margin: 0;
     text-decoration: none;
     list-style: none;
-    box-sizing: border-box;
 }
 
 body {
     font-family: montserrat, serif;
-}
-
-/*
-added new
- */
-
-body {
+    display: flex;
+    flex-direction: column;
     min-height: 100vh;
-    margin: 0;
 }
 
 header {
@@ -29,19 +22,9 @@ footer {
     background: lightcyan;
 }
 
-/* The article fills all the space between header & footer */
-body {
-    display: flex;
-    flex-direction: column;
-}
-
 article {
     flex: 1;
 }
-
-/*
-finish
- */
 
 .nav {
     font-family: Programme, sans-serif;
