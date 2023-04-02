@@ -1,0 +1,20 @@
+.search-page {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.search-page h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.search-results li {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.search-results li a {
+    text-decoration: none;
+    color: #800080;
+}
