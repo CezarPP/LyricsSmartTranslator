@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Song</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="css/addSong.css">
+    <script src="/js/loadNavbar.js" defer></script>
+</head>
+<body>
+<div id="navbar-container"></div>
+
+<main>
+    <div class="add-song-container">
+        <h2>Add Song</h2>
+        <form action="/submit-song" method="post">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="author">Author</label>
+                <input type="text" id="author" name="author" required>
+            </div>
+            <div class="form-group">
+                <label for="lyrics">Lyrics</label>
+                <textarea id="lyrics" name="lyrics" rows="10" cols="50" required></textarea>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Submit">
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>
