@@ -117,3 +117,26 @@ nav ul li a {
         font-size: 14px;
     }
 }
+
+footer{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #800080;
+    height: auto;
+    width: 100%;
+    padding-top: 5px;
+    color: #fff;
+}
+
+.footer-content {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+}
+
+.footer-content .github-logo img{
+    width: 50px;
+    height: auto;
+}
