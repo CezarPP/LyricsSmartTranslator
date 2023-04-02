@@ -1,26 +1,33 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title> LyricGlot </title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Navbar</title>
     <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
 </head>
 <body>
+<div class="nav">
+    <div class="search-bar">
+        <label>
+            <input type="text" placeholder="Search...">
+        </label>
+    </div>
+    <div class="logo"><a href="index.html"> Logo </a></div>
+    <div class="auth-buttons">
+        <button>Login</button>
+        <button class="barBetweenObjects"> | </button>
+        <button>Sign Up</button>
+    </div>
+</div>
 <nav>
-    <input type="checkbox" id="check">
-    <label for="check" class="checkbtn">
-        <i class="fas fa-bars"></i>
-    </label>
-    <label class="logo"> NameSite </label>
     <ul>
-        <li><a class="active" href="#"> Featured </a></li>
-        <li><a href="#"> Charts </a></li>
-        <li><a href="#"> Sign up </a></li>
-        <li><a href="#"> Log in </a></li>
+        <li><a href="#" class="active">Featured</a></li>
+        <li><a href="#">Charts</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Help</a></li>
     </ul>
 </nav>
-<section></section>
 </body>
 </html>

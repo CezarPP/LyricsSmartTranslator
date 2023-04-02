@@ -10,124 +10,111 @@ body {
     font-family: montserrat, serif;
 }
 
-nav {
-    background: #7B68EE; /* Purple shade */
-    height: 80px;
-    width: 100%;
+.nav {
+    font-weight: 800;
+    font-family: Programme, sans-serif;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 40px;
+    background: #800080;
+    height: 50px;
+    width: 100%;
 }
 
-
-label.logo {
+.nav .logo {
     color: white;
-    font-size: 35px;
-    line-height: 80px;
+    font-size: 30px;
     font-weight: bold;
+    text-align: center;
+    flex-grow: 1;
+}
+
+.nav .search-bar {
+    display: flex;
+    flex-grow: 1;
+    justify-content: flex-start;
+    margin-left: 20px;
+}
+
+.nav .search-bar input {
+    width: 200px;
+    height: 30px;
+    border: none;
+    padding-left: 5px;
+    border-radius: 5px;
+}
+
+.nav .auth-buttons {
+    display: flex;
+    flex-grow: 1;
+    justify-content: flex-end;
+    margin-right: 20px;
+}
+
+.nav .auth-buttons button {
+    color: white;
+    font-size: 12px;
+    border: none;
+    background: transparent;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-left: 30px;
 }
 
 nav ul {
     display: flex;
+    justify-content: space-around;
     align-items: center;
+    background: black;
+    height: 40px;
+    width: 100%;
 }
 
 nav ul li {
-    line-height: 80px;
+    display: inline-block;
     margin: 0 5px;
 }
 
 nav ul li a {
+    text-decoration: none;
     color: white;
-    font-size: 17px;
-    padding: 7px 13px;
-    border-radius: 3px;
+    font-size: 16px;
+    padding: 1px 1px;
     text-transform: uppercase;
 }
 
+.bar {
+    cursor: not-allowed;
+}
+
+/*
 a.active, a:hover {
-    background: #9370DB; /* Slightly lighter purple shade */
+    background: #1b9bff;
     transition: .5s;
 }
+*/
 
-.checkbtn {
-    font-size: 30px;
-    color: white;
-    cursor: pointer;
-    display: none;
-}
-
-#check {
-    display: none;
-}
-
-@media (max-width: 952px) {
-    label.logo {
-        font-size: 30px;
-        padding-left: 50px;
+@media (max-width: 768px) {
+    .nav .logo {
+        font-size: 24px;
+        text-align: left;
+        flex-grow: 0;
     }
 
-    nav ul li a {
-        font-size: 16px;
-    }
-}
-
-/* ... (rest of the CSS code) ... */
-
-@media (max-width: 858px) {
-    nav {
-        flex-direction: row-reverse;
+    .nav .search-bar {
+        flex-grow: 0;
     }
 
-    .checkbtn {
-        display: block;
-        order: 1;
+    .nav .search-bar input {
+        width: 150px;
+        height: 25px;
     }
 
-    label.logo {
-        order: 2;
+    .nav .auth-buttons {
+        flex-grow: 0;
     }
 
-    ul {
-        position: fixed;
-        width: 100%;
-        height: 100vh;
-        background: #2c3e50;
-        top: 80px;
-        left: -100%;
-        text-align: center;
-        transition: all .5s;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+    .nav .auth-buttons button {
+        font-size: 14px;
     }
-
-    nav ul li {
-        display: block;
-        margin: 50px 0;
-        line-height: 30px;
-    }
-
-    nav ul li a {
-        font-size: 20px;
-    }
-
-    a:hover, a.active {
-        background: none;
-        color: #7B68EE; /* Purple shade */
-    }
-
-    #check:checked ~ ul {
-        left: 0;
-    }
-}
-
-/* ... (rest of the CSS code) ... */
-
-
-section {
-    background-size: cover;
-    height: calc(100vh - 80px);
 }
