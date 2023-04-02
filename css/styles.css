@@ -11,22 +11,27 @@ body {
 }
 
 .nav {
-    font-weight: 800;
     font-family: Programme, sans-serif;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #800080;
+    background-color: #800080;
     height: 50px;
     width: 100%;
 }
 
 .nav .logo {
     color: white;
+    text-decoration: none;
     font-size: 30px;
     font-weight: bold;
     text-align: center;
     flex-grow: 1;
+}
+
+a {
+    text-decoration: none;
+    color: white;
 }
 
 .nav .search-bar {
@@ -52,6 +57,7 @@ body {
 }
 
 .nav .auth-buttons button {
+    font-weight: bold;
     color: white;
     font-size: 12px;
     border: none;
@@ -83,16 +89,9 @@ nav ul li a {
     text-transform: uppercase;
 }
 
-.bar {
-    cursor: not-allowed;
+.nav .auth-buttons .bar {
+    cursor: default;
 }
-
-/*
-a.active, a:hover {
-    background: #1b9bff;
-    transition: .5s;
-}
-*/
 
 @media (max-width: 768px) {
     .nav .logo {
