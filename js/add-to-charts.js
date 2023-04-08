@@ -1,7 +1,7 @@
-const showMoreButton = document.querySelector('.charts-container .show-more-button');
+const showMoreButtonCharts = document.querySelector('.charts-container .show-more-button');
 const chartsList = document.querySelector('.charts-container .charts-list');
 
-const addMoreItems = () => {
+const addMoreCharts = () => {
     for (let i = 1; i <= 5; i++) {
         const newItem = document.createElement('li');
         newItem.innerHTML = `
@@ -11,8 +11,8 @@ const addMoreItems = () => {
     `;
         chartsList.appendChild(newItem);
         if(chartsList.children.length > 20)
-            showMoreButton.style.display = "none";
+            showMoreButtonCharts.style.display = "none";
     }
 };
 
-showMoreButton.addEventListener('click', addMoreItems);
+showMoreButtonCharts.addEventListener('click', addMoreCharts);
