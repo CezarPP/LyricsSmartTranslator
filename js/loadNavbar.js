@@ -26,8 +26,10 @@ loadNavbar().then(r => {
                 }
             } else {
                 document.body.classList.remove("no-scroll");
-                featured.setAttribute("href", "#news");
-                charts.setAttribute("href", "#charts-container");
+                featured.setAttribute("href", "index.html#news");
+                charts.setAttribute("href", "index.html#charts-container");
+                featured.removeAttribute("onclick");
+                charts.removeAttribute("onclick");
             }
         });
         console.log("added event listener");

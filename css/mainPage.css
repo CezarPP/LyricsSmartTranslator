@@ -9,6 +9,7 @@
     margin-top: 30px;
     margin-bottom: 30px;
 }
+
 .featured-title {
     font-family: Programme, Arial, sans-serif;
     font-size: 40px;
@@ -17,7 +18,8 @@
     margin-bottom: 20px;
     text-align: left;
 }
-.news-container{
+
+.news-container {
     width: 100%;
     min-height: 10vh;
     background-color: #ffffff;
@@ -25,36 +27,41 @@
     justify-content: center;
     align-items: center;
 }
-.news-container .news-content{
+
+.news-container .news-content {
     display: flex;
     justify-content: center;
     align-items: flex-start;
 }
-.news-container .news-content .news-card{
+
+.news-container .news-content .news-card {
     flex: 1;
     border-right: 2px solid black;
     padding: 0px 30px;
     align-self: normal;
 }
 
-.news-container .news-content .news-card:first-child{
+.news-container .news-content .news-card:first-child {
     padding-left: 0;
 }
-.news-container .news-content .news-card:last-child{
+
+.news-container .news-content .news-card:last-child {
     border-right: none;
     padding-right: 0;
 }
-.news-container .news-content .news-card img{
+
+.news-container .news-content .news-card img {
     max-width: 100%;
     height: auto;
 }
-.news-container .news-content .news-card .news-title{
+
+.news-container .news-content .news-card .news-title {
     font-size: 15px;
     margin-bottom: 5px;
     font-weight: bold;
 }
 
-.news-container .news-content .news-card .news-author{
+.news-container .news-content .news-card .news-author {
     font-size: 10px;
     font-style: italic;
     color: gray;
@@ -65,6 +72,7 @@
 #charts-container {
     margin-bottom: 30px;
 }
+
 .charts-title {
     font-family: Programme, Arial, sans-serif;
     font-size: 40px;
@@ -73,9 +81,11 @@
     margin-bottom: 20px;
     text-align: left;
 }
+
 .charts-list {
     font-family: Programme, Arial, sans-serif;
 }
+
 .charts-list li {
     display: flex;
     justify-content: space-between;
@@ -83,20 +93,25 @@
     padding: 8px 0;
     border-bottom: 1px solid #ccc;
 }
+
 .charts-list .song-number {
     width: 10%;
 }
+
 .charts-list .song-title {
     width: 30%;
 }
+
 .charts-list .song-author {
     width: 20%;
 }
+
 .dropdown {
     display: inline-block;
 }
+
 .dropbtn {
-    background-color: #800080;
+    background-color: var(--background-color);
     color: white;
     font-family: Programme, Arial, sans-serif;
     font-size: 1rem;
@@ -104,9 +119,11 @@
     border: none;
     cursor: pointer;
 }
+
 .dropbtn:hover, .dropbtn:focus {
-    background-color: #a600a6;
+    background-color: var(--background-lighter);
 }
+
 .dropdown-content {
     display: none;
     position: absolute;
@@ -114,6 +131,7 @@
     min-width: 160px;
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
 }
+
 .dropdown-content a {
     color: black;
     padding: 12px 16px;
@@ -121,15 +139,19 @@
     display: block;
     font-size: 14px;
 }
+
 .dropdown-content a:hover {
     background-color: #f1f1f1;
 }
+
 .dropdown:hover .dropdown-content {
     display: block;
 }
+
 .dropdown:focus-within .dropdown-content {
     display: block;
 }
+
 .section-title-container {
     flex-grow: 1;
     display: flex;
@@ -141,6 +163,7 @@
 #community-container {
     margin-bottom: 30px;
 }
+
 .community-title {
     font-family: Programme, Arial, sans-serif;
     font-size: 40px;
@@ -149,9 +172,11 @@
     margin-bottom: 20px;
     text-align: left;
 }
+
 .community-list {
     font-family: Programme, Arial, sans-serif;
 }
+
 .community-list li {
     display: flex;
     justify-content: space-between;
@@ -159,23 +184,24 @@
     padding: 8px 0;
     border-bottom: 1px solid #ccc;
 }
+
 .community-list .community-number {
     width: 10%;
 }
+
 .community-list .community-name {
     width: 30%;
 }
+
 .community-list .community-activity {
     width: 20%;
 }
 
 
-
-
-.show-more-button{
+.show-more-button {
     display: block;
     margin: 20px auto;
-    background-color: #800080;
+    background-color: var(--background-color);
     color: white;
     font-family: Programme, Arial, sans-serif;
     font-size: 1rem;
@@ -183,6 +209,7 @@
     border: none;
     cursor: pointer;
 }
-.show-more-button:hover{
-    background-color: #a600a6;
+
+.show-more-button:hover {
+    background-color: var(--background-lighter);
 }

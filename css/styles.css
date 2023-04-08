@@ -8,6 +8,7 @@
     text-decoration: none;
     list-style: none;
     --background-color: #800080;
+    --background-lighter: #a600a6;
 }
 
 body {

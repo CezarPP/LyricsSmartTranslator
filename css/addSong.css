@@ -30,7 +30,7 @@
 
 .form-group input[type="submit"] {
     font-weight: bold;
-    background-color: #800080;
+    background-color: var(--background-color);
     color: white;
     border: none;
     padding: 10px 20px;
@@ -39,5 +39,5 @@
 }
 
 .form-group input[type="submit"]:hover {
-    background-color: #990099;
+    background-color: var(--background-lighter);
 }
