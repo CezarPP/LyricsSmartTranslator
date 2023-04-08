@@ -164,6 +164,6 @@
     border: none;
     cursor: pointer;
 }
-.show-more-button:hover, .show-more-button:focus {
+.show-more-button:hover{
     background-color: #a600a6;
 }
