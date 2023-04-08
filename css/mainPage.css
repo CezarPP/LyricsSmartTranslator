@@ -101,7 +101,6 @@
 }
 
 .dropdown {
-    position: relative;
     display: inline-block;
 }
 
@@ -109,7 +108,7 @@
     background-color: #800080;
     color: white;
     font-family: Programme, Arial, sans-serif;
-    font-size: 18px;
+    font-size: 1rem;
     padding: 5px 10px;
     border: none;
     cursor: pointer;
@@ -152,4 +151,19 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.show-more-button{
+    display: block;
+    margin: 20px auto;
+    background-color: #800080;
+    color: white;
+    font-family: Programme, Arial, sans-serif;
+    font-size: 1rem;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+}
+.show-more-button:hover, .show-more-button:focus {
+    background-color: #a600a6;
 }
