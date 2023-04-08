@@ -43,6 +43,8 @@ nav ul {
 }
 
 nav ul li {
+    cursor: default;
+    color: white;
     display: inline-block;
     line-height: 80px;
     margin: 0 15px;
