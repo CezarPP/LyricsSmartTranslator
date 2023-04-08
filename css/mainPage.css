@@ -5,7 +5,7 @@
     padding: 0 15px;
 }
 
-.news {
+#news {
     margin-top: 30px;
     margin-bottom: 30px;
 }
@@ -62,7 +62,7 @@
 }
 
 /* Charts */
-.charts-container {
+#charts-container {
     margin-bottom: 30px;
 }
 .charts-title {
@@ -136,42 +136,9 @@
     align-items: center;
     justify-content: space-between;
 }
-.charts-container {
-    margin-bottom: 30px;
-}
-.charts-title {
-    font-family: Programme, Arial, sans-serif;
-    font-size: 40px;
-    font-weight: bold;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-    text-align: left;
-}
-.charts-list {
-    font-family: Programme, Arial, sans-serif;
-}
-.charts-list li {
-    display: flex;
-    justify-content: space-between;
-    font-size: 18px;
-    padding: 8px 0;
-    border-bottom: 1px solid #ccc;
-}
-
-.charts-list .song-number {
-    width: 10%;
-}
-
-.charts-list .song-title {
-    width: 30%;
-}
-
-.charts-list .song-author {
-    width: 20%;
-}
 
 /*COMMUNITY*/
-.community-container {
+#community-container {
     margin-bottom: 30px;
 }
 .community-title {

@@ -1,5 +1,5 @@
-const showMoreButtonCharts = document.querySelector('.charts-container .show-more-button');
-const chartsList = document.querySelector('.charts-container .charts-list');
+const showMoreButtonCharts = document.querySelector('#charts-container .show-more-button');
+const chartsList = document.querySelector('#charts-container .charts-list');
 
 const addMoreCharts = () => {
     for (let i = 1; i <= 5; i++) {
