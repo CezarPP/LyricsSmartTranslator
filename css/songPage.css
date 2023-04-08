@@ -4,6 +4,38 @@
     margin: 0 auto;
 }
 
+.song-header-container {
+    width: 100%;
+    min-height: 10vh;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.song-header {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* nu stiu ce sa zic de asta */
+    flex: 1;
+}
+.song-img{
+    flex: 1;
+    padding-right: 30px;
+}
+.song-img img{
+    max-width: 15rem;
+    width: 100%;
+    height: auto;
+}
+.song-information{
+    flex: 1;
+    padding-right: 30px;
+}
+.song-stats{
+    flex: 1;
+}
+
 .song-container {
     display: flex;
     justify-content: space-between;
