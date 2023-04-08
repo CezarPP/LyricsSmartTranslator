@@ -89,6 +89,9 @@ label svg {
 }
 
 @media only screen and (max-width: 860px) {
+    #separatingBar {
+        display: none;
+    }
     label #btn {
         display: block;
     }
