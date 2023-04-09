@@ -1,27 +1,24 @@
-.content-container {
-    padding: 1rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
 .song-header-container {
     width: 100%;
     min-height: 10vh;
-    background-color: white;
+    background-color: cyan;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .song-header {
+    max-width: 1200px;
+    padding: 30px;
+    width: 90%;
     display: flex;
-    justify-content: center;
-    align-items: flex-start; /* nu stiu ce sa zic de asta */
     flex: 1;
 }
 .song-img{
     flex: 1;
-    padding-right: 30px;
+    padding-right: 10px;
+    align-self: center;
+    justify-self: center;
 }
 .song-img img{
     max-width: 15rem;
@@ -30,18 +27,28 @@
 }
 .song-information{
     flex: 1;
+    font-family: 'Programme', Arial, sans-serif;
     padding-right: 30px;
 }
+.song-information .song-title{
+    font-size: 2rem;
+    font-weight: bold;
+}
+
 .song-stats{
     flex: 1;
 }
 
+.content-container {
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
 .song-container {
     display: flex;
     justify-content: space-between;
     margin: 2rem 0;
 }
-
 .lyrics-container {
     flex: 0 0 60%;
     font-family: 'Programme', Arial, sans-serif;
@@ -49,18 +56,54 @@
     line-height: 1.5;
     margin-right: 2rem;
 }
-
-.song-title {
+.lyrics-container .song-title {
     font-size: 2rem;
     margin-bottom: 1rem;
 }
-
 .annotations-container {
     flex: 0 0 35%;
     font-family: 'Programme', Arial, sans-serif;
     line-height: 1.5;
     font-size: 1.5rem;
     padding-left: 1rem;
+}
+
+.about-container {
+    width: 100%;
+    min-height: 20vh;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.about-section {
+    max-width: 1400px;
+    padding: 30px;
+    width: 90%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    flex: 1;
+}
+.about-content{
+    padding-right: 30px;
+    color: white;
+    flex: 1;
+}
+.youtube-song{
+    position: relative;
+    padding-bottom: 30%;
+    height: 0;
+    max-width: 100%;
+    margin: 0 auto;
+    flex: 1;
+}
+.clip{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .comments-container {
