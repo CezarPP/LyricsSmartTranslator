@@ -29,12 +29,22 @@
     flex: 1;
     font-family: 'Programme', Arial, sans-serif;
     padding-right: 30px;
+    position: relative;
 }
+
 .song-information .song-title{
     font-size: 2rem;
     font-weight: bold;
 }
+.song-information .song-author{
+    font-size: 1rem;
+    padding-bottom: 40px;
+}
 
+.song-information .song-desc{
+    position: absolute;
+    bottom: 0;
+}
 .song-stats{
     flex: 1;
 }
