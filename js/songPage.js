@@ -18,8 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const annotations = document.getElementById("annotations-container").getBoundingClientRect();
         const box = document.createElement('div');
         box.classList.add('annotation-box', 'annotation-box-active');
+        const topValue = rect.top + window.scrollY;
         box.style.left = `${annotations.left}px`;
-        box.style.top = `${rect.top + window.scrollY / 2}px`;
+        box.style.top = `${topValue}px`;
         activeAnnotationBox = box;
         const inputWrapper = document.createElement('div');
 
@@ -102,6 +103,9 @@ document.addEventListener('DOMContentLoaded', () => {
         box.appendChild(btnWrapper);
 
         document.body.appendChild(box);
+        setTimeout(() => {
+            updateAnnotationBoxPosition();
+        }, 0);
     }
 
     function addAnnotation(selectedText, annotation) {
@@ -113,6 +117,21 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         annotationsContainer.appendChild(annotationElement);
     }
+
+    function updateAnnotationBoxPosition() {
+        if (activeAnnotationBox) {
+            const range = window.getSelection().getRangeAt(0);
+            const rect = range.getBoundingClientRect();
+            const annotations = document.getElementById("annotations-container").getBoundingClientRect();
+            const topValue = rect.top + window.scrollY;
+            activeAnnotationBox.style.left = `${annotations.left}px`;
+            activeAnnotationBox.style.top = `${topValue}px`;
+        }
+    }
+
+    window.addEventListener('resize', updateAnnotationBoxPosition);
+
+    // COMMENTS
 
     // add comment adding feature
     const submitCommentBtn = document.getElementById("submit-comment");
@@ -127,20 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
             commentInput.value = "";
         }
     });
-
-    function updateAnnotationBoxPosition() {
-        if (activeAnnotationBox) {
-            const range = window.getSelection().getRangeAt(0);
-            const rect = range.getBoundingClientRect();
-            const annotations = document.getElementById("annotations-container").getBoundingClientRect();
-            activeAnnotationBox.style.left = `${annotations.left}px`;
-            activeAnnotationBox.style.top = `${rect.top + window.scrollY / 2}px`;
-        }
-    }
-
-    window.addEventListener('resize', updateAnnotationBoxPosition);
-
-    // COMMENTS
 
     /*https://img.olympicchannel.com/images/image/private/t_s_w960/t_s_16_9_g_auto/f_auto/primary/eegjuvlm3u2lrhkcc1oc*/
     function addComment(text) {
