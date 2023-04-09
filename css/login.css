@@ -63,17 +63,23 @@
 }
 
 
-@media (max-width: 767px) {
+@media only screen and (max-width: 600px) {
     .split-form-container {
         flex-direction: column;
+        margin-top: 120px;
+        height: auto;
     }
 
-    .login-container,
+    .form-container {
+        margin: 0 0 20px;
+        box-shadow: none;
+    }
+
+    .login-container {
+        margin: 0 0 20px;
+    }
+
     .sign-up-container {
         margin: 0;
-    }
-
-    .sign-up-container {
-        margin-top: 20px;
     }
 }
