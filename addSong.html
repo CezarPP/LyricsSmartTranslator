@@ -16,7 +16,7 @@
 <article>
     <div class="add-song-container">
         <h2>Add Song</h2>
-        <form action="/submit-song" method="post">
+        <form action="submit-song.html" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="title">Title</label>
                 <input type="text" id="title" name="title" required>
@@ -30,7 +30,20 @@
                 <textarea id="lyrics" name="lyrics" rows="10" cols="50" required></textarea>
             </div>
             <div class="form-group">
-                <input type="submit" value="Submit">
+                <label for="cover-photo">Cover Photo</label>
+                <input type="file" id="cover-photo" name="cover-photo" accept="image/*" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="5" cols="50" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="youtube-link">YouTube Link</label>
+                <input type="url" id="youtube-link" name="youtube-link"
+                       placeholder="https://www.youtube.com/watch?v=...">
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Submit" id="add-song-submit">
             </div>
         </form>
     </div>

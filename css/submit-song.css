@@ -1,0 +1,14 @@
+.success-message-container {
+    width: 80%;
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.success-message-container h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}

@@ -41,3 +41,7 @@
 .form-group input[type="submit"]:hover {
     background-color: var(--background-lighter);
 }
+
+#youtube-link {
+    width: 250px;
+}
