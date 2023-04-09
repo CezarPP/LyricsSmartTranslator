@@ -7,16 +7,17 @@
     <title> Lyrit </title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/mainPage.css">
+    <link rel="stylesheet" href="/css/searchBar.css">
     <script src="/js/loadNavbar.js" defer></script>
     <script src="/js/loadFooter.js" defer></script>
     <script src="js/add-to-charts.js" defer></script>
     <script src="js/add-to-community.js" defer></script>
+    <script src="js/searchScript.js" defer></script>
 </head>
 <body>
 <header id="navbar-container"></header>
 
 <article class="content-container">
-
     <div id="news">
         <h2 class="featured-title">FEATURED</h2>
         <div class="news-container">
@@ -43,6 +44,15 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class = "search-bar-container">
+        <form autocomplete="off">
+            <div class = "autocomplete">
+                <input id="myInput" type="text" name="mySong" placeholder="Search song">
+            </div>
+            <input type = "submit">
+        </form>
     </div>
 
     <section id="charts-container">
