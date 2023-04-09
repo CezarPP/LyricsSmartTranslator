@@ -14,18 +14,21 @@
     display: flex;
     flex: 1;
 }
-.song-img{
+
+.song-img {
     flex: 1;
     padding-right: 10px;
     align-self: center;
     justify-self: flex-end;
 }
-.song-img img{
+
+.song-img img {
     max-width: 15rem;
     width: 100%;
     height: auto;
 }
-.song-information{
+
+.song-information {
     flex: 1;
     font-family: 'Programme', Arial, sans-serif;
     padding-right: 30px;
@@ -34,41 +37,49 @@
     display: flex;
     flex-direction: column;
 }
-.song-information .song-info{
+
+.song-information .song-info {
     margin-bottom: auto;
 }
-.song-information .song-info .song-title{
+
+.song-information .song-info .song-title {
     font-size: 2rem;
     font-weight: bold;
 }
-.song-information  song.info .song-author{
+
+.song-information song.info .song-author {
     font-size: 1rem;
 }
-.song-information .song-description{
+
+.song-information .song-description {
     margin-top: auto;
 }
-.song-information .song-description p{
+
+.song-information .song-description p {
     padding-bottom: 10px;
 }
-.song-stats
-{
+
+.song-stats {
     flex: 1;
     padding-left: 30px;
     display: flex;
     flex-direction: column;
 }
-.song-stats .song-buttons{
+
+.song-stats .song-buttons {
     margin-bottom: auto;
 }
-.song-stats .share-buttons{
+
+.song-stats .share-buttons {
     margin-top: auto;
 }
 
 
-.dropdown-language{
+.dropdown-language {
     display: inline-block;
     padding: 10px 0;
 }
+
 .change-language {
     background-color: var(--background-color);
     color: white;
@@ -78,38 +89,44 @@
     border: none;
     cursor: pointer;
 }
-.change-language:hover, .change-language:focus{
+
+.change-language:hover, .change-language:focus {
     background-color: var(--background-lighter);
 }
-.language-options{
+
+.language-options {
     display: none;
     position: absolute;
     background-color: #f9f9f9;
     min-width: 160px;
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
 }
-.language-options a{
+
+.language-options a {
     color: black;
     padding: 12px 16px;
     text-decoration: none;
     display: block;
     font-size: 14px;
 }
-.language-options a:hover{
+
+.language-options a:hover {
     background-color: #f1f1f1;
 }
-.dropdown-language:hover .language-options{
-    display: block;
-}
-.dropdown-language:focus-within .language-options{
+
+.dropdown-language:hover .language-options {
     display: block;
 }
 
-.add-translation-button{
+.dropdown-language:focus-within .language-options {
+    display: block;
+}
+
+.add-translation-button {
     padding-top: 10px;
 }
 
-a.song-page-button{
+a.song-page-button {
     background-color: var(--background-color);
     color: white;
     font-family: Programme, Arial, sans-serif;
@@ -128,47 +145,56 @@ a.song-page-button:hover {
     display: flex;
     align-items: center;
 }
+
 .icons {
     display: flex;
     list-style: none;
     padding: 0;
     margin: 0;
 }
+
 .icons li {
     margin-right: 20px;
     display: flex;
     align-items: center;
 }
+
 .icons li:last-child {
     margin-right: 0;
 }
-.svg-heart{
+
+.svg-heart {
     height: 1rem;
     width: 1rem;
     fill: red;
 }
-.svg-eye{
+
+.svg-eye {
     height: 1rem;
     width: 1rem;
     fill: blue;
 }
-.svg-comment{
+
+.svg-comment {
     height: 1rem;
     width: 1rem;
     fill: green;
 }
-.tumblr-wordpress{
+
+.tumblr-wordpress {
     font-weight: bold;
     padding-top: 5px;
     display: flex;
     align-items: center;
 }
-.svg-tumblr{
+
+.svg-tumblr {
     margin: auto 5px;
     height: 1rem;
     width: 1rem;
 }
-.svg-wordpress{
+
+.svg-wordpress {
     margin: auto 5px;
     height: 1rem;
     width: 1rem;
@@ -177,31 +203,38 @@ a.song-page-button:hover {
 .content-container {
     padding: 1rem;
     max-width: 1200px;
-    margin: 0 auto;
-}
-.song-container {
     display: flex;
-    justify-content: space-between;
-    margin: 2rem 0;
+    align-items: center;
+    text-align: center;
 }
+
 .lyrics-container {
-    flex: 0 0 60%;
+    flex: 1;
     font-family: 'Programme', Arial, sans-serif;
     font-size: 1.5rem;
     line-height: 1.5;
+    margin-left: 100px;
     margin-right: 2rem;
+    text-align: left;
 }
+
 .lyrics-container .song-title {
     font-size: 2rem;
     margin-bottom: 1rem;
 }
-.annotations-container {
-    flex: 0 0 35%;
+
+#annotations-container {
+    flex: 1;
     font-family: 'Programme', Arial, sans-serif;
     line-height: 1.5;
     font-size: 1.5rem;
     padding-left: 1rem;
 }
+
+#annotations {
+    display: none;
+}
+
 #about-container {
     width: 100%;
     min-height: 20vh;
@@ -210,6 +243,7 @@ a.song-page-button:hover {
     justify-content: center;
     align-items: center;
 }
+
 .about-section {
     max-width: 1400px;
     padding: 30px;
@@ -219,12 +253,14 @@ a.song-page-button:hover {
     align-items: flex-start;
     flex: 1;
 }
-.about-content{
+
+.about-content {
     padding-right: 30px;
     color: white;
     flex: 1;
 }
-.youtube-song{
+
+.youtube-song {
     position: relative;
     padding-bottom: 30%;
     height: 0;
@@ -232,7 +268,8 @@ a.song-page-button:hover {
     margin: 0 auto;
     flex: 1;
 }
-.clip{
+
+.clip {
     position: absolute;
     top: 0;
     left: 0;
@@ -284,4 +321,63 @@ a.song-page-button:hover {
 .comment p {
     font-size: 16px;
     line-height: 1.5;
+}
+
+.annotation-box {
+    position: absolute;
+    align-items: center;
+    background-color: rgb(233, 233, 233);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+    z-index: 10;
+    width: 400px;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-family: 'Hunters', Arial, sans-serif;
+}
+
+.annotation-box-title {
+    text-align: left;
+    margin: 20px;
+}
+
+#annotations-input {
+    text-indent: 10px;
+    line-height: 30px;
+    font-size: 1rem;
+    background-color: rgb(233, 233, 233);
+    border: 1px solid black;
+    width: 300px;
+    height: 250px;
+}
+
+#annotation-btn-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+#submit-annotation,
+#cancel-annotation {
+    flex: 1;
+    margin: 20px;
+    background-color: var(--background-color);
+    color: white;
+    font-family: Programme, Arial, sans-serif;
+    font-size: 1rem;
+    padding: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+#submit-annotation:hover,
+#cancel-annotation:hover {
+    background-color: var(--background-lighter);
+    transition: .3s;
+}
+
+.annotation-box:not(.annotation-box-active) {
+    display: none;
 }
