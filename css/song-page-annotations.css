@@ -1,0 +1,72 @@
+#annotations-container {
+    flex: 1;
+    font-family: 'Programme', Arial, sans-serif;
+    line-height: 1.5;
+    font-size: 1.5rem;
+    padding-left: 1rem;
+}
+
+#annotations-title {
+    display: none;
+}
+
+.annotation-box {
+    position: absolute;
+    align-items: center;
+    background-color: rgb(233, 233, 233);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+    z-index: 10;
+    width: 80%;
+    max-width: 400px;
+    box-sizing: border-box;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-family: 'Hunters', Arial, sans-serif;
+}
+
+.annotation-box-title {
+    text-align: left;
+    margin: 20px;
+}
+
+#annotations-input {
+    text-indent: 10px;
+    line-height: 30px;
+    font-size: 1rem;
+    background-color: rgb(233, 233, 233);
+    border: 1px solid black;
+    width: 300px;
+    height: 250px;
+}
+
+#annotation-btn-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+#submit-annotation,
+#cancel-annotation {
+    flex: 1;
+    margin: 20px;
+    background-color: var(--background-color);
+    color: white;
+    font-family: Programme, Arial, sans-serif;
+    font-size: 1rem;
+    padding: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+#submit-annotation:hover,
+#cancel-annotation:hover {
+    background-color: var(--background-lighter);
+    transition: .3s;
+}
+
+.annotation-box:not(.annotation-box-active) {
+    display: none;
+}

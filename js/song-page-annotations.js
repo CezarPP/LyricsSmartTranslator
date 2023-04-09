@@ -47,17 +47,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         btnSubmit.addEventListener('click', () => {
             alert('Added annotation');
-            /*            const annotationText = textArea.value.trim();
-                        if (annotationText) {
-                            const annotationElement = document.createElement('div');
-                            annotationElement.classList.add('annotation');
-                            annotationElement.innerHTML = `
+            let annotationText = textArea.value.trim();
+            if (annotationText) {
+                const annotationElement = document.createElement('div');
+                annotationElement.classList.add('annotation');
+                annotationElement.innerHTML = `
                             <h3>${selection.toString()}</h3>
                             <p>${annotationText}</p>
                         `;
-                            annotationsContainer.appendChild(annotationElement);
-                            box.remove();
-                        }*/
+                annotationsContainer.appendChild(annotationElement);
+                box.remove();
+            }
         });
 
         document.addEventListener('mousedown', (event) => {
