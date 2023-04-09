@@ -7,14 +7,24 @@
     <title>Search Page</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/search.css">
+    <link rel="stylesheet" href="/css/searchBar.css">
     <script src="/js/loadNavbar.js" defer></script>
     <script src="/js/loadFooter.js" defer></script>
     <script src="/js/search.js" defer></script>
+    <script src="js/searchScript.js" defer></script>
 </head>
 <body>
 <header id="navbar-container"></header>
 
 <article>
+    <div class = "search-bar-container">
+        <form autocomplete="off">
+            <div class = "autocomplete">
+                <input id="myInput" type="text" name="mySong" placeholder="Search song">
+            </div>
+            <input type = "submit">
+        </form>
+    </div>
     <section class="search-page">
         <div class="search-content">
             <h1 id="searched-text">"Searched Text"</h1>
