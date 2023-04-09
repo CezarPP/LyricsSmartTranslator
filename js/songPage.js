@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // annotations feature
-
+    let activeAnnotationBox;
     const lyricsContainer = document.querySelector('.lyrics-container');
     const annotationsContainer = document.querySelector('.annotations-container');
 
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         box.classList.add('annotation-box', 'annotation-box-active');
         box.style.left = `${annotations.left}px`;
         box.style.top = `${rect.top + window.scrollY / 2}px`;
-
+        activeAnnotationBox = box;
         const inputWrapper = document.createElement('div');
 
         const label = document.createElement('label');
@@ -46,17 +46,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         btnSubmit.addEventListener('click', () => {
             alert('Added annotation');
-/*            const annotationText = textArea.value.trim();
-            if (annotationText) {
-                const annotationElement = document.createElement('div');
-                annotationElement.classList.add('annotation');
-                annotationElement.innerHTML = `
-                <h3>${selection.toString()}</h3>
-                <p>${annotationText}</p>
-            `;
-                annotationsContainer.appendChild(annotationElement);
-                box.remove();
-            }*/
+            /*            const annotationText = textArea.value.trim();
+                        if (annotationText) {
+                            const annotationElement = document.createElement('div');
+                            annotationElement.classList.add('annotation');
+                            annotationElement.innerHTML = `
+                            <h3>${selection.toString()}</h3>
+                            <p>${annotationText}</p>
+                        `;
+                            annotationsContainer.appendChild(annotationElement);
+                            box.remove();
+                        }*/
         });
 
         document.addEventListener('mousedown', (event) => {
@@ -128,6 +128,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    function updateAnnotationBoxPosition() {
+        if (activeAnnotationBox) {
+            const range = window.getSelection().getRangeAt(0);
+            const rect = range.getBoundingClientRect();
+            const annotations = document.getElementById("annotations-container").getBoundingClientRect();
+            activeAnnotationBox.style.left = `${annotations.left}px`;
+            activeAnnotationBox.style.top = `${rect.top + window.scrollY / 2}px`;
+        }
+    }
+
+    window.addEventListener('resize', updateAnnotationBoxPosition);
+
+    // COMMENTS
+
     /*https://img.olympicchannel.com/images/image/private/t_s_w960/t_s_16_9_g_auto/f_auto/primary/eegjuvlm3u2lrhkcc1oc*/
     function addComment(text) {
         const comment = document.createElement("div");
@@ -136,8 +150,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const infAuthor = document.createElement("img");
         infAuthor.src = "https://img.olympicchannel.com/images/image/private/t_s_w960/t_s_16_9_g_auto/f_auto/primary/eegjuvlm3u2lrhkcc1oc";
         infAuthor.alt = "Avatar Image";
-        infAuthor.width = "60";
-        infAuthor.height = "45";
+        infAuthor.width = 60;
+        infAuthor.height = 45;
         comment.appendChild(infAuthor);
 
         const commentDetails = document.createElement("div");

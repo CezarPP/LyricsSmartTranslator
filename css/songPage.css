@@ -372,8 +372,6 @@ a.song-page-button:hover {
 }
 
 
-
-
 .annotation-box {
     position: absolute;
     align-items: center;
@@ -382,7 +380,9 @@ a.song-page-button:hover {
     border-radius: 4px;
     padding: 8px;
     z-index: 10;
-    width: 400px;
+    width: 80%;
+    max-width: 400px;
+    box-sizing: border-box;
     height: 400px;
     display: flex;
     flex-direction: column;
