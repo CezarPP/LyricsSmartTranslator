@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // add ability to select lyrics
     const lyricsContainer = document.querySelector('.lyrics-container');
     const annotationsContainer = document.querySelector('.annotations-container');
 
@@ -17,9 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-});
 
-document.addEventListener("DOMContentLoaded", () => {
+    // add comment adding feature
     const submitCommentBtn = document.getElementById("submit-comment");
     const commentInput = document.getElementById("comment-input");
     const commentsList = document.getElementById("comments-list");
