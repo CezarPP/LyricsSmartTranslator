@@ -44,8 +44,11 @@
 .song-information  song.info .song-author{
     font-size: 1rem;
 }
-.song-information .song-desc{
+.song-information .song-description{
     margin-top: auto;
+}
+.song-information .song-description p{
+    padding-bottom: 10px;
 }
 .song-stats
 {
@@ -105,7 +108,8 @@
 .add-translation-button{
     padding-top: 10px;
 }
-.song-page-button{
+
+a.song-page-button{
     background-color: var(--background-color);
     color: white;
     font-family: Programme, Arial, sans-serif;
@@ -115,7 +119,7 @@
     cursor: pointer;
 }
 
-.song-page-button:hover {
+a.song-page-button:hover {
     background-color: var(--background-lighter);
 }
 
@@ -198,8 +202,7 @@
     font-size: 1.5rem;
     padding-left: 1rem;
 }
-
-.about-container {
+#about-container {
     width: 100%;
     min-height: 20vh;
     background-color: black;
