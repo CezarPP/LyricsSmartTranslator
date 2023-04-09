@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Lyrit - Profile </title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/profile.css">
+    <script src="/js/loadNavbar.js" defer></script>
+    <script src="/js/loadFooter.js" defer></script>
+    <script src="/js/profile.js" defer></script>
+</head>
+<body>
+<header id="navbar-container"></header>
+
+<article class="content-container">
+    <section id="profile-container">
+        <h2 class="profile-title">PROFILE</h2>
+        <div class="profile-content">
+            <div id="profile-photo">
+                <img id="profile-photo-img" src="img/default-profile-photo.png" alt="Profile Photo">
+                <input type="file" id="upload-photo" accept="image/*" style="display:none">
+                <button id="change-photo">Change Photo</button>
+            </div>
+            <form id="profile-form">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" value="JohnDoe" required>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" value="password123" required>
+                <h3>Stats</h3>
+                <p>Translations: <span id="translations-count">50</span></p>
+                <p>Annotations: <span id="annotations-count">75</span></p>
+                <p>Comments: <span id="comments-count">120</span></p>
+                <button type="submit" id="save-changes">Save Changes</button>
+            </form>
+        </div>
+    </section>
+</article>
+
+<footer id="footer-container"></footer>
+</body>
+</html>
