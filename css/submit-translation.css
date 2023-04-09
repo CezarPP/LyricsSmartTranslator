@@ -1,0 +1,33 @@
+.translation-submitted-container {
+    width: 80%;
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.translation-submitted-container h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.translation-submitted-container p {
+    margin-bottom: 20px;
+}
+
+.go-home-btn {
+    font-weight: bold;
+    background-color: var(--background-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.go-home-btn:hover {
+    background-color: var(--background-lighter);
+}

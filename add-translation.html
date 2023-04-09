@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Translation</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/add-translation.css">
+    <script src="/js/loadNavbar.js" defer></script>
+    <script src="/js/loadFooter.js" defer></script>
+</head>
+<body>
+<header id="navbar-container"></header>
+
+<article>
+    <div class="add-translation-container">
+        <h2>Add Translation</h2>
+        <form action="submit-translation.html" method="post">
+            <div class="form-group">
+                <label for="song">Song</label>
+                <input type="text" id="song" name="song" value="Fixed Song Title" readonly>
+            </div>
+            <div class="form-group">
+                <label for="author">Author</label>
+                <input type="text" id="author" name="author" value="Fixed Author Name" readonly>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="5" cols="50" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="translated-lyrics">Translated Lyrics</label>
+                <textarea id="translated-lyrics" name="translated-lyrics" rows="10" cols="50" required></textarea>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Submit">
+            </div>
+        </form>
+    </div>
+</article>
+
+<footer id="footer-container"></footer>
+</body>
+</html>
