@@ -159,13 +159,12 @@ footer {
     background: var(--background-color);
     height: auto;
     width: 100%;
-    color: #fff;
+    color: white;
 }
 
 .footer-content {
     padding: 15px;
     display: flex;
-    flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
 }
@@ -178,5 +177,36 @@ footer {
 .footer-copyright {
     display: flex;
     justify-content: center;
-    background: Black;
+    background: black;
+}
+
+.footer-links {
+    text-align: center;
+}
+
+.footer-links h3 {
+    margin-bottom: 10px;
+}
+
+.footer-links ul {
+    display: flex;
+    justify-content: center;
+}
+
+.footer-links ul li {
+    margin: 0 10px;
+}
+
+.footer-links ul li a {
+    text-transform: uppercase;
+    padding: 5px 0;
+    color: white;
+}
+
+.footer-links ul li a:hover {
+    text-decoration: underline;
+}
+
+.rss-icon {
+    width: 20px;
 }
