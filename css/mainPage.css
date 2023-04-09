@@ -37,7 +37,7 @@
 .news-container .news-content .news-card {
     flex: 1;
     border-right: 2px solid black;
-    padding: 0px 30px;
+    padding: 0 30px;
     align-self: normal;
 }
 
