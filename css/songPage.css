@@ -1,7 +1,7 @@
 .song-header-container {
     width: 100%;
     min-height: 10vh;
-    background-color: cyan;
+    background-color: #f5daf5;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -102,6 +102,9 @@
     display: block;
 }
 
+.add-translation-button{
+    padding-top: 10px;
+}
 .song-page-button{
     background-color: var(--background-color);
     color: white;
@@ -114,6 +117,57 @@
 
 .song-page-button:hover {
     background-color: var(--background-lighter);
+}
+
+
+.like-comment-share {
+    display: flex;
+    align-items: center;
+}
+.icons {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.icons li {
+    margin-right: 20px;
+    display: flex;
+    align-items: center;
+}
+.icons li:last-child {
+    margin-right: 0;
+}
+.svg-heart{
+    height: 1rem;
+    width: 1rem;
+    fill: red;
+}
+.svg-eye{
+    height: 1rem;
+    width: 1rem;
+    fill: blue;
+}
+.svg-comment{
+    height: 1rem;
+    width: 1rem;
+    fill: green;
+}
+.tumblr-wordpress{
+    font-weight: bold;
+    padding-top: 5px;
+    display: flex;
+    align-items: center;
+}
+.svg-tumblr{
+    margin: auto 5px;
+    height: 1rem;
+    width: 1rem;
+}
+.svg-wordpress{
+    margin: auto 5px;
+    height: 1rem;
+    width: 1rem;
 }
 
 .content-container {
