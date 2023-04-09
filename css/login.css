@@ -2,6 +2,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-top: 80px;
     height: calc(100vh - 80px);
 }
 
@@ -59,4 +60,20 @@
 
 .form-container button:hover {
     background-color: #1b9bff;
+}
+
+
+@media (max-width: 767px) {
+    .split-form-container {
+        flex-direction: column;
+    }
+
+    .login-container,
+    .sign-up-container {
+        margin: 0;
+    }
+
+    .sign-up-container {
+        margin-top: 20px;
+    }
 }
