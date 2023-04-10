@@ -66,10 +66,9 @@
     margin-right: 20px;
 }
 
-.avatar img {
-    border-radius: 50%;
+.avatar-container img {
     height: 60px;
-    width: 45px;
+    width: auto;
 }
 
 .input-container {

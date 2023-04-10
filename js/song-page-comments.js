@@ -16,10 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
         comment.classList.add("comment");
 
         const infAuthor = document.createElement("img");
-        infAuthor.src = "https://img.olympicchannel.com/images/image/private/t_s_w960/t_s_16_9_g_auto/f_auto/primary/eegjuvlm3u2lrhkcc1oc";
+        infAuthor.src = "img/default-profile-photo.png";
         infAuthor.alt = "Avatar Image";
-        infAuthor.width = 60;
-        infAuthor.height = 45;
+        infAuthor.style.width = 'auto';
+        infAuthor.style.height = '60px';
         comment.appendChild(infAuthor);
 
         const commentDetails = document.createElement("div");
