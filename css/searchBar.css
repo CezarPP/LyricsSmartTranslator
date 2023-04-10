@@ -11,8 +11,7 @@
     justify-content: center;
 }
 
-form
-{
+form {
     width: 90%;
     display: flex;
     flex-wrap: wrap;
@@ -34,11 +33,15 @@ input[type="text"] {
 }
 
 input[type="submit"] {
-    background-color: #800080FF;
-    color: #fff;
+    background-color: var(--background-red);
+    color: white;
     cursor: pointer;
     padding: 5px 20px;
     border: none;
+}
+
+input[type="submit"]:hover {
+    background-color: var(--background-orange);
 }
 
 .autocomplete-items {
@@ -57,7 +60,7 @@ input[type="submit"] {
 .autocomplete-items div {
     padding: 5px;
     cursor: pointer;
-    background-color: #fff;
+    background-color: white;
     border-bottom: 1px solid #d4d4d4;
 }
 

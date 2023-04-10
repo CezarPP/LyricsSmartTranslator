@@ -1,7 +1,7 @@
 .song-header-container {
     width: 100%;
     min-height: 10vh;
-    background-color: #f5daf5;
+    background-color: var(--background-pink);
     display: flex;
     justify-content: center;
     align-items: center;

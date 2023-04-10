@@ -30,6 +30,11 @@
     margin-top: 10px;
 }
 
+#submit-comment:hover {
+    background-color: #3f3c3c;
+    transition: .3s;
+}
+
 .comment {
     background-color: #f1f1f1;
     border-radius: 4px;
@@ -66,7 +71,6 @@
     height: 60px;
     width: 45px;
 }
-
 
 .input-container {
     max-width: 1400px;

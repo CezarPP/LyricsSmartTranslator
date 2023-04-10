@@ -7,8 +7,11 @@
     margin: 0;
     text-decoration: none;
     list-style: none;
-    --background-color: #800080;
-    --background-lighter: #a600a6;
+    --background-color: #41b3a3;
+    --background-lighter: #85dcba;
+    --background-pink: #c38d9e;
+    --background-orange: #e8a87c;
+    --background-red: #e28d60;
 }
 
 body {
@@ -97,6 +100,7 @@ label svg {
     #separatingBar {
         display: none;
     }
+
     label #btn {
         display: block;
     }
@@ -130,6 +134,7 @@ label svg {
     #check:checked ~ label #btn {
         display: none;
     }
+
     #check:checked ~ label #cancel {
         display: block;
     }
