@@ -33,7 +33,8 @@
     margin: 20px;
 }
 
-#annotations-input {
+#annotations-input,
+#editable-annotation-text {
     text-indent: 10px;
     line-height: 30px;
     font-size: 1rem;
@@ -49,7 +50,10 @@
 }
 
 #submit-annotation,
-#cancel-annotation {
+#cancel-annotation,
+#btn-edit-annotation,
+#btn-save-annotation,
+#btn-share-annotation {
     flex: 1;
     margin: 20px;
     background-color: var(--background-color);
@@ -62,11 +66,18 @@
 }
 
 #submit-annotation:hover,
-#cancel-annotation:hover {
+#cancel-annotation:hover,
+#btn-edit-annotation:hover,
+#btn-save-annotation:hover,
+#btn-share-annotation:hover {
     background-color: var(--background-lighter);
     transition: .3s;
 }
 
 .annotation-box:not(.annotation-box-active) {
     display: none;
+}
+
+.annotated-text {
+    background-color: lightgrey;
 }

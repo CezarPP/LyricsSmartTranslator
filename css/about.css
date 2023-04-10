@@ -1,23 +1,38 @@
 article {
     max-width: 800px;
-    margin: 0 auto;
+    margin: 50px auto;
     padding: 40px 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.about-section {
-    margin-bottom: 40px;
-}
-
-.about-section h1,
-.about-section h2 {
-    font-size: 28px;
+section h1 {
+    font-size: 42px;
+    margin-top: 10px;
     font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+section h2 {
+    font-size: 24px;
+    margin-top: 30px;
+    font-weight: bold;
+    color: #333;
     margin-bottom: 20px;
 }
 
-.about-section p {
-    font-size: 16px;
+section p {
     line-height: 1.5;
+    font-size: 18px;
+    color: #666;
+}
+
+.about-section {
     text-align: justify;
-    margin-bottom: 10px;
+}
+
+.about-section:last-of-type {
+    margin-bottom: 0;
 }

@@ -1,0 +1,61 @@
+{
+  "@context": "https://schema.org",
+  "@type": "About Page",
+  "name": "About",
+  "description": "Learn more about our team and project.",
+  "publisher": [{
+    "@type": "Person",
+    "name": "Alex Dumitrescu",
+    "jobTitle": "Student",
+    "telephone": "+40743191000",
+    "email": "AlexDumitrescu@gmail.com",
+    "memberOf": [
+      {
+        "@type": "Organization",
+        "name": "Legenda de echipa"
+      }
+    ],
+    "knowsAbout": "Introducere in Cryptografie",
+    "gender": "Male",
+    "birthPlace": "Iasi, Iasi, ROU",
+    "nationality": "Romana",
+    "award": "Graduating a training camp in Croatia"
+  },
+  {
+    "@type": "Person",
+    "name": "Cezar Popoveniuc",
+    "jobTitle": "Student",
+    "telephone": "+40743191000",
+    "email": "CezarPopoveniuc@gmail.com",
+    "memberOf": [
+      {
+        "@type": "Organization",
+        "name": "Legenda de echipa"
+      }
+    ],
+    "knowsAbout": "Sisteme de operare",
+    "gender": "Male",
+    "birthPlace": "Iasi, Iasi, ROU",
+    "nationality": "Romana",
+    "award": "Graduating a training camp in Croatia"
+   },
+   {
+     "@type": "Person",
+     "name": "Vlad Nechita",
+     "jobTitle": "Student",
+     "telephone": "+40743191000",
+     "email": "VladNechita@gmail.com",
+     "memberOf": [
+       {
+         "@type": "Organization",
+         "name": "Legenda de echipa"
+       }
+     ],
+     "knowsAbout": "Jocul de sah",
+     "gender": "Male",
+     "birthPlace": "Iasi, Iasi, ROU",
+     "nationality": "Romana",
+     "award": "Graduating a training camp in Croatia"
+   }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "name": "Help page",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do I create an account?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "To create an account, click on the 'Login' button on the top right corner of our website and follow the instructions provided."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I change my password?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You enter your profile page and from there you can change your password."
+      }
+    }
+  ]
+}

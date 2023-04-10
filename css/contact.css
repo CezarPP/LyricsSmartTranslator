@@ -6,8 +6,7 @@ article {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.help-section h1,
-.help-section h2 {
+section h2 {
     font-size: 42px;
     margin-top: 10px;
     font-weight: bold;
@@ -16,21 +15,10 @@ article {
     margin-bottom: 30px;
 }
 
-.help-section h3 {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.help-section p {
+section p {
     line-height: 1.5;
     font-size: 18px;
     color: #666;
-    text-align: justify;
-}
-
-.help-section ul {
-    margin-bottom: 20px;
 }
 
 button {
