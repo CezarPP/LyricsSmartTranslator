@@ -1,0 +1,21 @@
+{
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  "name": "Contact Us",
+  "description": "Get in touch with us if you have any questions or concerns.",
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+1-555-555-5555",
+    "contactType": "customer service",
+    "areaServed": "ROU",
+    "availableLanguage": ["Romanian"]
+  },
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Soseaua Mentei Numarul 314",
+    "addressLocality": "Iasi",
+    "addressRegion": "IS",
+    "postalCode": "43191",
+    "addressCountry": "ROU"
+  }
+}

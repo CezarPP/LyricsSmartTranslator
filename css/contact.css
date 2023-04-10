@@ -17,21 +17,13 @@ section {
     margin-bottom: 30px;
 }
 
-section h1 {
-    font-size: 42px;
+section h2 {
+    font-size: 36px;
     margin-top: 50px;
     font-weight: bold;
     color: #333;
     text-align: center;
-    margin-bottom: 50px;
-}
-
-section h2 {
-    font-size: 24px;
-    margin-top: 30px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 section p {
@@ -45,11 +37,26 @@ img {
     max-width: 100%;
 }
 
-.about-section {
-    text-align: justify;
-    text-justify: inter-word;
+button {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 18px;
+    text-align: center;
+    transition: background-color 0.3s ease;
 }
 
-.about-section:last-of-type {
-    margin-bottom: 0;
+button:hover {
+    background-color: #0062cc;
+}
+
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
 }
