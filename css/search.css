@@ -4,9 +4,13 @@
     padding: 20px;
 }
 
-.search-page h1 {
+.search-page p {
     font-size: 28px;
     margin-bottom: 20px;
+}
+
+h1 {
+    padding: 20px;
 }
 
 .search-results li {
