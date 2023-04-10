@@ -81,6 +81,6 @@ input[type="submit"]:hover {
 }
 
 .autocomplete-active {
-    background-color: #A600A6FF !important;
+    background-color: var(--background-color) !important;
     color: #ffffff;
 }
