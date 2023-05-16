@@ -1,4 +1,4 @@
-class ImageModel {
+export class ImageModel {
     id: number;
     img: Buffer;
 
