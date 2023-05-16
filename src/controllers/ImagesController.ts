@@ -2,7 +2,7 @@ import {IncomingMessage, ServerResponse} from 'http';
 import {ImagesRepository} from '../repositories/ImagesRepository';
 import {ImageModel} from '../models/ImageModel';
 
-class ImagesController {
+export class ImagesController {
     private imagesRepository: ImagesRepository;
 
     constructor() {
