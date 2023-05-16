@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload Image</title>
+</head>
+<body>
+<h1>Upload Image</h1>
+<form id="upload-form" enctype="multipart/form-data">
+  <input type="file" id="image-upload" name="image" accept="image/*">
+  <button type="submit">Upload</button>
+</form>
+
+<script>
+  // Get a reference to the form element
+  const form = document.getElementById('upload-form');
+
+  // Attach an event listener to the form's submit event
+  form.addEventListener('submit', (event) => {
+    // Prevent the form from being submitted normally
+    event.preventDefault();
+
+    // Create a new FormData object
+    const formData = new FormData();
+
+    // Get a reference to the file input element
+    const inputElement = document.getElementById('image-upload');
+
+    // Append the selected file to the FormData object
+    formData.append('image', inputElement.files[0]);
+
+    // Send the file in a POST request
+    fetch('http://localhost:3000/image', {
+      method: 'POST',
+      body: formData,
+    })
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch(error => console.error(error));
+  });
+</script>
+</body>
+</html>

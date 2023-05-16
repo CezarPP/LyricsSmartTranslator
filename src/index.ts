@@ -13,9 +13,8 @@ index.listen(port, () => {
 });
 */
 
-import { IncomingMessage, ServerResponse } from "http";
-import * as fs from 'fs';
-import { ImagesController } from './controllers/ImagesController';
+import {IncomingMessage, ServerResponse} from "http";
+import {ImagesController} from './controllers/ImagesController';
 
 const http = require('http');
 
@@ -23,13 +22,12 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     const url = req.url;
     const method = req.method;
     let imagesController = new ImagesController();
-
     if (method === 'POST' && url === '/image') {
         imagesController.addImage(req, res);
     } else if (method === 'GET' && url && url.startsWith('/image/')) {
         imagesController.getImage(req, res);
     } else {
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.writeHead(404, {'Content-Type': 'text/plain'});
         res.end('Not Found');
     }
 });

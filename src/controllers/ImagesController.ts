@@ -1,6 +1,5 @@
 import {IncomingMessage, ServerResponse} from 'http';
 import {ImagesRepository} from '../repositories/ImagesRepository';
-import {ImageModel} from '../models/ImageModel';
 
 export class ImagesController {
     private imagesRepository: ImagesRepository;
@@ -10,17 +9,20 @@ export class ImagesController {
     }
 
     async addImage(req: IncomingMessage, res: ServerResponse) {
-        let body = '';
+        const chunks: Buffer[] = [];
+
         req.on('data', chunk => {
-            body += chunk.toString();
+            chunks.push(chunk);
         });
 
         req.on('end', async () => {
-            const image = JSON.parse(body) as ImageModel;
-            await this.imagesRepository.addImage(image);
+            const buffer: Buffer = Buffer.concat(chunks);
+            console.log(buffer);
+            const imageId: number = await this.imagesRepository.addImage(buffer);
+            console.log(imageId);
 
             res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({message: 'Image added successfully'}));
+            res.end(JSON.stringify({message: 'Image added successfully', id: imageId}));
         });
     }
 

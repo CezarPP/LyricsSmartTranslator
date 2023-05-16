@@ -7,20 +7,36 @@ export class ImagesRepository {
     constructor() {
         this.db = new Pool({
             user: 'ionut',
-            host: 'dpg-chf53k2k728trctjdjtg-a',
+            host: 'dpg-chf53k2k728trctjdjtg-a.frankfurt-postgres.render.com',
             database: 'postdb_r5n0',
             password: 'WbYko7SeIKZW1Ao1ISubLFZplAJEG4nA',
             port: 5432,
+            ssl: {
+                rejectUnauthorized: false
+            }
         });
     }
 
-    async addImage(image: ImageModel): Promise<void> {
-        const query = 'INSERT INTO Images(id, img) VALUES($1, $2)';
-        const values = [image.id, image.img];
-        await this.db.query(query, values);
+    async addImage(imageData: Buffer): Promise<number> {
+        const query = 'INSERT INTO images(img) VALUES($1) RETURNING id';
+        const values = [imageData];
+
+        try {
+            const result = await this.db.query(query, values);
+            return result.rows[0].id;
+        } catch (error) {
+            console.error(`Failed to insert image into database: ${error}`);
+            throw error;
+        }
     }
 
     async getImage(id: number): Promise<ImageModel | null> {
+        try {
+            await this.db.connect();
+        } catch (error) {
+            console.error('Failed connection');
+            throw error;
+        }
         const query = 'SELECT * FROM Images WHERE id = $1';
         const values = [id];
         const result = await this.db.query(query, values);
