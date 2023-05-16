@@ -15,6 +15,7 @@ index.listen(port, () => {
 
 import {IncomingMessage, ServerResponse} from "http";
 import {ImagesController} from './controllers/ImagesController';
+import {sendStaticFile} from "./util/sendStaticFile";
 
 const http = require('http');
 
@@ -26,9 +27,12 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         imagesController.addImage(req, res);
     } else if (method === 'GET' && url && url.startsWith('/image/')) {
         imagesController.getImage(req, res);
-    } else {
-        res.writeHead(404, {'Content-Type': 'text/plain'});
-        res.end('Not Found');
+    } else if (method == 'GET') {
+        sendStaticFile(req, res)
+            .then(() => console.log("Sent static file"))
+            .catch(() => console.log("Error sending static file"));
+        // res.writeHead(404, {'Content-Type': 'text/plain'});
+        // res.end('Not Found');
     }
 });
 
