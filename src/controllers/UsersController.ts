@@ -79,15 +79,15 @@ export class UsersController {
 
 
     // to do: getUserProfile
-    asyns getUserProfile(req: IncomingMessage, res: ServerResponse){
-        try{
-
-        } catch (error){
-            res.writeHead(500, {'Content-Type': 'application/json'});
-            res.write(JSON.stringify({message: 'Internal Server Error'}));
-            res.end();
-        }
-    }
+    // async getUserProfile(req: IncomingMessage, res: ServerResponse){
+    //     try{
+    //
+    //     } catch (error){
+    //         res.writeHead(500, {'Content-Type': 'application/json'});
+    //         res.write(JSON.stringify({message: 'Internal Server Error'}));
+    //         res.end();
+    //     }
+    // }
 
     // to do: update user credentials
 
