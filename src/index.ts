@@ -16,6 +16,7 @@ index.listen(port, () => {
 import {IncomingMessage, ServerResponse} from "http";
 import {ImagesController} from './controllers/ImagesController';
 import {sendStaticFile} from "./util/sendStaticFile";
+import {UsersController} from "./controllers/UsersController";
 
 const http = require('http');
 
@@ -23,10 +24,18 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     const url = req.url;
     const method = req.method;
     let imagesController = new ImagesController();
+    let userController = new UsersController();
+
     if (method === 'POST' && url === '/image') {
         imagesController.addImage(req, res);
     } else if (method === 'GET' && url && url.startsWith('/image/')) {
         imagesController.getImage(req, res);
+    } else if(method == 'POST' && url == '/login') {
+        userController.loginUser(req, res);
+    } else if(method == 'POST' && url == '/register'){
+        userController.registerUser(req, res);
+    } else if(method == 'GET' && url && url.startsWith('/profile/')){
+        userController.getUserProfile(req, res);
     } else if (method == 'GET') {
         sendStaticFile(req, res)
             .then(() => console.log("Sent static file"))
