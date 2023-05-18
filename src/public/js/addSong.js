@@ -2,6 +2,7 @@ document
     .querySelector('.add-song-container form')
     .addEventListener('submit', function (event) {
         event.preventDefault();
+        console.log("Got to event");
 
         const formData = new FormData(event.target);
 
@@ -17,6 +18,7 @@ document
         })
             .then(response => response.json())
             .then(data => {
+                console.log("Appended image");
                 formData.append('image-id', data.id);
 
                 // Send the rest of the form data to the server
@@ -26,6 +28,7 @@ document
                 });
             })
             .then(response => {
+                console.log("Add response from server");
                 // Handle the response from the server
                 if (response.ok) {
                     alert('Song added successfully!');

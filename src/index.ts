@@ -17,6 +17,7 @@ import {IncomingMessage, ServerResponse} from "http";
 import {ImagesController} from './controllers/ImagesController';
 import {sendStaticFile} from "./util/sendStaticFile";
 import {UsersController} from "./controllers/UsersController";
+import {SongsController} from "./controllers/SongsController";
 
 const http = require('http');
 
@@ -27,14 +28,14 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     let userController = new UsersController();
 
     if (method === 'POST' && url === '/image') {
-        imagesController.addImage(req, res);
+        imagesController.addImage(req, res).then(() => console.log("Added image"));
     } else if (method === 'GET' && url && url.startsWith('/image/')) {
         imagesController.getImage(req, res);
-    } else if(method == 'POST' && url == '/login') {
+    } else if (method == 'POST' && url == '/login') {
         userController.loginUser(req, res);
-    } else if(method == 'POST' && url == '/register'){
+    } else if (method == 'POST' && url == '/register') {
         userController.registerUser(req, res);
-    } else if(method == 'GET' && url && url.startsWith('/profile/')){
+    } else if (method == 'GET' && url && url.startsWith('/profile/')) {
         userController.getUserProfile(req, res);
     } else if (method == 'GET') {
         sendStaticFile(req, res)
@@ -42,6 +43,14 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
             .catch(() => console.log("Error sending static file"));
         // res.writeHead(404, {'Content-Type': 'text/plain'});
         // res.end('Not Found');
+    } else if (method == 'POST' && url == "submit-song.html") {
+        console.log("Entered my ifff");
+        const songsController = new SongsController();
+        songsController.handleSongSubmit(req, res).then(r => console.log("nice man post"));
+        /*
+        sendStaticFile(req, res)
+            .then(() => console.log("Sent static file submit song"))
+            .catch(() => console.log("Error sending static file"));*/
     }
 });
 

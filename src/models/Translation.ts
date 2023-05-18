@@ -1,17 +1,21 @@
-class Translation {
+export class Translation {
     id: number;
-    song_id: number;
-    user_id: number;
+    songId: number;
+    userId: number;
+    language: string;
     description: string;
     lyrics: string;
     no_views: number;
     no_likes: number;
     time: Date;
 
-    constructor(id: number, song_id: number, user_id: number, description: string, lyrics: string, no_views: number, no_likes: number, time: Date) {
+    constructor(id: number, songId: number, userId: number, language: string,
+                description: string, lyrics: string, no_views: number,
+                no_likes: number, time: Date) {
         this.id = id;
-        this.song_id = song_id;
-        this.user_id = user_id;
+        this.songId = songId;
+        this.userId = userId;
+        this.language = language;
         this.description = description;
         this.lyrics = lyrics;
         this.no_views = no_views;

@@ -1,3 +1,11 @@
+DROP TABLE IF EXISTS Updates;
+DROP TABLE IF EXISTS Comments;
+DROP TABLE IF EXISTS Annotations;
+DROP TABLE IF EXISTS Translations;
+DROP TABLE IF EXISTS Songs;
+DROP TABLE IF EXISTS Users;
+DROP TABLE IF EXISTS Images;
+
 CREATE TABLE Users
 (
     id       SERIAL PRIMARY KEY,
@@ -35,6 +43,7 @@ CREATE TABLE Translations
     id          SERIAL PRIMARY KEY,
     song_id     INT,
     user_id     INT,
+    language    VARCHAR(64),
     description TEXT,
     lyrics      TEXT,
     no_views    INT,
