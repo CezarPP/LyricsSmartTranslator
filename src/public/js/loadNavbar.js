@@ -1,6 +1,6 @@
 async function loadNavbar() {
     try {
-        const response = await fetch('./navbar.html');
+        const response = await fetch('navbar.html');
         document.getElementById('navbar-container').innerHTML = await response.text();
     } catch (error) {
         console.error('Error fetching navbar:', error);
@@ -22,12 +22,12 @@ loadNavbar().then(r => {
                     element.onclick = function () {
                         window.location.reload();
                     }
-                    element.setAttribute("href", "index.html");
+                    element.setAttribute("href", "/");
                 }
             } else {
                 document.body.classList.remove("no-scroll");
-                featured.setAttribute("href", "index.html#news");
-                charts.setAttribute("href", "index.html#charts-container");
+                featured.setAttribute("href", "/#news");
+                charts.setAttribute("href", "/#charts-container");
                 featured.removeAttribute("onclick");
                 charts.removeAttribute("onclick");
             }

@@ -22,12 +22,17 @@ import {SongsController} from "./controllers/SongsController";
 const http = require('http');
 
 const server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
-    const url = req.url;
+    const url = req.url as string;
     const method = req.method;
     let imagesController = new ImagesController();
     let userController = new UsersController();
 
-    if (method === 'POST' && url === '/image') {
+    if(method === 'GET' && url.startsWith("/css") || url.startsWith("/js") || url === '/') {
+        // for main page, css and js
+        sendStaticFile(req, res)
+            .then(() => console.log("Sent static file"))
+            .catch(() => console.log("Error sending static file"));
+    } else if (method === 'POST' && url === '/image') {
         imagesController.addImage(req, res).then(() => console.log("Added image"));
     } else if (method === 'GET' && url && url.startsWith('/image/')) {
         imagesController.getImage(req, res).then(() => "imagesController got image");

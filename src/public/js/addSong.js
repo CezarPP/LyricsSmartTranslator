@@ -32,7 +32,7 @@ document
                 console.log("Add response from server");
                 // Handle the response from the server
                 if (response.ok) {
-                    alert('Song added successfully!');
+                    window.location.href = "/submit-song.html";
                 } else {
                     alert('Failed to add song');
                 }

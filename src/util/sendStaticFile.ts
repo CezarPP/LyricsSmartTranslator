@@ -7,8 +7,9 @@ export const sendStaticFile = async (req: IncomingMessage, res: ServerResponse) 
     if (!req.url) {
         return;
     }
+    let url = req.url;
 
-    const ext: string = String(extname(req.url)).toLowerCase();
+    let ext: string = String(extname(url)).toLowerCase();
 
     const mimeTypes: { [index: string]: string } = {
         '.html': 'text/html',
@@ -17,20 +18,25 @@ export const sendStaticFile = async (req: IncomingMessage, res: ServerResponse) 
         '.json': 'application/json',
         '.png': 'image/png',
         '.jpg': 'image/jpg',
-        '.gif': 'image/gif'
+        '.gif': 'image/gif',
+        '.svg': 'image/svg+xml',
+        '.xml': 'application/xml'
     };
 
     let filePath: string = '';
-    if (ext == '.html') {
-        filePath = join(__dirname, '../public/assets/pages', req.url);
-        if (req.url === '/') {
-            filePath = join(__dirname, '../public', 'index.html');
-        }
-    } else if (ext == '.css') {
-        filePath = join(__dirname, '../public/css', req.url);
-    } else if (ext == '.js') {
-        filePath = join(__dirname, '../public/js', req.url);
-    }
+    console.log("URL is to serve is" + url);
+    if (url === '/') {
+        console.log("Serving index.html");
+        filePath = join(__dirname, '../public', '/index.html');
+        ext = '.html';
+    } else if (ext === '.html' || ext == '.xml') {
+        filePath = join(__dirname, '../public/assets/pages', url);
+    } else if (ext === '.css') {
+        filePath = join(__dirname, '../public', url);
+    } else if (ext === '.js') {
+        filePath = join(__dirname, '../public', url);
+    } else if (ext === '.svg')
+        filePath = join(__dirname, '../public/assets/img', url);
     console.log('Filepath is ' + filePath);
 
     const contentType: string = mimeTypes[ext] || 'application/octet-stream';
