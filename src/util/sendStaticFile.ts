@@ -29,14 +29,12 @@ export const sendStaticFile = async (req: IncomingMessage, res: ServerResponse) 
         console.log("Serving index.html");
         filePath = join(__dirname, '../public', '/index.html');
         ext = '.html';
-    } else if (ext === '.html' || ext == '.xml') {
+    } else if (ext === '.html' || ext == '.xml' || ext == '.json') {
         filePath = join(__dirname, '../public/assets/pages', url);
-    } else if (ext === '.css') {
+    } else if (ext === '.css' || ext === '.js') {
         filePath = join(__dirname, '../public', url);
-    } else if (ext === '.js') {
-        filePath = join(__dirname, '../public', url);
-    } else if (ext === '.svg')
-        filePath = join(__dirname, '../public/assets/img', url);
+    } else if (url.startsWith('/img') || ext === '.jpg' || ext === 'png')
+        filePath = join(__dirname, '../public/assets', url);
     console.log('Filepath is ' + filePath);
 
     const contentType: string = mimeTypes[ext] || 'application/octet-stream';

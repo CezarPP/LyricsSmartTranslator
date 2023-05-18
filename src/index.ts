@@ -27,7 +27,8 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     let imagesController = new ImagesController();
     let userController = new UsersController();
 
-    if(method === 'GET' && url.startsWith("/css") || url.startsWith("/js") || url === '/') {
+    if (method === 'GET' && url.startsWith("/css") || url.startsWith("/js")
+        || url.startsWith('/img') || url === '/') {
         // for main page, css and js
         sendStaticFile(req, res)
             .then(() => console.log("Sent static file"))
