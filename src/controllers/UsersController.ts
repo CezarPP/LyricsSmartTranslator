@@ -2,6 +2,7 @@ import { IncomingMessage, ServerResponse } from 'http';
 import { UsersRepository } from '../repositories/UsersRepository';
 import { User } from '../models/User';
 import * as jwt from 'jsonwebtoken';
+import * as formidable from "formidable";
 
 const secretKey = 'ionut';
 
@@ -13,20 +14,23 @@ export class UsersController {
 
     async loginUser(req: IncomingMessage, res: ServerResponse) {
         try {
-            let body = '';
-            req.on('data', chunk => {
-                body += chunk.toString();
-            });
+            const form = new formidable.IncomingForm();
+            form.parse(req, async (err, fields) => {
+                if (err) {
+                    console.error('Error parsing form data:', err);
+                    res.statusCode = 500;
+                    res.end('Server error');
+                    return;
+                }
+                //console.log("I am here");
 
-            //console.log("I am here");
-
-            req.on('end', async () => {
-                const {username, password} = JSON.parse(body);
+                const username = fields['username'] as string;
+                const password = fields['password'] as string;
 
                 const user = await this.usersRepository.getUserByName(username);
                 if (user) {
                     const userPassword = user.password;
-                    if(!(userPassword === password)){
+                    if (!(userPassword === password)) {
                         res.writeHead(401, {'Content-Type': 'application/json'});
                         res.end(JSON.stringify({message: 'Invalid credentials'}));
                     } else {
@@ -47,21 +51,18 @@ export class UsersController {
 
     async registerUser(req: IncomingMessage, res: ServerResponse) {
         try {
-            let body = '';
-
-            req.on('data', (chunk) => {
-                body += chunk.toString();
-            });
-
-            req.on('end', async () => {
-                const {username, password} = JSON.parse(body);
-
-                if (!username || !password) {
-                    res.writeHead(400, {'Content-Type': 'application/json'});
-                    res.write(JSON.stringify({message: 'Invalid input data'}));
-                    res.end();
+            const form = new formidable.IncomingForm();
+            form.parse(req, async (err, fields) => {
+                if (err) {
+                    console.error('Error parsing form data:', err);
+                    res.statusCode = 500;
+                    res.end('Server error');
                     return;
                 }
+                //console.log("I am here");
+
+                const username = fields['username'] as string;
+                const password = fields['password'] as string;
 
                 // trebuie salvat in database
                 const existingUser = await this.usersRepository.getUserByName(username);
