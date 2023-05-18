@@ -18,6 +18,7 @@ import {ImagesController} from './controllers/ImagesController';
 import {sendStaticFile} from "./util/sendStaticFile";
 import {UsersController} from "./controllers/UsersController";
 import {SongsController} from "./controllers/SongsController";
+import {TranslationsController} from "./controllers/TranslationsController";
 
 const http = require('http');
 
@@ -52,7 +53,11 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     } else if (method == 'POST' && url == "/submit-song.html") {
         console.log("Submitting song");
         const songsController = new SongsController();
-        songsController.handleSongSubmit(req, res).then(r => console.log("Songs controller added song"));
+        songsController.handleSongSubmit(req, res).then(() => console.log("Songs controller added song"));
+    } else if(method == 'POST' && url == '/submit-translation.html') {
+        console.log("Submitting translation");
+        const translationController = new TranslationsController();
+        translationController.handleTranslationSubmit(req, res).then(() => console.log("Translation controller added song"))
     }
 });
 

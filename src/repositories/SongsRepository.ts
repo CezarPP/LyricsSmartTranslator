@@ -52,4 +52,40 @@ export class SongsRepository {
             throw error;
         }
     }
+
+    async getSongById(songId: number): Promise<Song | null> {
+        const query = 'SELECT * FROM songs WHERE id = $1';
+        const values = [songId];
+
+        try {
+            const result = await this.db.query(query, values);
+            if (result.rows.length === 0) {
+                return null;
+            }
+            const row = result.rows[0];
+            return new Song(row.id, row.primary_translation, row.image_id, row.artist, row.title, row.link);
+
+        } catch (error) {
+            console.error(`Failed to fetch song: ${error}`);
+            throw error;
+        }
+    }
+
+    async getSongByName(songName: string): Promise<Song | null> {
+        const query = 'SELECT * FROM songs WHERE title ILIKE $1';
+        const values = [songName];
+
+        try {
+            const result = await this.db.query(query, values);
+            if (result.rows.length === 0) {
+                return null;
+            }
+            const row = result.rows[0];
+            return new Song(row.id, row.primary_translation, row.image_id, row.artist, row.title, row.link);
+        } catch (error) {
+            console.error(`Failed to fetch song: ${error}`);
+            throw error;
+        }
+    }
+
 }
