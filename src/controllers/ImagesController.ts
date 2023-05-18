@@ -17,9 +17,8 @@ export class ImagesController {
 
         req.on('end', async () => {
             const buffer: Buffer = Buffer.concat(chunks);
-            console.log(buffer);
             const imageId: number = await this.imagesRepository.addImage(buffer);
-            console.log(imageId);
+            console.log("Image id is " + imageId);
 
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(JSON.stringify({message: 'Image added successfully', id: imageId}));

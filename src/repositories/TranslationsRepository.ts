@@ -19,7 +19,7 @@ export class TranslationsRepository {
 
     async addTranslation(translation: Translation): Promise<number> {
         const query =
-            'INSERT INTO translations(song_id, user_id, description, lyrics, no_views, no_likes, time) VALUES($1, $2, $3, $4, $5, $6, $7)';
+            'INSERT INTO translations(song_id, user_id, description, lyrics, no_views, no_likes, time, language) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id';
         const values = [
             translation.songId,
             translation.userId,
@@ -27,7 +27,8 @@ export class TranslationsRepository {
             translation.lyrics,
             translation.no_views,
             translation.no_likes,
-            translation.time
+            translation.time,
+            translation.language
         ];
 
         try {

@@ -30,7 +30,7 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     if (method === 'POST' && url === '/image') {
         imagesController.addImage(req, res).then(() => console.log("Added image"));
     } else if (method === 'GET' && url && url.startsWith('/image/')) {
-        imagesController.getImage(req, res);
+        imagesController.getImage(req, res).then(() => "imagesController got image");
     } else if (method == 'POST' && url == '/login') {
         userController.loginUser(req, res);
     } else if (method == 'POST' && url == '/register') {
@@ -43,14 +43,10 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
             .catch(() => console.log("Error sending static file"));
         // res.writeHead(404, {'Content-Type': 'text/plain'});
         // res.end('Not Found');
-    } else if (method == 'POST' && url == "submit-song.html") {
-        console.log("Entered my ifff");
+    } else if (method == 'POST' && url == "/submit-song.html") {
+        console.log("Submitting song");
         const songsController = new SongsController();
-        songsController.handleSongSubmit(req, res).then(r => console.log("nice man post"));
-        /*
-        sendStaticFile(req, res)
-            .then(() => console.log("Sent static file submit song"))
-            .catch(() => console.log("Error sending static file"));*/
+        songsController.handleSongSubmit(req, res).then(r => console.log("Songs controller added song"));
     }
 });
 

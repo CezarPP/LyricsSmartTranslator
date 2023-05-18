@@ -4,6 +4,7 @@ import {SongsRepository} from "../repositories/SongsRepository";
 import {TranslationsRepository} from "../repositories/TranslationsRepository";
 import {Translation} from "../models/Translation";
 import {Song} from "../models/Song";
+import {IncomingMessage, ServerResponse} from "http";
 
 export class SongsController {
     private songRepository: SongsRepository;
@@ -14,7 +15,7 @@ export class SongsController {
         this.translationRepository = new TranslationsRepository();
     }
 
-    async handleSongSubmit(req: http.IncomingMessage, res: http.ServerResponse) {
+    async handleSongSubmit(req: IncomingMessage, res: ServerResponse) {
         const form = new formidable.IncomingForm();
         form.parse(req, async (err, fields, files) => {
             if (err) {
@@ -36,7 +37,7 @@ export class SongsController {
             const song = new Song(0, 0, imageId, author, title, link);
             console.log("Preparing song to add to repo");
             const songId = await this.songRepository.addSongNoFk(song);
-            console.log("Added song to repo with id" + songId);
+            console.log("Added song to repo with id " + songId);
             /// TODO(add userID)
             const userId = 1;
             const translation = new Translation(0, songId, userId,

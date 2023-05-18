@@ -18,10 +18,11 @@ document
         })
             .then(response => response.json())
             .then(data => {
-                console.log("Appended image");
+                console.log("Got image id " + data.id);
                 formData.append('image-id', data.id);
 
                 // Send the rest of the form data to the server
+                console.log("Submitting to submit-song");
                 return fetch('submit-song.html', {
                     method: 'POST',
                     body: formData
