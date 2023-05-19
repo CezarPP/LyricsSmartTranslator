@@ -88,4 +88,18 @@ export class SongsRepository {
         }
     }
 
+    async getAllSongs(): Promise<string[]> {
+        const query = 'SELECT * FROM songs';
+
+        try {
+            const result = await this.db.query(query);
+            let songs: string[] = [];
+            for (let i = 0; i < result.rows.length; i++)
+                songs.push(result.rows[i].title);
+            return songs;
+        } catch (error) {
+            console.error(`Failed to fetch song: ${error}`);
+            throw error;
+        }
+    }
 }
