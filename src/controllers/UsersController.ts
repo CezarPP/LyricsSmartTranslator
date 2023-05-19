@@ -4,7 +4,8 @@ import { User } from '../models/User';
 import * as jwt from 'jsonwebtoken';
 import {JwtPayload, verify} from "jsonwebtoken";
 import {parse} from "cookie";
-
+import fs from "fs";
+import {extname, join} from "path";
 
 const secretKey = 'ionut';
 
@@ -95,8 +96,7 @@ export class UsersController {
         }
     }
 
-    //to do: getUserProfile trebuie mai modificat putin
-    async getUserProfile(req: IncomingMessage, res: ServerResponse){
+    async getUserPage(req: IncomingMessage, res: ServerResponse){
         try{
             console.log(req.url);
             const url: URL = new URL(req.url as string, `http://${req.headers.host}`);
@@ -115,8 +115,58 @@ export class UsersController {
                     res.end(JSON.stringify({message: 'Unauthorized'}));
                 }
                 else {
+                    const filePath = join(__dirname, '../public/assets/pages/profile.html');
+                    fs.readFile(filePath, (error, content: Buffer): void => {
+                        if (error) {
+                            if (error.code == 'ENOENT') {
+                                // ENOENT stands for Error NO ENTry, file not found
+                                fs.readFile('./404.html', (error, content: Buffer) => {
+                                    res.writeHead(404, {'Content-Type': 'text/html'});
+                                    res.end(content, 'utf-8');
+                                });
+                            } else {
+                                res.writeHead(500);
+                                res.end(`Sorry, check with the site admin for error: ${error.code} ..\n`);
+                            }
+                        } else {
+                            res.writeHead(200, {'Content-Type': `text/html`});
+                            res.end(content, 'utf-8');
+                        }
+                    });
+                }
+            }
+        } catch (error){
+            res.writeHead(500, {'Content-Type': 'application/json'});
+            res.write(JSON.stringify({message: 'Internal Server Error'}));
+            res.end();
+        }
+    }
+    //to do: getUserProfile trebuie mai modificat putin
+    async getUserStats(req: IncomingMessage, res: ServerResponse){
+        try{
+            console.log(req.url);
+            const url: URL = new URL(req.url as string, `http://${req.headers.host}`);
+
+            const username = url.pathname.split('/')[2];
+            const user = await this.usersRepository.getUserByName(username);
+            if(user == null) {
+                res.writeHead(404, {'Content-Type': 'application/json'});
+                res.write(JSON.stringify({message: 'User not found'}));
+                res.end();
+            } else {
+                const userId = this.authenticateUser(req, res);
+                console.log(userId);
+                if(!(userId === user.id)) {
+                    res.writeHead(401, {'Content-Type': 'application/json'});
+                    res.end(JSON.stringify({message: 'Unauthorized'}));
+                }
+                else {
+                    const translationsCount = 0;
+                    const annotationsCount = 0;
+                    const commentsCount = 0;
                     res.writeHead(200, {'Content-Type': 'application/json'});
-                    res.write(JSON.stringify({message: 'User profile', user}));
+                    res.write(JSON.stringify({message: 'User profile', username: user.username, password: user.password, img_id: user.img_id, translationsCount,
+                        annotationsCount, commentsCount}));
                 }
                 res.end();
             }
@@ -126,6 +176,8 @@ export class UsersController {
             res.end();
         }
     }
+    async updateUser(){};
+    async getMostActive(){};
 
     authenticateUser(req: IncomingMessage, res: ServerResponse): number {
         const cookies = req.headers.cookie;

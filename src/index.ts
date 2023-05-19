@@ -43,10 +43,12 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         userController.loginUser(req, res);
     } else if (method == 'POST' && url == '/register') {
         userController.registerUser(req, res);
-    } else if(method == 'POST' && url == '/logout'){
+    } else if (method == 'POST' && url == '/logout'){
         userController.logoutUser(req, res);
-    }else if (method == 'GET' && url && url.startsWith('/profile/')) {
-        userController.getUserProfile(req, res);
+    } else if (method == 'GET' && url && url.startsWith('/profile/')) {
+        userController.getUserPage(req, res);
+    } else if (method == 'GET' && url && url.startsWith('/stats')){
+        userController.getUserStats(req, res);
     } else if (method == 'POST' && url && url.startsWith('/get-song-data/')) {
         console.log("Handling get song");
         songsController.handleGetSong(req, res)
