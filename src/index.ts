@@ -42,7 +42,9 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         userController.loginUser(req, res);
     } else if (method == 'POST' && url == '/register') {
         userController.registerUser(req, res);
-    } else if (method == 'GET' && url && url.startsWith('/profile/')) {
+    } else if(method == 'POST' && url == '/logout'){
+        userController.logoutUser(req, res);
+    }else if (method == 'GET' && url && url.startsWith('/profile/')) {
         userController.getUserProfile(req, res);
     } else if (method == 'GET') {
         sendStaticFile(req, res)

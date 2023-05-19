@@ -2,7 +2,7 @@ import { IncomingMessage, ServerResponse } from 'http';
 import { UsersRepository } from '../repositories/UsersRepository';
 import { User } from '../models/User';
 import * as jwt from 'jsonwebtoken';
-import {JwtPayload} from "jsonwebtoken";
+import {JwtPayload, verify} from "jsonwebtoken";
 import {parse} from "cookie";
 
 
@@ -34,7 +34,7 @@ export class UsersController {
                     } else {
                         const token = jwt.sign({userId: user.id}, secretKey, {expiresIn: '20d'});
 
-                        res.setHeader('Set-Cookie', `jwt=${token}; HttpOnly; Secure; SameSite=Strict`);
+                        res.setHeader('Set-Cookie', `jwt=${token}; HttpOnly; SameSite=Strict`);
                         res.writeHead(200, {'Content-Type': 'application/json'});
                         res.end(JSON.stringify({token, message: 'Login successful'}));
                     }
@@ -47,6 +47,12 @@ export class UsersController {
             res.writeHead(500, {'Content-Type': 'application/json'});
             res.end(JSON.stringify({message: 'Internal Server Error'}));
         }
+    }
+
+    async logoutUser(req: IncomingMessage, res: ServerResponse) {
+        res.setHeader('Set-Cookie', 'jwt=; HttpOnly; SameSite=Strict; Max-Age=0');
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Logout successful' }));
     }
 
     async registerUser(req: IncomingMessage, res: ServerResponse) {
@@ -103,9 +109,15 @@ export class UsersController {
                 res.end();
             } else {
                 const userId = this.authenticateUser(req, res);
-                console.log('Pula calului raza soarelui' + userId);
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify({message: 'User profile', user}));
+                console.log(userId);
+                if(!(userId === user.id)) {
+                    res.writeHead(401, {'Content-Type': 'application/json'});
+                    res.end(JSON.stringify({message: 'Unauthorized'}));
+                }
+                else {
+                    res.writeHead(200, {'Content-Type': 'application/json'});
+                    res.write(JSON.stringify({message: 'User profile', user}));
+                }
                 res.end();
             }
         } catch (error){
@@ -115,17 +127,24 @@ export class UsersController {
         }
     }
 
-    async authenticateUser(req: IncomingMessage, res: ServerResponse): Promise<number>{
-        const cookies = parse(req.headers.cookie || '');
-        const jwtCookie = cookies.jwt;
-        try{
-            const decodedToken = jwt.verify(jwtCookie, secretKey);
-            const userId = (decodedToken as JwtPayload).userId;
-            return userId;
-        } catch(error){
-            return -1;
+    authenticateUser(req: IncomingMessage, res: ServerResponse): number {
+        const cookies = req.headers.cookie;
+        console.log(cookies);
+        // Parse the cookie to retrieve the JWT
+        const parsedCookies = parse(cookies || '');
+        const jwtCookie = parsedCookies.jwt;
+
+        if (jwtCookie) {
+            try {
+                // Verify and decode the JWT to access the payload
+                const decodedToken = verify(jwtCookie, secretKey) as JwtPayload;
+                const userId = decodedToken.userId;
+                return userId;
+            } catch (error) {
+                // Handle JWT verification errors
+                console.error('JWT verification failed:', error);
+            }
         }
         return -1;
     }
-
 }
