@@ -27,7 +27,7 @@ export class UsersController {
 
                 const user = await this.usersRepository.getUserByName(username);
                 if (user) {
-                     const userPassword = user.password;
+                    const userPassword = user.password;
                     if(!(userPassword === password)){
                         res.writeHead(401, {'Content-Type': 'application/json'});
                         res.end(JSON.stringify({message: 'Invalid credentials'}));
