@@ -34,6 +34,8 @@ export const sendStaticFile = async (req: IncomingMessage, res: ServerResponse) 
     } else if (url.startsWith('/song-page/')) {
         filePath = join(__dirname, '../public/assets/pages/song-page.html');
         ext = '.html';
+    } else if(url.startsWith('/img/') && ext === '.svg') {
+        filePath = join(__dirname, '../public/assets' + url);
     }
 
     const contentType: string = mimeTypes[ext] || 'application/octet-stream';
