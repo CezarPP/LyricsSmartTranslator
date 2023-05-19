@@ -2,6 +2,9 @@ import { IncomingMessage, ServerResponse } from 'http';
 import { UsersRepository } from '../repositories/UsersRepository';
 import { User } from '../models/User';
 import * as jwt from 'jsonwebtoken';
+import {JwtPayload} from "jsonwebtoken";
+import {parse} from "cookie";
+
 
 const secretKey = 'ionut';
 
@@ -30,6 +33,8 @@ export class UsersController {
                         res.end(JSON.stringify({message: 'Invalid credentials'}));
                     } else {
                         const token = jwt.sign({userId: user.id}, secretKey, {expiresIn: '20d'});
+
+                        res.setHeader('Set-Cookie', `jwt=${token}; HttpOnly; Secure; SameSite=Strict`);
                         res.writeHead(200, {'Content-Type': 'application/json'});
                         res.end(JSON.stringify({token, message: 'Login successful'}));
                     }
@@ -97,6 +102,8 @@ export class UsersController {
                 res.write(JSON.stringify({message: 'User not found'}));
                 res.end();
             } else {
+                const userId = this.authenticateUser(req, res);
+                console.log('Pula calului raza soarelui' + userId);
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.write(JSON.stringify({message: 'User profile', user}));
                 res.end();
@@ -108,6 +115,17 @@ export class UsersController {
         }
     }
 
-
+    async authenticateUser(req: IncomingMessage, res: ServerResponse): Promise<number>{
+        const cookies = parse(req.headers.cookie || '');
+        const jwtCookie = cookies.jwt;
+        try{
+            const decodedToken = jwt.verify(jwtCookie, secretKey);
+            const userId = (decodedToken as JwtPayload).userId;
+            return userId;
+        } catch(error){
+            return -1;
+        }
+        return -1;
+    }
 
 }
