@@ -55,4 +55,41 @@ export class SongsController {
             res.end('Song added successfully!');
         });
     }
+
+    async handleGetSong(req: IncomingMessage, res: ServerResponse) {
+        if(!req.url) {
+            res.statusCode = 500;
+            res.end('Server error');
+            return;
+        }
+        const translationId: number = parseInt(req.url.split('/')[2]);
+
+        const translation = await this.translationRepository.getTranslationById(translationId);
+        if (translation === null) {
+            res.statusCode = 404;
+            res.end('Translation not found');
+            return;
+        }
+
+        const song = await this.songRepository.getSongById(translation.songId);
+        if (song === null) {
+            res.statusCode = 405;
+            res.end('Song not found');
+            return;
+        }
+
+        const data = {
+            title: song.title,
+            lyrics: translation.lyrics,
+            about: translation.description,
+            no_likes: translation.no_likes,
+            no_comments: 0,
+            no_views: translation.no_views,
+            img: song.imageId,
+            songLink: song.link
+        };
+
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(data));
+    }
 }
