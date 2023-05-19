@@ -3,7 +3,7 @@ import {extname, join} from "path";
 import {IncomingMessage, ServerResponse} from "http";
 
 export const sendStaticFile = async (req: IncomingMessage, res: ServerResponse) => {
-    // TODO(sanitize)
+    // TODO(sanitize URL)
     if (!req.url) {
         return;
     }
@@ -33,15 +33,17 @@ export const sendStaticFile = async (req: IncomingMessage, res: ServerResponse) 
         filePath = join(__dirname, '../public/assets/pages', url);
     } else if (ext === '.css' || ext === '.js') {
         filePath = join(__dirname, '../public', url);
-    } else if (url.startsWith('/img') || ext === '.jpg' || ext === 'png')
-        filePath = join(__dirname, '../public/assets', url);
+    } else if (url.startsWith('/song-page/')) {
+        filePath = join(__dirname, '../public/assets/pages/song-page.html');
+        ext = '.html';
+        console.log("Got path to song page " + filePath);
+    }
     console.log('Filepath is ' + filePath);
 
     const contentType: string = mimeTypes[ext] || 'application/octet-stream';
     fs.readFile(filePath, (error, content: Buffer): void => {
         if (error) {
             if (error.code == 'ENOENT') {
-                // ENOENT stands for Error NO ENTry, file not found
                 fs.readFile('./404.html', (error, content: Buffer) => {
                     res.writeHead(404, {'Content-Type': 'text/html'});
                     res.end(content, 'utf-8');
