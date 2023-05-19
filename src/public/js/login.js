@@ -25,13 +25,12 @@ document.querySelector('.login-container form').addEventListener('submit', funct
         body: JSON.stringify(jsonData)
     })
         .then(response => {
-            if (response.status === 401) {
-                console.log("Unauthorized");
+            if(response.ok){
+                window.location.href = "/";
             }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Response message:", data.message);
+            else{
+                alert('Failed to log in');
+            }
         })
         .catch(error => {
             console.error('Error logging in:', error);
@@ -61,9 +60,13 @@ document
             },
             body: JSON.stringify(jsonData)
         })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Response message:", data.message);
+            .then(response => {
+                if(response.ok){
+                    window.location.href = "/register-page.html";
+                }
+                else{
+                    alert('Failed to register');
+                }
             })
             .catch(error => {
                 console.error('Error registering:', error);
