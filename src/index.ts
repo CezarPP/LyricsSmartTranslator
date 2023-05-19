@@ -27,16 +27,17 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     const method = req.method;
     let imagesController = new ImagesController();
     let userController = new UsersController();
+    let songsController = new SongsController();
 
-    if (method === 'GET' && url.startsWith("/css") || url.startsWith("/js")
-        || url.startsWith('/img') || url === '/') {
-        // for main page, css and js
+    if (method === 'GET' && url.startsWith("/css") ||
+        url.startsWith("/js") || url === '/') {
+        // for main page, css, js
         sendStaticFile(req, res)
             .then(() => console.log("Sent static file"))
             .catch(() => console.log("Error sending static file"));
     } else if (method === 'POST' && url === '/image') {
         imagesController.addImage(req, res).then(() => console.log("Added image"));
-    } else if (method === 'GET' && url && url.startsWith('/image/')) {
+    } else if (method === 'GET' && url && url.startsWith('/img')) {
         imagesController.getImage(req, res).then(() => "imagesController got image");
     } else if (method == 'POST' && url == '/login') {
         userController.loginUser(req, res);
@@ -46,6 +47,10 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         userController.logoutUser(req, res);
     }else if (method == 'GET' && url && url.startsWith('/profile/')) {
         userController.getUserProfile(req, res);
+    } else if (method == 'POST' && url && url.startsWith('/get-song-data/')) {
+        console.log("Handling get song");
+        songsController.handleGetSong(req, res)
+            .then(() => console.log("Handled get song"));
     } else if (method == 'GET') {
         sendStaticFile(req, res)
             .then(() => console.log("Sent static file"))
@@ -56,7 +61,7 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         console.log("Submitting song");
         const songsController = new SongsController();
         songsController.handleSongSubmit(req, res).then(() => console.log("Songs controller added song"));
-    } else if(method == 'POST' && url == '/submit-translation.html') {
+    } else if (method == 'POST' && url == '/submit-translation.html') {
         console.log("Submitting translation");
         const translationController = new TranslationsController();
         translationController.handleTranslationSubmit(req, res).then(() => console.log("Translation controller added song"))
