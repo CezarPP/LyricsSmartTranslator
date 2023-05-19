@@ -71,6 +71,25 @@
     background-color: var(--background-lighter);
 }
 
+#logout-btn {
+    font-size: 1.2rem;
+    width: 100px;
+    margin-top: 20px;
+    margin-right: auto;
+    margin-left: auto;
+    padding: 5px;
+    background-color: var(--background-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#logout-btn:hover {
+    background-color: var(--background-lighter);
+}
+
 #change-photo {
     font-size: 1rem;
     padding: 5px;

@@ -1,6 +1,6 @@
-import { IncomingMessage, ServerResponse } from 'http';
-import { UsersRepository } from '../repositories/UsersRepository';
-import { User } from '../models/User';
+import {IncomingMessage, ServerResponse} from 'http';
+import {UsersRepository} from '../repositories/UsersRepository';
+import {User} from '../models/User';
 import * as jwt from 'jsonwebtoken';
 import {JwtPayload, verify} from "jsonwebtoken";
 import {parse} from "cookie";
@@ -11,6 +11,7 @@ const secretKey = 'ionut';
 
 export class UsersController {
     private usersRepository: UsersRepository;
+
     constructor() {
         this.usersRepository = new UsersRepository;
     }
@@ -29,7 +30,7 @@ export class UsersController {
                 const user = await this.usersRepository.getUserByName(username);
                 if (user) {
                     const userPassword = user.password;
-                    if(!(userPassword === password)){
+                    if (!(userPassword === password)) {
                         res.writeHead(401, {'Content-Type': 'application/json'});
                         res.end(JSON.stringify({message: 'Invalid credentials'}));
                     } else {
@@ -52,8 +53,8 @@ export class UsersController {
 
     async logoutUser(req: IncomingMessage, res: ServerResponse) {
         res.setHeader('Set-Cookie', 'jwt=; HttpOnly; SameSite=Strict; Max-Age=0');
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: 'Logout successful' }));
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify({message: 'Logout successful'}));
     }
 
     async registerUser(req: IncomingMessage, res: ServerResponse) {
@@ -96,88 +97,76 @@ export class UsersController {
         }
     }
 
-    async getUserPage(req: IncomingMessage, res: ServerResponse){
-        try{
-            console.log(req.url);
-            const url: URL = new URL(req.url as string, `http://${req.headers.host}`);
+    async getLoggedUser(req: IncomingMessage, res: ServerResponse) {
+        const userId = this.authenticateUser(req, res);
+        const user = await this.usersRepository.getUserById(userId);
+        return user;
+    }
 
-            const username = url.pathname.split('/')[2];
-            const user = await this.usersRepository.getUserByName(username);
-            if(user == null) {
+    async getUserPage(req: IncomingMessage, res: ServerResponse) {
+        try {
+            console.log(req.url);
+            const user = await this.getLoggedUser(req, res);
+            if (user === null) {
                 res.writeHead(404, {'Content-Type': 'application/json'});
                 res.write(JSON.stringify({message: 'User not found'}));
                 res.end();
             } else {
-                const userId = this.authenticateUser(req, res);
-                console.log(userId);
-                if(!(userId === user.id)) {
-                    res.writeHead(401, {'Content-Type': 'application/json'});
-                    res.end(JSON.stringify({message: 'Unauthorized'}));
-                }
-                else {
-                    const filePath = join(__dirname, '../public/assets/pages/profile.html');
-                    fs.readFile(filePath, (error, content: Buffer): void => {
-                        if (error) {
-                            if (error.code == 'ENOENT') {
-                                // ENOENT stands for Error NO ENTry, file not found
-                                fs.readFile('./404.html', (error, content: Buffer) => {
-                                    res.writeHead(404, {'Content-Type': 'text/html'});
-                                    res.end(content, 'utf-8');
-                                });
-                            } else {
-                                res.writeHead(500);
-                                res.end(`Sorry, check with the site admin for error: ${error.code} ..\n`);
-                            }
+                const filePath = join(__dirname, '../public/assets/pages/profile.html');
+                fs.readFile(filePath, (error, content: Buffer): void => {
+                    if (error) {
+                        if (error.code == 'ENOENT') {
+                            // ENOENT stands for Error NO ENTry, file not found
+                            fs.readFile('./404.html', (error, content: Buffer) => {
+                                res.writeHead(404, {'Content-Type': 'text/html'});
+                                res.end(content, 'utf-8');
+                            });
                         } else {
-                            res.writeHead(200, {'Content-Type': `text/html`});
-                            res.end(content, 'utf-8');
+                            res.writeHead(500);
+                            res.end(`Sorry, check with the site admin for error: ${error.code} ..\n`);
                         }
-                    });
-                }
+                    } else {
+                        res.writeHead(200, {'Content-Type': `text/html`});
+                        res.end(content, 'utf-8');
+                    }
+                });
             }
-        } catch (error){
+        } catch (error) {
             res.writeHead(500, {'Content-Type': 'application/json'});
             res.write(JSON.stringify({message: 'Internal Server Error'}));
             res.end();
         }
     }
-    //to do: getUserProfile trebuie mai modificat putin
-    async getUserStats(req: IncomingMessage, res: ServerResponse){
-        try{
-            console.log(req.url);
-            const url: URL = new URL(req.url as string, `http://${req.headers.host}`);
 
-            const username = url.pathname.split('/')[2];
-            const user = await this.usersRepository.getUserByName(username);
-            if(user == null) {
+    async getUserStats(req: IncomingMessage, res: ServerResponse) {
+        try {
+            const user = await this.getLoggedUser(req, res);
+            if (user === null) {
                 res.writeHead(404, {'Content-Type': 'application/json'});
                 res.write(JSON.stringify({message: 'User not found'}));
                 res.end();
             } else {
-                const userId = this.authenticateUser(req, res);
-                console.log(userId);
-                if(!(userId === user.id)) {
-                    res.writeHead(401, {'Content-Type': 'application/json'});
-                    res.end(JSON.stringify({message: 'Unauthorized'}));
-                }
-                else {
-                    const translationsCount = 0;
-                    const annotationsCount = 0;
-                    const commentsCount = 0;
-                    res.writeHead(200, {'Content-Type': 'application/json'});
-                    res.write(JSON.stringify({message: 'User profile', username: user.username, password: user.password, img_id: user.img_id, translationsCount,
-                        annotationsCount, commentsCount}));
-                }
-                res.end();
+                const translationsCount = 0;
+                const annotationsCount = 0;
+                const commentsCount = 0;
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.write(JSON.stringify({
+                    message: 'User profile',
+                    username: user.username,
+                    password: user.password,
+                    img_id: user.img_id,
+                    translationsCount,
+                    annotationsCount,
+                    commentsCount
+                }));
             }
-        } catch (error){
+            res.end();
+        } catch (error) {
             res.writeHead(500, {'Content-Type': 'application/json'});
             res.write(JSON.stringify({message: 'Internal Server Error'}));
             res.end();
         }
     }
-    async updateUser(){};
-    async getMostActive(){};
 
     authenticateUser(req: IncomingMessage, res: ServerResponse): number {
         const cookies = req.headers.cookie;

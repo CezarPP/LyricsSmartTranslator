@@ -43,6 +43,19 @@ export class UsersRepository {
         const row = result.rows[0];
         return new User(row.id, row.img_id, row.username, row.password);
     }
+
+    async getUserById(id: number): Promise<User | null>{
+        const query = 'SELECT * FROM Users WHERE id = $1';
+        const values = [id];
+        const result = await this.db.query(query, values);
+
+        if(result.rows.length === 0){
+            return null;
+        }
+        const row = result.rows[0];
+        return new User(row.id, row.img_id, row.username, row.password);
+    }
+
     async addUser(username: String, password: String): Promise<number>{
         const query = 'INSERT INTO users(username, password, img_id) VALUES($1, $2, $3) RETURNING id';
         const values = [username, password, 1];

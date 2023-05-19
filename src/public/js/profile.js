@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const usernameInput = document.querySelector("#username");
     const passwordInput = document.querySelector("#password");
     const photoInput = document.querySelector("#upload-photo");
+    const logoutBtn = document.querySelector("#logout-btn");
 
     const currentURL = window.location.href;
     const parts = currentURL.split('/');
@@ -15,8 +16,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     saveChangesBtn.addEventListener("click", saveChanges);
     changePhotoBtn.addEventListener("click", () => photoInput.click());
+    logoutBtn.addEventListener("click", logout);
 
-    fetch(`/stats/${username}`, { method: 'GET' })
+    fetch(`/stats`, { method: 'GET' })
         .then(response => response.json())
         .then(data => {
             // Update the DOM with the received profile data
@@ -38,6 +40,16 @@ document.addEventListener("DOMContentLoaded", function () {
         // ...
 
         alert("Profile changes saved!");
+    }
+
+    function logout() {
+        fetch('/logout', { method: 'POST' })
+            .then(() => {
+                window.location.href = '/'; // Redirect to the main page after logout
+            })
+            .catch(error => {
+                console.error("Error logging out:", error);
+            });
     }
 
     photoInput.addEventListener("change", function (event) {
