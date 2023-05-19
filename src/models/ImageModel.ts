@@ -1,9 +1,11 @@
 export class ImageModel {
     id: number;
-    img: Buffer;
+    link: string;
+    ext: string;
 
-    constructor(id: number, img: Buffer) {
+    constructor(id: number, link: string, ext: string) {
         this.id = id;
-        this.img = img;
+        this.link = link;
+        this.ext = ext;
     }
 }

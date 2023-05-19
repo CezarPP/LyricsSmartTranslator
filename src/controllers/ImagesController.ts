@@ -8,42 +8,61 @@ export class ImagesController {
         this.imagesRepository = new ImagesRepository();
     }
 
-    async addImage(req: IncomingMessage, res: ServerResponse) {
-        const chunks: Buffer[] = [];
+    async addImage(req: IncomingMessage, res: ServerResponse): Promise<void> {
+        let body = '';
 
         req.on('data', chunk => {
-            chunks.push(chunk);
+            body += chunk.toString();
         });
 
         req.on('end', async () => {
-            const buffer: Buffer = Buffer.concat(chunks);
-            const imageId: number = await this.imagesRepository.addImage(buffer);
-            console.log("Image id is " + imageId);
+            const bodyObject = JSON.parse(body);
+            const imageBuffer = Buffer.from(bodyObject.image, 'base64');
+
+            const image = await this.imagesRepository.addImage(imageBuffer);
+            if (image == null) {
+                res.writeHead(500, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify({message: 'Not a valid image'}));
+                return;
+            }
+
+            console.log("Image link is " + image.link);
 
             res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({message: 'Image added successfully', id: imageId}));
+            res.end(JSON.stringify({
+                message: 'Image added successfully',
+                id: image.id, link: image.link, extension: image.ext
+            }));
         });
     }
 
-    async getImage(req: IncomingMessage, res: ServerResponse) {
-        const url: URL = new URL(req.url as string, `http://${req.headers.host}`);
-        const id: number = Number(url.searchParams.get('id'));
+    /*    async getImage(req: IncomingMessage, res: ServerResponse) {
+            if (!req.url) {
+                res.writeHead(400, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify({message: 'Invalid URL'}));
+                return;
+            }
 
-        if (isNaN(id)) {
-            res.writeHead(400, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({message: 'Invalid id parameter'}));
-            return;
-        }
+            const id: number = parseInt(req.url.split('/')[2]);
+            console.log("Image id for getImage " + id);
 
-        const image = await this.imagesRepository.getImage(id);
+            if (isNaN(id)) {
+                res.writeHead(400, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify({message: 'Invalid id parameter'}));
+                return;
+            }
 
-        if (image === null) {
-            res.writeHead(404, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({message: 'Image not found'}));
-            return;
-        }
+            const image = await this.imagesRepository.getImage(id);
 
-        res.writeHead(200, {'Content-Type': 'application/json'});
-        res.end(JSON.stringify(image));
-    }
+            if (image === null) {
+                res.writeHead(404, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify({message: 'Image not found'}));
+                return;
+            }
+
+            res.writeHead(200, {
+                'Content-Type': 'image/jpeg'
+            });
+            res.end(image.img);
+        }*/
 }

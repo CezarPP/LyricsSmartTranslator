@@ -113,3 +113,12 @@ ALTER TABLE Updates
 ALTER TABLE Updates
     ADD FOREIGN KEY (translation_id)
         REFERENCES Translations(id);
+
+-- we should not keep images in db, will keep them in the cloud
+
+ALTER TABLE images
+    ADD COLUMN link TEXT,
+    ADD COLUMN extension TEXT;
+
+ALTER TABLE images
+    DROP COLUMN img;
