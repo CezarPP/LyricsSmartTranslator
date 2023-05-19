@@ -26,8 +26,8 @@ export class SongsRepository {
         const query =
             'INSERT INTO songs(artist, title, image_id, link) VALUES($1, $2, $3, $4) RETURNING id';
         const values = [
-            song.title,
             song.artist,
+            song.title,
             song.imageId,
             song.link,
         ];

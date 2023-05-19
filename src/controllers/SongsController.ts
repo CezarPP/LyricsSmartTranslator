@@ -4,14 +4,17 @@ import {TranslationsRepository} from "../repositories/TranslationsRepository";
 import {Translation} from "../models/Translation";
 import {Song} from "../models/Song";
 import {IncomingMessage, ServerResponse} from "http";
+import {ImagesRepository} from "../repositories/ImagesRepository";
 
 export class SongsController {
     private songRepository: SongsRepository;
     private translationRepository: TranslationsRepository;
+    private imagesRepository: ImagesRepository;
 
     constructor() {
         this.songRepository = new SongsRepository();
         this.translationRepository = new TranslationsRepository();
+        this.imagesRepository = new ImagesRepository();
     }
 
     async handleSongSubmit(req: IncomingMessage, res: ServerResponse) {
@@ -27,14 +30,16 @@ export class SongsController {
             console.log('Received form data:', fields);
 
             const title = fields['title'] as string;
+            console.log("Server the title of the song is " + title);
             const author = fields['author'] as string;
+            console.log("Server the author of the song is " + author);
             const lyrics = fields['lyrics'] as string;
             const description = fields['description'] as string;
             const link = fields['youtube-link'] as string;
             const imageId = parseInt(fields['image-id'] as string, 10);
 
             const song = new Song(0, 0, imageId, author, title, link);
-            console.log("Preparing song to add to repo");
+            console.log("Preparing song to add to repo with title " + song.title);
             const songId = await this.songRepository.addSongNoFk(song);
             console.log("Added song to repo with id " + songId);
             /// TODO(add userID)
@@ -57,12 +62,14 @@ export class SongsController {
     }
 
     async handleGetSong(req: IncomingMessage, res: ServerResponse) {
-        if(!req.url) {
+        if (!req.url) {
             res.statusCode = 500;
             res.end('Server error');
             return;
         }
         const translationId: number = parseInt(req.url.split('/')[2]);
+
+        console.log("Translation id is " + translationId);
 
         const translation = await this.translationRepository.getTranslationById(translationId);
         if (translation === null) {
@@ -70,6 +77,7 @@ export class SongsController {
             res.end('Translation not found');
             return;
         }
+        console.log("Description is " + translation.lyrics);
 
         const song = await this.songRepository.getSongById(translation.songId);
         if (song === null) {
@@ -78,14 +86,21 @@ export class SongsController {
             return;
         }
 
+        const image = await this.imagesRepository.getImageById(song.imageId);
+        if (image == null) {
+            res.statusCode = 406;
+            res.end('Image not found');
+            return;
+        }
+
         const data = {
             title: song.title,
             lyrics: translation.lyrics,
-            about: translation.description,
+            description: translation.description,
             no_likes: translation.no_likes,
             no_comments: 0,
             no_views: translation.no_views,
-            img: song.imageId,
+            imageLink: image.link,
             songLink: song.link
         };
 

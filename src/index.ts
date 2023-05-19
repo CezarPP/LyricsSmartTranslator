@@ -33,21 +33,19 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         url.startsWith("/js") || url === '/') {
         // for main page, css, js
         sendStaticFile(req, res)
-            .then(() => console.log("Sent static file"))
+            .then()
             .catch(() => console.log("Error sending static file"));
     } else if (method === 'POST' && url === '/image') {
         imagesController.addImage(req, res).then(() => console.log("Added image"));
-    } else if (method === 'GET' && url && url.startsWith('/img')) {
-        imagesController.getImage(req, res).then(() => "imagesController got image");
     } else if (method == 'POST' && url == '/login') {
         userController.loginUser(req, res);
     } else if (method == 'POST' && url == '/register') {
         userController.registerUser(req, res);
-    } else if (method == 'POST' && url == '/logout'){
+    } else if (method == 'POST' && url == '/logout') {
         userController.logoutUser(req, res);
-    } else if (method == 'GET' && url && url==='/profile') {
+    } else if (method == 'GET' && url && url === '/profile') {
         userController.getUserPage(req, res);
-    } else if (method == 'GET' && url && url==='/stats'){
+    } else if (method == 'GET' && url && url === '/stats') {
         userController.getUserStats(req, res);
     } else if (method == 'POST' && url && url.startsWith('/get-song-data/')) {
         console.log("Handling get song");
@@ -55,7 +53,7 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
             .then(() => console.log("Handled get song"));
     } else if (method == 'GET') {
         sendStaticFile(req, res)
-            .then(() => console.log("Sent static file"))
+            .then()
             .catch(() => console.log("Error sending static file"));
         // res.writeHead(404, {'Content-Type': 'text/plain'});
         // res.end('Not Found');

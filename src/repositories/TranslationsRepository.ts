@@ -47,8 +47,8 @@ export class TranslationsRepository {
 
             const row = result.rows[0];
             return new Translation(row.id, row.song_id, row.user_id,
-                row.description, row.lyrics, row.no_views, row.no_likes,
-                row.time, row.language);
+                row.language, row.description, row.lyrics, row.no_views, row.no_likes,
+                row.time);
         } catch (error) {
             console.error(`Failed to fetch translation: ${error}`);
             throw error;

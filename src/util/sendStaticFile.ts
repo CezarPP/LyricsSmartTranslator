@@ -24,9 +24,7 @@ export const sendStaticFile = async (req: IncomingMessage, res: ServerResponse) 
     };
 
     let filePath: string = '';
-    console.log("URL is to serve is" + url);
     if (url === '/') {
-        console.log("Serving index.html");
         filePath = join(__dirname, '../public', '/index.html');
         ext = '.html';
     } else if (ext === '.html' || ext == '.xml' || ext == '.json') {
@@ -36,9 +34,7 @@ export const sendStaticFile = async (req: IncomingMessage, res: ServerResponse) 
     } else if (url.startsWith('/song-page/')) {
         filePath = join(__dirname, '../public/assets/pages/song-page.html');
         ext = '.html';
-        console.log("Got path to song page " + filePath);
     }
-    console.log('Filepath is ' + filePath);
 
     const contentType: string = mimeTypes[ext] || 'application/octet-stream';
     fs.readFile(filePath, (error, content: Buffer): void => {
