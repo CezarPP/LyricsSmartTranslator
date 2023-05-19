@@ -30,7 +30,7 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     let songsController = new SongsController();
 
     if (method === 'GET' && url.startsWith("/css") ||
-        url.startsWith("/js") || url === '/') {
+        url.startsWith("/js") || url === '/' && url.startsWith('/img/')) {
         // for main page, css, js
         sendStaticFile(req, res)
             .then()
