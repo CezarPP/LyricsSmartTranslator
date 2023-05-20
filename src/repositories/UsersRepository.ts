@@ -1,5 +1,3 @@
-
-
 import { Pool } from 'pg';
 import { User } from '../models/User';
 
@@ -43,6 +41,17 @@ export class UsersRepository {
         const row = result.rows[0];
         return new User(row.id, row.img_id, row.username, row.password);
     }
+    async getAllUsers(): Promise<User[] | null> {
+        const query = 'SELECT * FROM Users';
+        const result = await this.db.query(query);
+        if (result.rows.length === 0) {
+            return null;
+        }
+        const users: User[] = result.rows.map((row: any) => {
+            return new User(row.id, row.img_id, row.username, row.password);
+        });
+        return users;
+    }
 
     async getUserById(id: number): Promise<User | null>{
         const query = 'SELECT * FROM Users WHERE id = $1';
@@ -67,6 +76,26 @@ export class UsersRepository {
             throw error;
         }
     }
+    async updateUser(id: number, newUsername: string, newPassword: string, newImg_id: number): Promise<boolean> {
+        const query = 'UPDATE Users SET username = $1, password = $2, img_id = $3 WHERE id = $4';
+        const values = [newUsername, newPassword, newImg_id, id];
+        try {
+            const result = await this.db.query(query, values);
+            return result.rowCount > 0; // Returns true if at least one row was affected
+        } catch (error) {
+            console.error(`Failed to update user in the database: ${error}`);
+            throw error;
+        }
+    }
+    async deleteUser(id: number): Promise<boolean> {
+        const query = 'DELETE FROM Users WHERE id = $1';
+        const values = [id];
+        try {
+            const result = await this.db.query(query, values);
+            return result.rowCount > 0; // Returns true if at least one row was affected
+        } catch (error) {
+            console.error(`Failed to delete user from the database: ${error}`);
+            throw error;
+        }
+    }
 }
-
-

@@ -16,11 +16,52 @@ export class UsersController {
         this.usersRepository = new UsersRepository;
     }
 
-
     async handleApiRequest(req: IncomingMessage, res: ServerResponse){
-        if(req.method === 'POST'){
-
+        if(!req.url){
+            return; // nu are cum sa intre aici niciodata
         }
+        console.log(req.url);
+        const parsedURL = req.url.split('/');
+        console.log(parsedURL);
+        console.log(parsedURL.length);
+        if(req.method === 'POST'){
+            if(parsedURL.length === 4) {
+                if (parsedURL[3] === 'login') {
+                    await this.loginUser(req, res);
+                    return;
+                }
+                else if (parsedURL[3] === 'logout') {
+                    await this.logoutUser(req, res);
+                    return;
+                }
+                else if (parsedURL[3] === 'register') {
+                    await this.registerUser(req, res);
+                    return;
+                }
+            }
+        } else if(req.method === 'GET'){
+            if(parsedURL.length === 3) {
+                await this.getUsersStats(req, res);
+                return;
+            }
+            else if(parsedURL.length === 4) {
+                await this.getUserStats(req, res, parsedURL[3]);
+                return;
+            }
+        } else if(req.method === 'PUT'){
+            if(parsedURL.length === 4) {
+                await this.updateUserProfile(req, res, parsedURL[3]);
+                return;
+            }
+        } else if(req.method === 'DELETE'){
+            if(parsedURL.length === 4) {
+                await this.deleteUser(req, res, parsedURL[3]);
+                return;
+            }
+        }
+        res.writeHead(404, {'Content-Type': 'application/json'});
+        res.write(JSON.stringify({message: 'Resource not found'}));
+        res.end();
     }
     async loginUser(req: IncomingMessage, res: ServerResponse) {
         try {
@@ -56,13 +97,11 @@ export class UsersController {
             res.end(JSON.stringify({message: 'Internal Server Error'}));
         }
     }
-
     async logoutUser(req: IncomingMessage, res: ServerResponse) {
         res.setHeader('Set-Cookie', 'jwt=; HttpOnly; SameSite=Strict; Max-Age=0');
         res.writeHead(200, {'Content-Type': 'application/json'});
         res.end(JSON.stringify({message: 'Logout successful'}));
     }
-
     async registerUser(req: IncomingMessage, res: ServerResponse) {
         try {
             let body = '';
@@ -81,7 +120,6 @@ export class UsersController {
                     return;
                 }
 
-                // trebuie salvat in database
                 const existingUser = await this.usersRepository.getUserByName(username);
                 if (existingUser) {
                     res.writeHead(400, {'Content-Type': 'application/json'});
@@ -102,13 +140,141 @@ export class UsersController {
             res.end();
         }
     }
-
-    async getLoggedUser(req: IncomingMessage, res: ServerResponse) {
-        const userId = this.authenticateUser(req, res);
-        const user = await this.usersRepository.getUserById(userId);
-        return user;
+    async getUserStats(req: IncomingMessage, res: ServerResponse, username:String) {
+        try {
+            const user = await this.usersRepository.getUserByName(username);
+            if (user === null) {
+                res.writeHead(404, {'Content-Type': 'application/json'});
+                res.write(JSON.stringify({message: 'User not found'}));
+                res.end();
+            } else {
+                const translationsCount = 0;
+                const annotationsCount = 0;
+                const commentsCount = 0;
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.write(JSON.stringify({
+                    username: user.username,
+                    img_id: user.img_id,
+                    translationsCount,
+                    annotationsCount,
+                    commentsCount
+                }));
+            }
+            res.end();
+        } catch (error) {
+            res.writeHead(500, {'Content-Type': 'application/json'});
+            res.write(JSON.stringify({message: 'Internal Server Error'}));
+            res.end();
+        }
     }
+    async getUsersStats(req: IncomingMessage, res: ServerResponse){
+        try {
+            let users: User[] | null = null;
+            users = await this.usersRepository.getAllUsers();
+            if (users === null) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.write(JSON.stringify({ message: 'User not found' }));
+                res.end();
+            } else {
+                const usersData = users.map((user) => ({
+                    username: user.username,
+                    img_id: user.img_id,
+                    translationsCount: 0,
+                    annotationsCount: 0,
+                    commentsCount: 0,
+                }));
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.write(JSON.stringify(usersData));
+                res.end();
+            }
+        } catch (error) {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.write(JSON.stringify({ message: 'Internal Server Error' }));
+            res.end();
+        }
+    }
+    async updateUserProfile(req: IncomingMessage, res: ServerResponse, username:String){
+        try {
 
+            let body = '';
+            req.on('data', chunk => {
+                body += chunk.toString();
+            });
+
+            req.on('end', async () => {
+                console.log(body);
+                const {newUsername, newImg_id, newPassword} = JSON.parse(body);
+                const user = await this.usersRepository.getUserByName(username);
+                if (user === null) {
+                    res.writeHead(404, {'Content-Type': 'application/json'});
+                    res.write(JSON.stringify({message: 'User not found'}));
+                    res.end();
+                } else {
+                    const loggedUser = await this.getLoggedUser(req, res);
+                    if(loggedUser === null){
+                        res.writeHead(401, {'Content-Type': 'application/json'});
+                        res.end(JSON.stringify({message: 'Unauthorized'}));
+                    } else if(loggedUser.id === 1 || loggedUser.id === user.id){
+                        const oldUser = await this.usersRepository.getUserByName(newUsername);
+                        if(oldUser !== null) {
+                            res.writeHead(401, {'Content-Type': 'application/json'});
+                            res.end(JSON.stringify({message: 'User with this username already exists'}));
+                        } else {
+                            const status = await this.usersRepository.updateUser(user.id, newUsername, newPassword, newImg_id);
+                            if(status){
+                                res.writeHead(200, {'Content-Type': 'application/json'});
+                                res.end(JSON.stringify({message: 'User successfully updated'}));
+                            }
+                            else{
+                                res.writeHead(500, {'Content-Type': 'application/json'});
+                                res.write(JSON.stringify({message: 'Failed to update user'}));
+                            }
+                        }
+                    } else{
+                        res.writeHead(401, {'Content-Type': 'application/json'});
+                        res.end(JSON.stringify({message: 'Unauthorized'}));
+                    }
+                }
+            });
+        } catch (error) {
+            res.writeHead(500, {'Content-Type': 'application/json'});
+            res.end(JSON.stringify({message: 'Internal Server Error'}));
+        }
+    }
+    async deleteUser(req: IncomingMessage, res: ServerResponse, username: String) {
+        try{
+            const user = await this.usersRepository.getUserByName(username);
+            if (user === null) {
+                res.writeHead(404, {'Content-Type': 'application/json'});
+                res.write(JSON.stringify({message: 'User not found'}));
+                res.end();
+            } else {
+                const loggedUser = await this.getLoggedUser(req, res);
+                if(loggedUser === null){
+                    res.writeHead(401, {'Content-Type': 'application/json'});
+                    res.end(JSON.stringify({message: 'Unauthorized'}));
+                } else if(loggedUser.id === 1 || loggedUser.id === user.id){
+                    const status = await this.usersRepository.deleteUser(user.id);
+                    if(status){
+                        res.writeHead(200, {'Content-Type': 'application/json'});
+                        res.end(JSON.stringify({message: 'User successfully deleted'}));
+                    }
+                    else{
+                        res.writeHead(500, {'Content-Type': 'application/json'});
+                        res.write(JSON.stringify({message: 'Failed to delete user'}));
+                    }
+                } else{
+                    res.writeHead(401, {'Content-Type': 'application/json'});
+                    res.end(JSON.stringify({message: 'Unauthorized'}));
+                }
+            }
+            res.end();
+        } catch (error) {
+            res.writeHead(500, {'Content-Type': 'application/json'});
+            res.write(JSON.stringify({message: 'Internal Server Error'}));
+            res.end();
+        }
+    }
     async getUserPage(req: IncomingMessage, res: ServerResponse) {
         try {
             console.log(req.url);
@@ -144,36 +310,11 @@ export class UsersController {
         }
     }
 
-    async getUserStats(req: IncomingMessage, res: ServerResponse) {
-        try {
-            const user = await this.getLoggedUser(req, res);
-            if (user === null) {
-                res.writeHead(404, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify({message: 'User not found'}));
-                res.end();
-            } else {
-                const translationsCount = 0;
-                const annotationsCount = 0;
-                const commentsCount = 0;
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify({
-                    message: 'User profile',
-                    username: user.username,
-                    password: user.password,
-                    img_id: user.img_id,
-                    translationsCount,
-                    annotationsCount,
-                    commentsCount
-                }));
-            }
-            res.end();
-        } catch (error) {
-            res.writeHead(500, {'Content-Type': 'application/json'});
-            res.write(JSON.stringify({message: 'Internal Server Error'}));
-            res.end();
-        }
+    async getLoggedUser(req: IncomingMessage, res: ServerResponse) {
+        const userId = this.authenticateUser(req, res);
+        const user = await this.usersRepository.getUserById(userId);
+        return user;
     }
-
     authenticateUser(req: IncomingMessage, res: ServerResponse): number {
         const cookies = req.headers.cookie;
         console.log(cookies);

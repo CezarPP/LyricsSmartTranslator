@@ -58,8 +58,6 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         userController.logoutUser(req, res);
     } else if (method == 'GET' && url && url === '/profile') {
         userController.getUserPage(req, res);
-    } else if (method == 'GET' && url && url === '/stats') {
-        userController.getUserStats(req, res);
     } else if (method == 'GET') {
         sendStaticFile(req, res)
             .then()
