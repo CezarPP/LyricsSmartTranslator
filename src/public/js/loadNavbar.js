@@ -4,7 +4,7 @@ async function loadNavbar() {
         document.getElementById('navbar-container').innerHTML = await response.text();
 
         const loginButton = document.getElementById('loginButton');
-        const userStatus = await fetch('/stats', { method: 'GET' });
+        const userStatus = await fetch('/api/me', { method: 'GET' });
 
         if (userStatus.ok) {
             const data = await userStatus.json(); // Await the JSON data

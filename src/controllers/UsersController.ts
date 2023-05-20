@@ -83,7 +83,7 @@ export class UsersController {
                     } else {
                         const token = jwt.sign({userId: user.id}, secretKey, {expiresIn: '20d'});
 
-                        res.setHeader('Set-Cookie', `jwt=${token}; HttpOnly; SameSite=Strict`);
+                        res.setHeader('Set-Cookie', `jwt=${token}; Path=/; HttpOnly; SameSite=Strict`);
                         res.writeHead(200, {'Content-Type': 'application/json'});
                         res.end(JSON.stringify({token, message: 'Login successful'}));
                     }
@@ -309,7 +309,24 @@ export class UsersController {
             res.end();
         }
     }
-
+    async getLoggedUserUsername(req:IncomingMessage, res: ServerResponse){
+        try {
+            const user = await this.getLoggedUser(req, res);
+            if (user === null){
+                res.writeHead(404, {'Content-Type': 'application/json'});
+                res.write(JSON.stringify({message:'No user is logged in'}));
+                res.end();
+            } else{
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.write(JSON.stringify({ username: user.username}));
+                res.end();
+            }
+        } catch (error) {
+            res.writeHead(500, {'Content-Type': 'application/json'});
+            res.write(JSON.stringify({message: 'Internal Server Error'}));
+            res.end();
+        }
+    }
     async getLoggedUser(req: IncomingMessage, res: ServerResponse) {
         const userId = this.authenticateUser(req, res);
         const user = await this.usersRepository.getUserById(userId);
