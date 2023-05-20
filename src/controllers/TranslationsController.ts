@@ -2,7 +2,6 @@ import {SongsRepository} from "../repositories/SongsRepository";
 import {TranslationsRepository} from "../repositories/TranslationsRepository";
 import {IncomingMessage, ServerResponse} from "http";
 import * as formidable from "formidable";
-import {Song} from "../models/Song";
 import {Translation} from "../models/Translation";
 
 export class TranslationsController {
@@ -12,6 +11,38 @@ export class TranslationsController {
     constructor() {
         this.songRepository = new SongsRepository();
         this.translationRepository = new TranslationsRepository();
+    }
+
+    async handleApiRequest(req: IncomingMessage, res: ServerResponse) {
+        if (req.method == 'GET') {
+            await this.handleGetTranslation(req, res);
+        } else if (req.method == 'POST') {
+            await this.handleTranslationSubmit(req, res);
+        } else if (req.method == 'PUT') {
+
+        } else if (req.method == 'DELETE') {
+
+        } else {
+            res.statusCode = 404;
+            res.end('Method not found');
+        }
+    }
+
+    async handleGetTranslation(req: IncomingMessage, res: ServerResponse) {
+        if (!req.url) {
+            res.statusCode = 500;
+            res.end('Invalid url');
+            return;
+        }
+        const translationId = parseInt(req.url.split('/')[3]);
+        const translation: Translation | null = await this.translationRepository.getTranslationById(translationId);
+        if (translation === null) {
+            res.statusCode = 404;
+            res.end('No translation found');
+            return;
+        }
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(translation.toObject()));
     }
 
     async handleTranslationSubmit(req: IncomingMessage, res: ServerResponse) {
