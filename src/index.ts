@@ -29,7 +29,11 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     let userController = new UsersController();
     let songsController = new SongsController();
 
-    if (method === 'GET' && url.startsWith("/css") ||
+    if (url.startsWith('/api/song')) {
+        songsController
+            .handleApiRequest(req, res)
+            .then();
+    } else if (method === 'GET' && url.startsWith("/css") ||
         url.startsWith("/js") || url === '/' && url.startsWith('/img/')) {
         // for main page, css, js
         sendStaticFile(req, res)
@@ -49,7 +53,7 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         userController.getUserStats(req, res);
     } else if (method == 'POST' && url && url.startsWith('/get-song-data/')) {
         console.log("Handling get song");
-        songsController.handleGetSong(req, res)
+        songsController.handleGetSongOld(req, res)
             .then(() => console.log("Handled get song"));
     } else if (method == 'GET') {
         sendStaticFile(req, res)
