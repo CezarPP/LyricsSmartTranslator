@@ -9,4 +9,12 @@ export class Comment{
         this.translationId = translationId;
         this.content = content;
     }
+    toObject() {
+        return {
+            id: this.id,
+            userId: this.userId,
+            translationId: this.translationId,
+            content: this.content
+        };
+    }
 }

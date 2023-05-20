@@ -14,4 +14,15 @@ export class Song {
         this.title = title;
         this.link = link;
     }
+
+    toObject() {
+        return {
+            id: this.id,
+            primary_translation: this.primary_translation,
+            imageId: this.imageId,
+            artist: this.artist,
+            title: this.title,
+            link: this.link
+        };
+    }
 }

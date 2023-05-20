@@ -22,4 +22,18 @@ export class Translation {
         this.no_likes = no_likes;
         this.time = time;
     }
+
+    toObject() {
+        return {
+            id: this.id,
+            songId: this.songId,
+            userId: this.userId,
+            language: this.language,
+            description: this.description,
+            lyrics: this.lyrics,
+            no_views: this.no_views,
+            no_likes: this.no_likes,
+            time: this.time
+        }
+    }
 }
