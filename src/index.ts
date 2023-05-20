@@ -25,12 +25,17 @@ const http = require('http');
 const server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
     const url = req.url as string;
     const method = req.method;
-    let imagesController = new ImagesController();
-    let userController = new UsersController();
-    let songsController = new SongsController();
+    const imagesController = new ImagesController();
+    const userController = new UsersController();
+    const songsController = new SongsController();
+    const translationsController = new TranslationsController();
 
     if (url.startsWith('/api/song')) {
         songsController
+            .handleApiRequest(req, res)
+            .then();
+    } else if(url.startsWith('/api/translation')) {
+        translationsController
             .handleApiRequest(req, res)
             .then();
     } else if(url.startsWith('api/user')){
@@ -55,24 +60,12 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         userController.getUserPage(req, res);
     } else if (method == 'GET' && url && url === '/stats') {
         userController.getUserStats(req, res);
-    } else if (method == 'POST' && url && url.startsWith('/get-song-data/')) {
-        console.log("Handling get song");
-        songsController.handleGetSongOld(req, res)
-            .then(() => console.log("Handled get song"));
     } else if (method == 'GET') {
         sendStaticFile(req, res)
             .then()
             .catch(() => console.log("Error sending static file"));
         // res.writeHead(404, {'Content-Type': 'text/plain'});
         // res.end('Not Found');
-    } else if (method == 'POST' && url == "/submit-song.html") {
-        console.log("Submitting song");
-        const songsController = new SongsController();
-        songsController.handleSongSubmit(req, res).then(() => console.log("Songs controller added song"));
-    } else if (method == 'POST' && url == '/submit-translation.html') {
-        console.log("Submitting translation");
-        const translationController = new TranslationsController();
-        translationController.handleTranslationSubmit(req, res).then(() => console.log("Translation controller added song"))
     }
 });
 
