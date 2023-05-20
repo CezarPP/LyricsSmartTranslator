@@ -1,10 +1,10 @@
-import * as formidable from "formidable";
 import {SongsRepository} from "../repositories/SongsRepository";
 import {TranslationsRepository} from "../repositories/TranslationsRepository";
 import {Translation} from "../models/Translation";
 import {Song} from "../models/Song";
 import {IncomingMessage, ServerResponse} from "http";
 import {ImagesRepository} from "../repositories/ImagesRepository";
+import assert from "assert";
 
 export class SongsController {
     private songRepository: SongsRepository;
@@ -17,29 +17,51 @@ export class SongsController {
         this.imagesRepository = new ImagesRepository();
     }
 
-    async handleSongSubmit(req: IncomingMessage, res: ServerResponse) {
-        const form = new formidable.IncomingForm();
-        form.parse(req, async (err, fields, files) => {
-            if (err) {
-                console.error('Error parsing form data:', err);
-                res.statusCode = 500;
-                res.end('Server error');
-                return;
+    async handleApiRequest(req: IncomingMessage, res: ServerResponse) {
+        if (req.method == 'GET') {
+            assert(req.url);
+            if (req.url.split('/').length > 3) {
+                await this.handleGetById(req, res);
+            } else {
+                await this.handleGetAll(req, res);
             }
+        } else if (req.method == 'POST') {
+            await this.handlePost(req, res);
+        } else if (req.method == 'PUT') {
 
-            console.log('Received form data:', fields);
+        } else if (req.method == 'DELETE') {
 
-            const title = fields['title'] as string;
-            console.log("Server the title of the song is " + title);
-            const author = fields['author'] as string;
-            console.log("Server the author of the song is " + author);
-            const lyrics = fields['lyrics'] as string;
-            const description = fields['description'] as string;
-            const link = fields['youtube-link'] as string;
-            const imageId = parseInt(fields['image-id'] as string, 10);
+        } else {
+            res.statusCode = 404;
+            res.end(`Method not found for path ${req.url}`);
+        }
+    }
+
+    async handlePost(req: IncomingMessage, res: ServerResponse) {
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+
+        req.on('end', async () => {
+            console.log("Got all data");
+
+            const postData = JSON.parse(body);
+            const title = postData.title as string;
+            const author = postData.author as string;
+            const lyrics = postData.lyrics as string;
+            const description = postData.description as string;
+            let link = postData['youtube-link'] as string;
+            const imageId = postData.imageId as number;
+
+            console.log("Got all vars");
+
+            // in case the url is like this
+            link.replace('/watch?v=', '/embed/');
 
             const song = new Song(0, 0, imageId, author, title, link);
             console.log("Preparing song to add to repo with title " + song.title);
+
             const songId = await this.songRepository.addSongNoFk(song);
             console.log("Added song to repo with id " + songId);
             /// TODO(add userID)
@@ -52,16 +74,45 @@ export class SongsController {
 
             await this.songRepository.updatePrimaryTranslation(songId, translationId);
 
-            console.log("Updated primary translation");
-
             console.log("Song added successfully");
 
             res.statusCode = 200;
-            res.end('Song added successfully!');
+            const data = {
+                message: 'Song added successfully!',
+                songId: songId,
+                translationId: translationId
+            }
+            res.end(JSON.stringify(data));
         });
     }
 
-    async handleGetSong(req: IncomingMessage, res: ServerResponse) {
+    async handleGetById(req: IncomingMessage, res: ServerResponse) {
+        if (!req.url) {
+            res.statusCode = 500;
+            res.end('Server error');
+            return;
+        }
+        const songId: number = parseInt(req.url.split('/')[3]);
+        console.log('Song id is ' + songId);
+
+        const song: Song | null = await this.songRepository.getSongById(songId);
+        if (song == null) {
+            res.statusCode = 404;
+            res.end('Song not found');
+            return;
+        }
+
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(song.toObject()));
+    }
+
+    async handleGetAll(req: IncomingMessage, res: ServerResponse) {
+        const allSongs: Song[] = await this.songRepository.getAllSongs();
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(allSongs));
+    }
+
+    async handleGetSongOld(req: IncomingMessage, res: ServerResponse) {
         if (!req.url) {
             res.statusCode = 500;
             res.end('Server error');
@@ -77,7 +128,6 @@ export class SongsController {
             res.end('Translation not found');
             return;
         }
-        console.log("Description is " + translation.lyrics);
 
         const song = await this.songRepository.getSongById(translation.songId);
         if (song === null) {
