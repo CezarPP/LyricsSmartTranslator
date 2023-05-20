@@ -33,6 +33,10 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         songsController
             .handleApiRequest(req, res)
             .then();
+    } else if(url.startsWith('api/user')){
+        userController
+            .handleApiRequest(req, res)
+            .then();
     } else if (method === 'GET' && url.startsWith("/css") ||
         url.startsWith("/js") || url === '/' && url.startsWith('/img/')) {
         // for main page, css, js
