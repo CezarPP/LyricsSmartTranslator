@@ -1,18 +1,3 @@
-/*import http from 'http';
-
-const port: number = 3000;
-
-const index: http.Server = http.createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('Hello World\n');
-});
-
-index.listen(port, () => {
-    console.log(`Server running`);
-});
-*/
-
 import {IncomingMessage, ServerResponse} from "http";
 import {ImagesController} from './controllers/ImagesController';
 import {sendStaticFile} from "./util/sendStaticFile";
@@ -38,7 +23,7 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         translationsController
             .handleApiRequest(req, res)
             .then();
-    } else if(url.startsWith('api/user')){
+    } else if(url.startsWith('/api/user')){
         userController
             .handleApiRequest(req, res)
             .then();
