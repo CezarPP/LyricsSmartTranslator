@@ -67,7 +67,7 @@ export class SongsController {
             /// TODO(add userID)
             const userId = 1;
             const translation = new Translation(0, songId, userId,
-                'english', description, lyrics, 0, 0, new Date());
+                'english', description, lyrics, 0, new Date());
             console.log("Preparing to add translation to repo");
             const translationId = await this.translationRepository.addTranslation(translation);
             console.log("Added translation to repo with id " + translationId);
@@ -110,51 +110,5 @@ export class SongsController {
         const allSongs: Song[] = await this.songRepository.getAllSongs();
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(allSongs));
-    }
-
-    async handleGetSongOld(req: IncomingMessage, res: ServerResponse) {
-        if (!req.url) {
-            res.statusCode = 500;
-            res.end('Server error');
-            return;
-        }
-        const translationId: number = parseInt(req.url.split('/')[2]);
-
-        console.log("Translation id is " + translationId);
-
-        const translation = await this.translationRepository.getTranslationById(translationId);
-        if (translation === null) {
-            res.statusCode = 404;
-            res.end('Translation not found');
-            return;
-        }
-
-        const song = await this.songRepository.getSongById(translation.songId);
-        if (song === null) {
-            res.statusCode = 405;
-            res.end('Song not found');
-            return;
-        }
-
-        const image = await this.imagesRepository.getImageById(song.imageId);
-        if (image == null) {
-            res.statusCode = 406;
-            res.end('Image not found');
-            return;
-        }
-
-        const data = {
-            title: song.title,
-            lyrics: translation.lyrics,
-            description: translation.description,
-            no_likes: translation.no_likes,
-            no_comments: 0,
-            no_views: translation.no_views,
-            imageLink: image.link,
-            songLink: song.link
-        };
-
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify(data));
     }
 }

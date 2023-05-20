@@ -85,7 +85,7 @@ export class TranslationsController {
             const userId = 1;
 
             translation = new Translation(0, songId, userId,
-                language, description, lyrics, 0, 0, new Date());
+                language, description, lyrics, 0, new Date());
 
             console.log("Preparing to add translation to repo");
             const translationId = await this.translationRepository.addTranslation(translation);

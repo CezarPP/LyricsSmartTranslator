@@ -122,3 +122,6 @@ ALTER TABLE images
 
 ALTER TABLE images
     DROP COLUMN img;
+
+ALTER TABLE translations
+    DROP COLUMN no_likes;

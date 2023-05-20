@@ -6,12 +6,11 @@ export class Translation {
     description: string;
     lyrics: string;
     no_views: number;
-    no_likes: number;
     time: Date;
 
-    constructor(id: number, songId: number, userId: number, language: string,
-                description: string, lyrics: string, no_views: number,
-                no_likes: number, time: Date) {
+    constructor(id: number, songId: number, userId: number,
+                language: string, description: string,
+                lyrics: string, no_views: number, time: Date) {
         this.id = id;
         this.songId = songId;
         this.userId = userId;
@@ -19,7 +18,6 @@ export class Translation {
         this.description = description;
         this.lyrics = lyrics;
         this.no_views = no_views;
-        this.no_likes = no_likes;
         this.time = time;
     }
 
@@ -32,7 +30,6 @@ export class Translation {
             description: this.description,
             lyrics: this.lyrics,
             no_views: this.no_views,
-            no_likes: this.no_likes,
             time: this.time
         }
     }

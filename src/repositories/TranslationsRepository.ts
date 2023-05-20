@@ -19,10 +19,10 @@ export class TranslationsRepository {
 
     async addTranslation(translation: Translation): Promise<number> {
         const query =
-            'INSERT INTO translations(song_id, user_id, description, lyrics, no_views, no_likes, time, language) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id';
+            'INSERT INTO translations(song_id, user_id, description, lyrics, no_views, time, language) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id';
         const values = [
             translation.songId, translation.userId, translation.description,
-            translation.lyrics, translation.no_views, translation.no_likes,
+            translation.lyrics, translation.no_views,
             translation.time, translation.language
         ];
 
@@ -47,8 +47,8 @@ export class TranslationsRepository {
 
             const row = result.rows[0];
             return new Translation(row.id, row.song_id, row.user_id,
-                row.language, row.description, row.lyrics, row.no_views, row.no_likes,
-                row.time);
+                row.language, row.description, row.lyrics,
+                row.no_views, row.time);
         } catch (error) {
             console.error(`Failed to fetch translation: ${error}`);
             throw error;
@@ -73,7 +73,7 @@ export class TranslationsRepository {
             return new Translation(
                 row.id, row.song_id, row.user_id,
                 row.description, row.lyrics, row.no_views,
-                row.no_likes, row.time, row.language);
+                row.time, row.language);
         } catch (error) {
             console.error(`Failed to fetch translation: ${error}`);
             throw error;
