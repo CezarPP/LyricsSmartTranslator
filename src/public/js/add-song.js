@@ -6,6 +6,12 @@ document
 
         const formData = new FormData(event.target);
 
+        // Convert formData to a regular object
+        let formObject = {};
+        formData.forEach((value, key) => formObject[key] = value);
+
+        delete formObject['cover-photo'];
+
         const imageFile = document.getElementById('cover-photo');
 
         const reader = new FileReader();
@@ -13,6 +19,7 @@ document
         reader.onloadend = function () {
             const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
 
+            // Send the image tot the server
             fetch('/image', {
                 method: 'POST',
                 headers: {
@@ -22,24 +29,26 @@ document
             })
                 .then(response => response.json())
                 .then(data => {
-                    console.log("Got image id " + data.id);
-                    formData.append('image-id', data.id);
+                    // Get the image id back from the server
+                    formObject['imageId'] = data.id;
                     // Send the rest of the form data to the server
-                    console.log("Submitting to submit-song");
-                    return fetch('/submit-song.html', {
+                    return fetch('/api/song', {
                         method: 'POST',
-                        body: formData
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formObject)
                     });
                 })
                 .then(response => {
-                    console.log("Add response from server");
-                    // Handle the response from the server
+                    // Redirect the user to a success page
                     if (response.ok) {
                         window.location.href = "/submit-song.html";
                     } else {
                         alert('Failed to add song');
                     }
-                }).catch(error => console.error(error));
+                })
+                .catch(error => console.error(error));
         }
 
         reader.readAsDataURL(imageFile.files[0]);

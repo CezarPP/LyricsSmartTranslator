@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="/css/addSong.css">
     <script src="/js/loadNavbar.js" defer></script>
     <script src="/js/loadFooter.js" defer></script>
-    <script src="/js/addSong.js" defer></script>
+    <script src="/js/add-song.js" defer></script>
 </head>
 <body>
 <header id="navbar-container"></header>
@@ -17,7 +17,7 @@
 <article>
     <div class="add-song-container">
         <h2>Add Song</h2>
-        <form action="submit-song.html" method="post" enctype="multipart/form-data">
+        <form action="/api/song" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="title">Title</label>
                 <input type="text" id="title" name="title" required>

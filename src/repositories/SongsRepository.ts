@@ -88,7 +88,7 @@ export class SongsRepository {
         }
     }
 
-    async getAllSongs(): Promise<string[]> {
+    async getAllSongTitles(): Promise<string[]> {
         const query = 'SELECT * FROM songs';
 
         try {
@@ -96,6 +96,22 @@ export class SongsRepository {
             let songs: string[] = [];
             for (let i = 0; i < result.rows.length; i++)
                 songs.push(result.rows[i].title);
+            return songs;
+        } catch (error) {
+            console.error(`Failed to fetch song: ${error}`);
+            throw error;
+        }
+    }
+
+    async getAllSongs(): Promise<Song[]> {
+        const query = 'SELECT * FROM songs';
+        try {
+            const result = await this.db.query(query);
+            let songs: Song[] = [];
+            for (let i = 0; i < result.rows.length; i++) {
+                const song = result.rows[i];
+                songs.push(new Song(song.id, song.primary_translation, song.image_id, song.artist, song.title, song.link));
+            }
             return songs;
         } catch (error) {
             console.error(`Failed to fetch song: ${error}`);
