@@ -18,12 +18,9 @@ export class UsersController {
 
 
     async handleApiRequest(req: IncomingMessage, res: ServerResponse){
-
         if(req.method === 'POST'){
 
-        } else if(req.method === 'GET'){
-
-        } else if(req.method === '')
+        }
     }
     async loginUser(req: IncomingMessage, res: ServerResponse) {
         try {
