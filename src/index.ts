@@ -27,6 +27,11 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         userController
             .handleApiRequest(req, res)
             .then();
+    } else if(method === 'GET' && url && url ==='/api/me'){
+        console.log("o ia?");
+        userController
+            .getLoggedUserUsername(req, res)
+            .then();
     } else if (method === 'GET' && url.startsWith("/css") ||
         url.startsWith("/js") || url === '/' && url.startsWith('/img/')) {
         // for main page, css, js

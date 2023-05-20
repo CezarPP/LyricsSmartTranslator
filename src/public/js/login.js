@@ -17,7 +17,7 @@ document.querySelector('.login-container form').addEventListener('submit', funct
     console.log(jsonData.password);
 
     // Send the form data as JSON to the server
-    fetch('/login', {
+    fetch('/api/user/login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -53,7 +53,7 @@ document
         };
 
         // Send the form data as JSON to the server
-        fetch('/register', {
+        fetch('/api/user/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
