@@ -1,6 +1,7 @@
 import fs from "fs";
 import {extname, join} from "path";
 import {IncomingMessage, ServerResponse} from "http";
+import {sendFile} from "./sendFile";
 
 export const sendStaticFile = async (req: IncomingMessage, res: ServerResponse) => {
     // TODO(sanitize URL)
@@ -25,35 +26,19 @@ export const sendStaticFile = async (req: IncomingMessage, res: ServerResponse) 
 
     let filePath: string = '';
     if (url === '/') {
-        filePath = join(__dirname, '../public', '/index.html');
+        filePath = join('../public', '/index.html');
         ext = '.html';
     } else if (ext === '.html' || ext == '.xml' || ext == '.json') {
-        filePath = join(__dirname, '../public/assets/pages', url);
+        filePath = join('../public/assets/pages', url);
     } else if (ext === '.css' || ext === '.js') {
-        filePath = join(__dirname, '../public', url);
+        filePath = join('../public', url);
     } else if (url.startsWith('/song-page/')) {
-        filePath = join(__dirname, '../public/assets/pages/song-page.html');
+        filePath = '../public/assets/pages/song-page.html';
         ext = '.html';
-    } else if(url.startsWith('/img/') && ext === '.svg') {
-        filePath = join(__dirname, '../public/assets' + url);
+    } else if (url.startsWith('/img/') && ext === '.svg') {
+        filePath = join('../public/assets' + url);
     }
 
     const contentType: string = mimeTypes[ext] || 'application/octet-stream';
-    fs.readFile(filePath, (error, content: Buffer): void => {
-        if (error) {
-            if (error.code == 'ENOENT') {
-                fs.readFile('./404.html', (error, content: Buffer) => {
-                    res.writeHead(404, {'Content-Type': 'text/html'});
-                    res.end(content, 'utf-8');
-                });
-            } else {
-                res.writeHead(500);
-                res.end(`Sorry, check with the site admin for error: ${error.code} ..\n`);
-            }
-        } else {
-            res.writeHead(200, {'Content-Type': contentType});
-            res.end(content, 'utf-8');
-        }
-    });
-
+    await sendFile(req, res, filePath, contentType);
 }

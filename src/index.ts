@@ -4,6 +4,7 @@ import {sendStaticFile} from "./util/sendStaticFile";
 import {UsersController} from "./controllers/UsersController";
 import {SongsController} from "./controllers/SongsController";
 import {TranslationsController} from "./controllers/TranslationsController";
+import {sendFile} from "./util/sendFile";
 
 const http = require('http');
 
@@ -39,9 +40,15 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     } else if (method === 'GET' && url.startsWith("/css") ||
         url.startsWith("/js") || url === '/' && url.startsWith('/img/')) {
         // for main page, css, js
+        console.log("Request for " + url);
         sendStaticFile(req, res)
             .then()
             .catch(() => console.log("Error sending static file"));
+    } else if (method == 'GET' && url.startsWith('/add-translation/')) {
+        console.log("sending add");
+        sendFile(req, res,
+            '../public/assets/pages/add-translation.html', 'text/html')
+            .then();
     } else if (method == 'POST' && url == '/login') {
         userController.loginUser(req, res);
     } else if (method == 'POST' && url == '/register') {
