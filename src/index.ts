@@ -19,15 +19,19 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         songsController
             .handleApiRequest(req, res)
             .then();
-    } else if(url.startsWith('/api/translation')) {
+    } else if (url.startsWith('/api/translation')) {
         translationsController
             .handleApiRequest(req, res)
             .then();
-    } else if(url.startsWith('/api/user')){
+    } else if (url.startsWith('/api/user')) {
         userController
             .handleApiRequest(req, res)
             .then();
-    } else if(method === 'GET' && url && url ==='/api/me'){
+    } else if (url.startsWith('/api/image')) {
+        imagesController
+            .handleApiRequest(req, res)
+            .then();
+    } else if (method === 'GET' && url && url === '/api/me') {
         console.log("o ia?");
         userController
             .getLoggedUserUsername(req, res)
@@ -38,8 +42,6 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         sendStaticFile(req, res)
             .then()
             .catch(() => console.log("Error sending static file"));
-    } else if (method === 'POST' && url === '/image') {
-        imagesController.addImage(req, res).then(() => console.log("Added image"));
     } else if (method == 'POST' && url == '/login') {
         userController.loginUser(req, res);
     } else if (method == 'POST' && url == '/register') {
