@@ -52,13 +52,12 @@ form.addEventListener("submit", async function (event) {
         body: JSON.stringify(formData)
     })
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            // Redirect the user to a success page
+            if (response.ok) {
+                window.location.href = "/submit-translation.html";
+            } else {
+                alert('Failed to add translation');
             }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Success:', data);
         })
         .catch((error) => {
             console.error('Error:', error);
