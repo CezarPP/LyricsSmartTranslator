@@ -22,6 +22,9 @@ async function getSongFromServer() {
 
 async function loadTranslation(translationData) {
     const songId = translationData.songId;
+    const addTranslationButton = document.getElementById('add-translation-button');
+    addTranslationButton.href = `/add-translation/${songId}`;
+
     const userId = translationData.userId;
     const language = translationData.language;
     const description = translationData.description;
@@ -38,7 +41,7 @@ async function loadTranslation(translationData) {
             return response.json();
         })
         .then(async data => {
-            await setSongElements(data.link, data.imageId, data.author, data.title);
+            await setSongElements(data.link, data.imageId, data.artist, data.title);
         })
         .catch(error => {
             console.error('Error:', error);
@@ -55,9 +58,9 @@ async function setTranslationElements(lyrics, description, no_views, time) {
     document.getElementById('song-date').textContent = time;
 }
 
-async function setSongElements(link, imageId, author, title) {
+async function setSongElements(link, imageId, artist, title) {
     document.getElementById('song-link').src = link;
-    document.getElementById('song-author').textContent = author;
+    document.getElementById('song-author').textContent = artist;
     document.getElementById('song-title').textContent = title;
     document.getElementById('lyrics-song-title').textContent = title;
     await setImage(imageId);

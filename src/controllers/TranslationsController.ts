@@ -1,7 +1,6 @@
 import {SongsRepository} from "../repositories/SongsRepository";
 import {TranslationsRepository} from "../repositories/TranslationsRepository";
 import {IncomingMessage, ServerResponse} from "http";
-import * as formidable from "formidable";
 import {Translation} from "../models/Translation";
 
 export class TranslationsController {
@@ -46,40 +45,30 @@ export class TranslationsController {
     }
 
     async handleTranslationSubmit(req: IncomingMessage, res: ServerResponse) {
-        const form = new formidable.IncomingForm();
-        form.parse(req, async (err, fields, files) => {
-            if (err) {
-                console.error('Error parsing form data:', err);
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+
+        req.on('end', async () => {
+            const postData = JSON.parse(body);
+            const songId = postData.songId;
+            const lyrics = postData.lyrics;
+            const language = postData.language.toLowerCase();
+            const description = postData.description;
+
+            const song = await this.songRepository.getSongById(songId);
+            if (song === null) {
                 res.statusCode = 500;
-                res.end('Server error');
+                res.end('Error: not a valid song');
                 return;
             }
-
-            console.log('Received form data:', fields);
-
-            const title = fields['song'] as string;
-            const author = fields['author'] as string;
-            const description = fields['translated-lyrics'] as string;
-            const lyrics = fields['description'] as string;
-            let language = fields['language'] as string;
-            language = language.toLowerCase();
-
-            const song = await this.songRepository.getSongByName(title);
-            if (song == null) {
-                console.log("Not found song to add translation to");
-                res.statusCode = 500;
-                res.end('Not a valid song');
-                return;
-            }
-            const songId = song.id;
             let translation
-                = await this.translationRepository.getTranslationByNameAndLanguage(title, language);
+                = await this.translationRepository.getTranslationByNameAndLanguage(song.title, language);
             if (translation !== null) {
                 res.statusCode = 500;
                 res.end('There exists a translation in this language for this song');
             }
-
-            console.log("This is a new translation");
 
             /// TODO(add userID)
             const userId = 1;
@@ -90,8 +79,6 @@ export class TranslationsController {
             console.log("Preparing to add translation to repo");
             const translationId = await this.translationRepository.addTranslation(translation);
             console.log("Added translation to repo with id " + translationId);
-
-            console.log("Translation added successfully");
 
             res.statusCode = 200;
             res.end('Translation added successfully!');

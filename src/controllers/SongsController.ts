@@ -48,18 +48,17 @@ export class SongsController {
 
             const postData = JSON.parse(body);
             const title = postData.title as string;
-            const author = postData.author as string;
+            const artist = postData.author as string;
             const lyrics = postData.lyrics as string;
             const description = postData.description as string;
             let link = postData['youtube-link'] as string;
             const imageId = postData.imageId as number;
 
-            console.log("Got all vars");
+            // Link has to be embedded, otherwise it won't load
+            link = link.replace('/watch?v=', '/embed/');
 
-            // in case the url is like this
-            link.replace('/watch?v=', '/embed/');
 
-            const song = new Song(0, 0, imageId, author, title, link);
+            const song = new Song(0, 0, imageId, artist, title, link);
             console.log("Preparing song to add to repo with title " + song.title);
 
             const songId = await this.songRepository.addSongNoFk(song);

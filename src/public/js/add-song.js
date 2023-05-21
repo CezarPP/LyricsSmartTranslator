@@ -20,7 +20,7 @@ document
             const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
 
             // Send the image tot the server
-            fetch('/image', {
+            fetch('/api/image', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

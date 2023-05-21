@@ -35,7 +35,7 @@ export const sendStaticFile = async (req: IncomingMessage, res: ServerResponse) 
     } else if (url.startsWith('/song-page/')) {
         filePath = '../public/assets/pages/song-page.html';
         ext = '.html';
-    } else if (url.startsWith('/img/') && ext === '.svg') {
+    } else if (url.startsWith('/img/')) {
         filePath = join('../public/assets' + url);
     }
 

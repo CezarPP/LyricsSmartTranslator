@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/css/add-translation.css">
     <script src="/js/loadNavbar.js" defer></script>
     <script src="/js/loadFooter.js" defer></script>
+    <script src="/js/add-translation.js" defer></script>
 </head>
 <body>
 <header id="navbar-container"></header>
@@ -16,14 +17,14 @@
 <article>
     <div class="add-translation-container">
         <h2>Add Translation</h2>
-        <form action="submit-translation.html" method="post">
+        <form id="submit-form" action="submit-translation.html" method="post">
             <div class="form-group">
                 <label for="song">Song</label>
-                <input type="text" id="song" name="song" value="Fixed Song Title" readonly>
+                <input type="text" id="song" name="song" readonly>
             </div>
             <div class="form-group">
-                <label for="author">Author</label>
-                <input type="text" id="author" name="author" value="Fixed Author Name" readonly>
+                <label for="artist">Artist</label>
+                <input type="text" id="artist" name="artist" readonly>
             </div>
             <div class="form-group">
                 <label for="description">Description</label>
