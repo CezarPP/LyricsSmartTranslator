@@ -44,22 +44,40 @@ async function loadTranslation(translationData) {
             console.error('Error:', error);
         });
 
-    await setTranslationElements(lyrics, description, no_views);
+    await setTranslationElements(lyrics, description, no_views, time);
 }
 
-async function setTranslationElements(lyrics, description, no_views) {
+async function setTranslationElements(lyrics, description, no_views, time) {
     document.getElementById('about-content').textContent = description;
     document.getElementById('song-description').textContent = description;
     document.getElementById('lyrics-paragraphs').textContent = lyrics;
     document.getElementById('no-views').textContent = no_views;
+    document.getElementById('song-date').textContent = time;
 }
 
 async function setSongElements(link, imageId, author, title) {
     document.getElementById('song-link').src = link;
-    document.getElementById('song-img').src = imageLink;
     document.getElementById('song-author').textContent = author;
     document.getElementById('song-title').textContent = title;
     document.getElementById('lyrics-song-title').textContent = title;
+    await setImage(imageId);
+}
+
+async function setImage(imageId) {
+    fetch(`/api/image/${imageId}`, {method: 'GET'})
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`
+                    + `error is ${response.json()}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('song-img').src = data.link;
+        })
+        .catch(error => {
+            console.error('Error: ' + error);
+        })
 }
 
 getSongFromServer().then(() => console.log("Got data from the server"));
