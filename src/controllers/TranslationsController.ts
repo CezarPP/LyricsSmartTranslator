@@ -52,10 +52,12 @@ export class TranslationsController {
 
         req.on('end', async () => {
             const postData = JSON.parse(body);
-            const songId = postData.songId;
-            const lyrics = postData.lyrics;
-            const language = postData.language.toLowerCase();
-            const description = postData.description;
+            const songId = postData.songId as number;
+            const lyrics = postData.lyrics as string;
+            let language = postData.language as string;
+            const description = postData.description as string;
+
+            language = language.toLowerCase();
 
             const song = await this.songRepository.getSongById(songId);
             if (song === null) {
@@ -65,9 +67,11 @@ export class TranslationsController {
             }
             let translation
                 = await this.translationRepository.getTranslationByNameAndLanguage(song.title, language);
+
             if (translation !== null) {
                 res.statusCode = 500;
                 res.end('There exists a translation in this language for this song');
+                return;
             }
 
             /// TODO(add userID)
@@ -81,7 +85,12 @@ export class TranslationsController {
             console.log("Added translation to repo with id " + translationId);
 
             res.statusCode = 200;
-            res.end('Translation added successfully!');
+            const data = {
+                message: 'Translation added successfully!',
+                songId: songId,
+                translationId: translationId
+            }
+            res.end(JSON.stringify(data));
         });
     }
 

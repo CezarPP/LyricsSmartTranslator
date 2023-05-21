@@ -1,8 +1,12 @@
-async function setTitleAuthor() {
+function getSongId() {
     const url = document.URL;
     // url should look like /add-translation/{id}
     const components = url.split('/');
-    const songId = parseInt(components[components.length - 1]);
+    return parseInt(components[components.length - 1]);
+}
+
+async function setTitleAuthor() {
+    const songId = getSongId();
     console.log("Song id is " + songId);
 
     const titleElement = document.getElementById("song");
@@ -29,17 +33,14 @@ const form = document.getElementById("submit-form");
 form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
-    let songElement = document.getElementById("song");
-    let artistElement = document.getElementById("artist");
     let descriptionElement = document.getElementById("description");
     let translatedLyricsElement = document.getElementById("translated-lyrics");
     let languageElement = document.getElementById("language");
 
     let formData = {
-        song: songElement.value,
-        author: artistElement.value,
+        songId: getSongId(),
         description: descriptionElement.value,
-        translatedLyrics: translatedLyricsElement.value,
+        lyrics: translatedLyricsElement.value,
         language: languageElement.value
     }
 
