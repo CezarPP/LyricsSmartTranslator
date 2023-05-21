@@ -27,84 +27,34 @@
     margin-bottom: 10px;
 }
 
-#profile-form {
+#profile-info {
     flex: 1;
     display: flex;
     flex-direction: column;
 }
 
-#profile-form label {
-    font-size: 1.2rem;
-    margin-bottom: 5px;
-}
-
-#profile-form input {
-    font-size: 1rem;
-    padding: 5px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
-
-#profile-form h3 {
+#profile-info h3 {
     font-size: 1.5rem;
     margin-bottom: 5px;
 }
 
-#profile-form p {
+#profile-info span {
     font-size: 1.2rem;
     margin-bottom: 10px;
 }
 
-#save-changes {
-    font-size: 1.2rem;
-    padding: 5px;
-    background-color: var(--background-color);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-#save-changes:hover {
-    background-color: var(--background-lighter);
-}
-
-#logout-btn {
-    font-size: 1.2rem;
-    width: 100px;
+#profile-stats {
     margin-top: 20px;
-    margin-right: auto;
-    margin-left: auto;
-    padding: 5px;
-    background-color: var(--background-color);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: 0.3s;
 }
 
-#logout-btn:hover {
-    background-color: var(--background-lighter);
+#profile-stats h3 {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
 }
 
-#change-photo {
-    font-size: 1rem;
-    padding: 5px;
-    background-color: var(--background-color);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    display: block;
-    margin: 0 auto;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-#change-photo:hover {
-    background-color: var(--background-lighter);
+#profile-stats p {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
 }
 
 @media screen and (max-width: 768px) {
@@ -118,7 +68,7 @@
     }
 
     #profile-photo,
-    #profile-form {
+    #profile-info {
         flex: initial;
         max-width: 80%;
         margin-bottom: 20px;

@@ -6,6 +6,7 @@ import {JwtPayload, verify} from "jsonwebtoken";
 import {parse} from "cookie";
 import fs from "fs";
 import {extname, join} from "path";
+import {sendFile} from "../util/sendFile";
 
 const secretKey = 'ionut';
 
@@ -98,7 +99,7 @@ export class UsersController {
         }
     }
     async logoutUser(req: IncomingMessage, res: ServerResponse) {
-        res.setHeader('Set-Cookie', 'jwt=; HttpOnly; SameSite=Strict; Max-Age=0');
+        res.setHeader('Set-Cookie', 'jwt=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0');
         res.writeHead(200, {'Content-Type': 'application/json'});
         res.end(JSON.stringify({message: 'Logout successful'}));
     }
@@ -195,7 +196,7 @@ export class UsersController {
     }
     async updateUserProfile(req: IncomingMessage, res: ServerResponse, username:String){
         try {
-
+            console.log('ajung aici sau ce rahat?');
             let body = '';
             req.on('data', chunk => {
                 body += chunk.toString();
@@ -220,7 +221,12 @@ export class UsersController {
                             res.writeHead(401, {'Content-Type': 'application/json'});
                             res.end(JSON.stringify({message: 'User with this username already exists'}));
                         } else {
-                            const status = await this.usersRepository.updateUser(user.id, newUsername, newPassword, newImg_id);
+                            // am adaugat asta acum
+                            let goodPassword = newPassword;
+                            if(goodPassword.trim().length === 0)
+                                goodPassword = user.password;
+
+                            const status = await this.usersRepository.updateUser(user.id, newUsername, goodPassword, newImg_id);
                             if(status){
                                 res.writeHead(200, {'Content-Type': 'application/json'});
                                 res.end(JSON.stringify({message: 'User successfully updated'}));
@@ -275,33 +281,39 @@ export class UsersController {
             res.end();
         }
     }
-    async getUserPage(req: IncomingMessage, res: ServerResponse) {
+    async getUserProfilePage(req: IncomingMessage, res: ServerResponse) {
         try {
-            console.log(req.url);
-            const user = await this.getLoggedUser(req, res);
-            if (user === null) {
+            if(!req.url){
+                //nu e posibil sa ajung aici
+                return;
+            }
+            const parsedURL = req.url.split('/');
+            if(parsedURL.length !== 3){
+                res.writeHead(404, {'Content-Type': 'application/json'});
+                res.write(JSON.stringify({message: 'Resource not found'}));
+                res.end();
+                return;
+            }
+            //vad la ce user vreau sa iau profilul
+            const username = parsedURL[2];
+            const user = await this.usersRepository.getUserByName(username);
+            if(user === null){
                 res.writeHead(404, {'Content-Type': 'application/json'});
                 res.write(JSON.stringify({message: 'User not found'}));
                 res.end();
+                return;
+            }
+            const loggedUser = await this.getLoggedUser(req, res);
+            if (loggedUser === null || (loggedUser.id !== 1 && loggedUser.id !== user.id )) {
+                // trebuie sa trimit pagina normala de profil
+                sendFile(req, res,
+                    '../public/assets/pages/profile.html', 'text/html')
+                    .then();
             } else {
-                const filePath = join(__dirname, '../public/assets/pages/profile.html');
-                fs.readFile(filePath, (error, content: Buffer): void => {
-                    if (error) {
-                        if (error.code == 'ENOENT') {
-                            // ENOENT stands for Error NO ENTry, file not found
-                            fs.readFile('./404.html', (error, content: Buffer) => {
-                                res.writeHead(404, {'Content-Type': 'text/html'});
-                                res.end(content, 'utf-8');
-                            });
-                        } else {
-                            res.writeHead(500);
-                            res.end(`Sorry, check with the site admin for error: ${error.code} ..\n`);
-                        }
-                    } else {
-                        res.writeHead(200, {'Content-Type': `text/html`});
-                        res.end(content, 'utf-8');
-                    }
-                });
+                // trimit pagina lui
+                sendFile(req, res,
+                    '../public/assets/pages/profile-me.html', 'text/html')
+                    .then();
             }
         } catch (error) {
             res.writeHead(500, {'Content-Type': 'application/json'});

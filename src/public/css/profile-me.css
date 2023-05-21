@@ -1,0 +1,154 @@
+#profile-container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 40px 0;
+}
+
+.profile-title {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-content {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+#profile-photo {
+    flex: 1;
+    text-align: center;
+}
+
+#profile-photo img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+#profile-form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+#profile-form label {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+}
+
+#profile-form input {
+    font-size: 1rem;
+    padding: 5px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+#password{
+    margin-bottom: 0px !important;
+}
+
+#profile-form h3 {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}
+
+#profile-form p {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.password-description {
+    font-size: 0.8rem !important;
+    color: grey;
+}
+
+#save-changes {
+    font-size: 1.2rem;
+    padding: 5px;
+    background-color: var(--background-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#save-changes:hover {
+    background-color: var(--background-lighter);
+}
+
+#logout-btn {
+    font-size: 1.2rem;
+    width: 100px;
+    margin-top: 10px;
+    margin-right: auto;
+    margin-left: auto;
+    padding: 5px;
+    background-color: var(--background-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#logout-btn:hover {
+    background-color: var(--background-lighter);
+}
+
+#remove-account-btn {
+    font-size: 1.2rem;
+    width: 100px;
+    margin-top: 30px;
+    margin-right: auto;
+    margin-left: auto;
+    padding: 5px;
+    background-color: var(--background-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#remove-account-btn:hover {
+    background-color: var(--background-lighter);
+}
+
+#change-photo {
+    font-size: 1rem;
+    padding: 5px;
+    background-color: var(--background-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    display: block;
+    margin: 0 auto;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#change-photo:hover {
+    background-color: var(--background-lighter);
+}
+
+@media screen and (max-width: 768px) {
+    #profile-container {
+        width: 100%;
+    }
+
+    .profile-content {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #profile-photo,
+    #profile-form {
+        flex: initial;
+        max-width: 80%;
+        margin-bottom: 20px;
+    }
+}

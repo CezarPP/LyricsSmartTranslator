@@ -33,11 +33,15 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
             .handleApiRequest(req, res)
             .then();
     } else if (method === 'GET' && url && url === '/api/me') {
-        console.log("o ia?");
         userController
             .getLoggedUserUsername(req, res)
             .then();
-    } else if (method === 'GET' && url.startsWith("/css") ||
+    } else if (method === 'GET' && url.startsWith('/profile')){
+        userController
+            .getUserProfilePage(req, res)
+            .then();
+    }
+    else if (method === 'GET' && url.startsWith("/css") ||
         url.startsWith("/js") || url === '/' && url.startsWith('/img/')) {
         // for main page, css, js
         console.log("Request for " + url);
@@ -55,8 +59,6 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         userController.registerUser(req, res);
     } else if (method == 'POST' && url == '/logout') {
         userController.logoutUser(req, res);
-    } else if (method == 'GET' && url && url === '/profile') {
-        userController.getUserPage(req, res);
     } else if (method == 'GET') {
         sendStaticFile(req, res)
             .then()

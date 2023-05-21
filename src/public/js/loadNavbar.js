@@ -9,7 +9,7 @@ async function loadNavbar() {
         if (userStatus.ok) {
             const data = await userStatus.json(); // Await the JSON data
             loginButton.textContent = data.username;
-            loginButton.href = '/profile';
+            loginButton.href = '/profile/' + data.username;
         }
     } catch (error) {
         console.error('Error fetching navbar:', error);
