@@ -51,10 +51,11 @@ form.addEventListener("submit", async function (event) {
         },
         body: JSON.stringify(formData)
     })
-        .then(response => {
+        .then(response => response.json())
+        .then(data => {
             // Redirect the user to a success page
-            if (response.ok) {
-                window.location.href = "/submit-translation.html";
+            if (data.translationId !== undefined) {
+                window.location.href = data.redirectPage;
             } else {
                 alert('Failed to add translation');
             }

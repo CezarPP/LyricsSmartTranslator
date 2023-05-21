@@ -5,16 +5,19 @@ import {Song} from "../models/Song";
 import {IncomingMessage, ServerResponse} from "http";
 import {ImagesRepository} from "../repositories/ImagesRepository";
 import assert from "assert";
+import {UsersController} from "./UsersController";
 
 export class SongsController {
     private songRepository: SongsRepository;
     private translationRepository: TranslationsRepository;
     private imagesRepository: ImagesRepository;
+    private usersController: UsersController;
 
     constructor() {
         this.songRepository = new SongsRepository();
         this.translationRepository = new TranslationsRepository();
         this.imagesRepository = new ImagesRepository();
+        this.usersController = new UsersController();
     }
 
     async handleApiRequest(req: IncomingMessage, res: ServerResponse) {
@@ -63,9 +66,20 @@ export class SongsController {
 
             const songId = await this.songRepository.addSongNoFk(song);
             console.log("Added song to repo with id " + songId);
-            /// TODO(add userID)
-            const userId = 1;
-            const translation = new Translation(0, songId, userId,
+
+            const user = await this.usersController.getLoggedUser(req, res);
+            if (user === null) {
+                res.statusCode = 200;
+                const data = {
+                    message: 'You need to be authenticated to submit a translation',
+                    redirectPage: '/not-auth.html',
+                    translationId: 0
+                }
+                res.end(JSON.stringify(data));
+                return;
+            }
+
+            const translation = new Translation(0, songId, user.id,
                 'english', description, lyrics, 0, new Date());
             console.log("Preparing to add translation to repo");
             const translationId = await this.translationRepository.addTranslation(translation);
@@ -78,6 +92,7 @@ export class SongsController {
             res.statusCode = 200;
             const data = {
                 message: 'Song added successfully!',
+                redirectPage: '/submit-song.html',
                 songId: songId,
                 translationId: translationId
             }

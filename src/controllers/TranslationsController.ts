@@ -2,14 +2,17 @@ import {SongsRepository} from "../repositories/SongsRepository";
 import {TranslationsRepository} from "../repositories/TranslationsRepository";
 import {IncomingMessage, ServerResponse} from "http";
 import {Translation} from "../models/Translation";
+import {UsersController} from "./UsersController";
 
 export class TranslationsController {
     private songRepository: SongsRepository;
     private translationRepository: TranslationsRepository;
+    private usersController: UsersController;
 
     constructor() {
         this.songRepository = new SongsRepository();
         this.translationRepository = new TranslationsRepository();
+        this.usersController = new UsersController();
     }
 
     async handleApiRequest(req: IncomingMessage, res: ServerResponse) {
@@ -74,10 +77,19 @@ export class TranslationsController {
                 return;
             }
 
-            /// TODO(add userID)
-            const userId = 1;
+            const user = await this.usersController.getLoggedUser(req, res);
+            if (user === null) {
+                res.statusCode = 200;
+                const data = {
+                    message: 'You need to be authenticated to submit a translation',
+                    redirectPage: '/not-auth.html',
+                    translationId: 0
+                }
+                res.end(JSON.stringify(data));
+                return;
+            }
 
-            translation = new Translation(0, songId, userId,
+            translation = new Translation(0, songId, user.id,
                 language, description, lyrics, 0, new Date());
 
             console.log("Preparing to add translation to repo");
@@ -87,6 +99,7 @@ export class TranslationsController {
             res.statusCode = 200;
             const data = {
                 message: 'Translation added successfully!',
+                redirectPage: '/submit-translation.html',
                 songId: songId,
                 translationId: translationId
             }
