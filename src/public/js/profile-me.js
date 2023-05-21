@@ -58,14 +58,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const logoutBtn = document.querySelector("#logout-btn");
     const removeAccountBtn = document.querySelector("#remove-account-btn");
 
-    saveChangesBtn.addEventListener("click", saveChanges);
+    saveChangesBtn.addEventListener("click", event => saveChanges(event));
     changePhotoBtn.addEventListener("click", () => photoInput.click());
-    logoutBtn.addEventListener("click", logout);
-    removeAccountBtn.addEventListener("click", removeAccount);
+    logoutBtn.addEventListener("click", event => logout(event));
+    removeAccountBtn.addEventListener("click", event => removeAccount(event));
 
     getUserInfo(username).then(() => console.log("userData loaded"));
 
-    function logout() {
+    function logout(event) {
+        event.preventDefault();
         fetch('/api/user/logout', { method: 'POST' })
             .then(response => {
                 if(!response.ok){
@@ -79,7 +80,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error("Error logging out:", error);
             });
     }
-    function removeAccount() {
+    function removeAccount(event) {
+        event.preventDefault();
         fetch(`/api/user/${username}`, {method: 'DELETE'})
             .then(response => {
                 if(!response.ok){
@@ -94,13 +96,14 @@ document.addEventListener("DOMContentLoaded", function () {
             })
     }
 
-    function saveChanges() {
+    function saveChanges(event) {
+        event.preventDefault();
+
         const imageFile = document.getElementById('upload-photo');
         const reader = new FileReader();
 
         reader.onloadend = function() {
             const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
-
             // Send the image to the server
             fetch('/api/image', {
                 method: 'POST',
@@ -127,7 +130,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify(newUsername, newImg_id, newPassword)
+                        body: JSON.stringify({newUsername, newImg_id, newPassword})
                     });
                 })
                 .then(response => {
@@ -145,6 +148,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     photoInput.addEventListener("change", function (event) {
+        event.preventDefault();
         if (event.target.files && event.target.files[0]) {
             const reader = new FileReader();
             const profilePhoto = document.querySelector("#profile-photo-img");

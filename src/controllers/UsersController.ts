@@ -203,8 +203,10 @@ export class UsersController {
             });
 
             req.on('end', async () => {
-                console.log(body);
                 const {newUsername, newImg_id, newPassword} = JSON.parse(body);
+                console.log(newImg_id);
+                console.log(newUsername);
+                console.log(newPassword);
                 const user = await this.usersRepository.getUserByName(username);
                 if (user === null) {
                     res.writeHead(404, {'Content-Type': 'application/json'});
@@ -217,7 +219,7 @@ export class UsersController {
                         res.end(JSON.stringify({message: 'Unauthorized'}));
                     } else if(loggedUser.id === 1 || loggedUser.id === user.id){
                         const oldUser = await this.usersRepository.getUserByName(newUsername);
-                        if(oldUser !== null) {
+                        if(oldUser !== null && oldUser.id !== user.id) {
                             res.writeHead(401, {'Content-Type': 'application/json'});
                             res.end(JSON.stringify({message: 'User with this username already exists'}));
                         } else {
@@ -226,6 +228,10 @@ export class UsersController {
                             if(goodPassword.trim().length === 0)
                                 goodPassword = user.password;
 
+                            console.log(user.id);
+                            console.log(newUsername);
+                            console.log(goodPassword);
+                            console.log(newImg_id);
                             const status = await this.usersRepository.updateUser(user.id, newUsername, goodPassword, newImg_id);
                             if(status){
                                 res.writeHead(200, {'Content-Type': 'application/json'});
