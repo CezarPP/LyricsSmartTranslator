@@ -9,6 +9,7 @@ import {TranslationsRepository} from "../repositories/TranslationsRepository";
 
 export class CommentsController {
     private commentsRepository: CommentsRepository;
+    private userRepository: UsersRepository;
     private usersController: UsersController;
     private translationsRepository: TranslationsRepository;
 
@@ -16,6 +17,7 @@ export class CommentsController {
         this.commentsRepository = new CommentsRepository();
         this.usersController = new UsersController();
         this.translationsRepository = new TranslationsRepository();
+        this.userRepository = new UsersRepository();
     }
 
     async handleApiRequest(req: IncomingMessage, res: ServerResponse) {
@@ -102,7 +104,6 @@ export class CommentsController {
                 res.write(JSON.stringify({message: 'No comments yet'}));
                 res.end();
             } else {
-                console.log(comments);
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.write(JSON.stringify(comments));
                 res.end();
@@ -138,8 +139,23 @@ export class CommentsController {
                 res.write(JSON.stringify({message: 'No comments yet'}));
                 res.end();
             } else {
+                let commentsData = [];
+                for (let i = 0; i < comments.length; i++) {
+                    const comment = comments[i];
+                    const user = await this.userRepository.getUserById(comment.userId);
+                    if(user === null)
+                        continue;
+                    const commentData = {
+                        id: comment.id,
+                        username: user.username,
+                        imageId: user.img_id,
+                        translationId: comment.translationId,
+                        content: comment.content
+                    }
+                    commentsData.push(commentData)
+                }
                 res.writeHead(200, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify(comments));
+                res.write(JSON.stringify(commentsData));
                 res.end();
             }
         } catch (error) {
