@@ -228,10 +228,6 @@ export class UsersController {
                             if(goodPassword.trim().length === 0)
                                 goodPassword = user.password;
 
-                            console.log(user.id);
-                            console.log(newUsername);
-                            console.log(goodPassword);
-                            console.log(newImg_id);
                             const status = await this.usersRepository.updateUser(user.id, newUsername, goodPassword, newImg_id);
                             if(status){
                                 res.writeHead(200, {'Content-Type': 'application/json'});

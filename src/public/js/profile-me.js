@@ -1,3 +1,5 @@
+let imageId = null;
+
 async function getUserInfo(username) {
     fetch(`/api/user/${username}`, {method: 'GET'})
         .then(response => {
@@ -26,12 +28,14 @@ async function setUserData(userData){
     document.querySelector("#translations-count").textContent = translationsCount;
     document.querySelector("#annotations-count").textContent = annotationsCount;
     document.querySelector("#comments-count").textContent = commentsCount;
+
+    imageId = img_id;
     await setImage(img_id);
 }
 
 async function setImage(img_id) {
     // o sa pun o constanta aici
-    fetch(`/api/image/19`, {method: 'GET'})
+    fetch(`/api/image/${img_id}`, {method: 'GET'})
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`
@@ -102,48 +106,71 @@ document.addEventListener("DOMContentLoaded", function () {
         const imageFile = document.getElementById('upload-photo');
         const reader = new FileReader();
 
-        reader.onloadend = function() {
-            const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
-            // Send the image to the server
-            fetch('/api/image', {
-                method: 'POST',
+        if(imageId === null) {
+            reader.onloadend = function () {
+                const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
+                // Send the image to the server
+                fetch('/api/image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({image: base64String}),
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Error adding new user photo: ${response.status}`
+                                + `error is ${response.json()}`);
+                        } else {
+                            return response.json();
+                        }
+                    })
+                    .then(data => {
+                        const newImg_id = data.id;
+                        const newUsername = document.getElementById('username').value;
+                        const newPassword = document.getElementById('password').value;
+
+                        return fetch(`/api/user/${username}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({newUsername, newImg_id, newPassword})
+                        });
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            alert('Failed to change user data');
+                        } else {
+                            const newUsername = document.getElementById('username').value;
+                            window.location.href = '/profile/' + newUsername;
+                        }
+                    })
+                    .catch(error => console.error(error));
+            }
+            reader.readAsDataURL(imageFile.files[0]);
+        } else {
+            const newImg_id = imageId;
+            const newUsername = document.getElementById('username').value;
+            const newPassword = document.getElementById('password').value;
+
+            fetch(`/api/user/${username}`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ image: base64String }),
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Error adding new user photo: ${response.status}`
-                            + `error is ${response.json()}`);
-                    } else {
-                        return response.json();
-                    }
-                })
-                .then(data => {
-                    const newImg_id = data.id;
+                body: JSON.stringify({newUsername, newImg_id, newPassword})
+            }).then(response => {
+                if(!response.ok)
+                    alert('Failed to change user data');
+                else{
                     const newUsername = document.getElementById('username').value;
-                    const newPassword = document.getElementById('password').value;
-
-                    return fetch(`/api/user/${username}`,{
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({newUsername, newImg_id, newPassword})
-                    });
-                })
-                .then(response => {
-                    if(!response.ok) {
-                        alert('Failed to change user data');
-                    } else{
-                        const newUsername = document.getElementById('username').value;
-                        window.location.href = '/profile/' + newUsername;
-                    }
-                })
-                .catch(error => console.error(error));
+                    window.location.href = '/profile/' + newUsername;
+                }
+            }).catch(error =>{
+                console.error("Error: " + error);
+            })
         }
-        reader.readAsDataURL(imageFile.files[0]);
     }
 
 
@@ -155,7 +182,7 @@ document.addEventListener("DOMContentLoaded", function () {
             reader.onload = function (e) {
                 profilePhoto.src = e.target.result;
             };
-
+            imageId = null;
             reader.readAsDataURL(event.target.files[0]);
         }
     });

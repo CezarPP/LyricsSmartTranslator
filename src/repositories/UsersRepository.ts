@@ -67,7 +67,7 @@ export class UsersRepository {
 
     async addUser(username: String, password: String): Promise<number>{
         const query = 'INSERT INTO users(username, password, img_id) VALUES($1, $2, $3) RETURNING id';
-        const values = [username, password, 1];
+        const values = [username, password, 81];
         try{
             const result = await this.db.query(query, values);
             return result.rows[0].id;
