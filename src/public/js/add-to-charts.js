@@ -2,16 +2,19 @@ const showMoreButtonCharts = document.querySelector('#charts-container .show-mor
 const chartsList = document.querySelector('#charts-container .charts-list');
 
 const songs = [];
+const translationId = [];
 const artists = [];
 
 const getNewestSongsData = async () => {
     songs.length = 0;
     artists.length = 0;
+    translationId.length = 0;
     await fetch('/api/stats/songs', {method: 'GET'})
         .then(response => response.json())
         .then(data => {
             data.forEach(song => {
                 songs.push(song.title);
+                translationId.push(song.translationId);
                 artists.push(song.artist);
             });
 
@@ -24,7 +27,7 @@ const addMoreCharts = () => {
         const index = chartsList.children.length + 1;
         newItem.innerHTML = `
       <span class="song-number">${index}</span>
-      <span class="song-title">${songs[index]}</span>
+      <span class="song-title"><a href="/song-page/${translationId[index]}" style="color:black">${songs[index]}</a></span>
       <span class="song-author">${artists[index]}</span>
     `;
         chartsList.appendChild(newItem);

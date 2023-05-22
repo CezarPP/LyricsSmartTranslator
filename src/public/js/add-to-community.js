@@ -22,7 +22,7 @@ const addMoreCommunity = () => {
         const index = communityList.children.length + 1;
         newItem.innerHTML = `
       <span class="community-number">${index}</span>
-      <span class="community-name">${users[index - 1]}</span>
+      <span class="community-name"><a href="/profile/${users[index - 1]}" style="color:black">${users[index - 1]}</a></span>
       <span class="community-activity">${contrib[index - 1]}</span>
     `;
         communityList.appendChild(newItem);
