@@ -14,7 +14,7 @@ export class UsersController {
     private usersRepository: UsersRepository;
 
     constructor() {
-        this.usersRepository = new UsersRepository;
+        this.usersRepository = new UsersRepository();
     }
 
     async handleApiRequest(req: IncomingMessage, res: ServerResponse){

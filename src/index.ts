@@ -4,8 +4,10 @@ import {sendStaticFile} from "./util/sendStaticFile";
 import {UsersController} from "./controllers/UsersController";
 import {SongsController} from "./controllers/SongsController";
 import {TranslationsController} from "./controllers/TranslationsController";
+import {CommentsController} from "./controllers/CommentsController";
 import {sendFile} from "./util/sendFile";
 import {StatsController} from "./controllers/StatsController";
+import {Comment} from "./models/Comment";
 
 const http = require('http');
 
@@ -17,6 +19,7 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     const songsController = new SongsController();
     const translationsController = new TranslationsController();
     const statsController = new StatsController();
+    const commentsController = new CommentsController();
 
     if (url.startsWith('/api/song')) {
         songsController
@@ -32,6 +35,10 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
             .then();
     } else if (url.startsWith('/api/image')) {
         imagesController
+            .handleApiRequest(req, res)
+            .then();
+    } else if(url.startsWith('/api/comments')) {
+        commentsController
             .handleApiRequest(req, res)
             .then();
     } else if (method === 'GET' && url && url === '/api/me') {

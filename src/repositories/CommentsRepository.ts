@@ -27,6 +27,24 @@ export class CommentsRepository {
             throw error;
         }
     }
+
+    async getAllComments(): Promise<Comment[] | null> {
+        const query = 'SELECT * FROM comments';
+        try{
+            const result = await this.db.query(query);
+            if(result.rows.length === 0){
+                return null;
+            }
+            const comments: Comment[] = result.rows.map((row: any) => {
+                return new Comment(row.id, row.userId, row.translationId, row.content);
+            });
+            return comments;
+        } catch (error) {
+            console.error(`Failed to retrieve comments from the database: ${error}`);
+            throw error;
+        }
+    }
+
     async getCommentsByTranslationId(translationId: number): Promise<Comment[] | null> {
         const query = `SELECT * FROM comments WHERE translation_id = $1;`;
         const values = [translationId];
@@ -41,6 +59,29 @@ export class CommentsRepository {
             return comments;
         } catch (error) {
             console.error(`Failed to retrieve comments from the database: ${error}`);
+            throw error;
+        }
+    }
+
+    async updateComment(id: number, newContent: String){
+        const query = 'UPDATE comments SET content = $1 WHERE id = $2';
+        const values = [newContent, id];
+        try {
+            const result = await this.db.query(query, values);
+            return result.rowCount > 0; // Returns true if at least one row was affected
+        } catch (error) {
+            console.error(`Failed to update comment in the database: ${error}`);
+            throw error;
+        }
+    }
+    async deleteComment(id: number): Promise<boolean>{
+        const query = 'DELETE FROM comments WHERE id = $1';
+        const values = [id];
+        try{
+            const result = await this.db.query(query, values);
+            return result.rowCount > 0;
+        } catch (error) {
+            console.error(`Failed to delete comment from the database: ${error}`);
             throw error;
         }
     }

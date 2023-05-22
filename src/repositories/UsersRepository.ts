@@ -31,7 +31,7 @@ export class UsersRepository {
     //
 
     async getUserByName(username: String): Promise<User| null>{
-        const query = 'SELECT * FROM Users WHERE username = $1';
+        const query = 'SELECT * FROM users WHERE username = $1';
         const values = [username];
         const result = await this.db.query(query, values);
 
@@ -42,7 +42,7 @@ export class UsersRepository {
         return new User(row.id, row.img_id, row.username, row.password);
     }
     async getAllUsers(): Promise<User[] | null> {
-        const query = 'SELECT * FROM Users';
+        const query = 'SELECT * FROM users';
         const result = await this.db.query(query);
         if (result.rows.length === 0) {
             return null;
@@ -54,7 +54,7 @@ export class UsersRepository {
     }
 
     async getUserById(id: number): Promise<User | null>{
-        const query = 'SELECT * FROM Users WHERE id = $1';
+        const query = 'SELECT * FROM users WHERE id = $1';
         const values = [id];
         const result = await this.db.query(query, values);
 
@@ -77,7 +77,7 @@ export class UsersRepository {
         }
     }
     async updateUser(id: number, newUsername: string, newPassword: string, newImg_id: number): Promise<boolean> {
-        const query = 'UPDATE Users SET username = $1, password = $2, img_id = $3 WHERE id = $4';
+        const query = 'UPDATE users SET username = $1, password = $2, img_id = $3 WHERE id = $4';
         const values = [newUsername, newPassword, newImg_id, id];
         try {
             const result = await this.db.query(query, values);
@@ -88,7 +88,7 @@ export class UsersRepository {
         }
     }
     async deleteUser(id: number): Promise<boolean> {
-        const query = 'DELETE FROM Users WHERE id = $1';
+        const query = 'DELETE FROM users WHERE id = $1';
         const values = [id];
         try {
             const result = await this.db.query(query, values);
