@@ -196,7 +196,6 @@ export class UsersController {
     }
     async updateUserProfile(req: IncomingMessage, res: ServerResponse, username:String){
         try {
-            console.log('ajung aici sau ce rahat?');
             let body = '';
             req.on('data', chunk => {
                 body += chunk.toString();

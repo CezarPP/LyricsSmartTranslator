@@ -15,21 +15,6 @@ export class UsersRepository {
             }
         });
     }
-
-    // async getUser(username: String, password: String): Promise<User | null> {
-    //     const query = 'SELECT * FROM Users WHERE username = $1 AND password = $2';
-    //     const values = [username, password];
-    //     const result = await this.db.query(query, values);
-    //
-    //     if(result.rows.length === 0){
-    //         return null;
-    //     }
-    //
-    //     const row = result.rows[0];
-    //     return new User(row.id, row.img_id, row.username, row.password);
-    // }
-    //
-
     async getUserByName(username: String): Promise<User| null>{
         const query = 'SELECT * FROM users WHERE username = $1';
         const values = [username];
