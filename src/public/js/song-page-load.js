@@ -84,7 +84,8 @@ async function setImage(imageId) {
 
 getSongFromServer().then(() => console.log("Got data from the server"));
 
-async function getCommentsFromServer(){
+
+async function getCommentsFromServer() {
     const path = window.location.pathname;
     const translationId = path.split('/')[2];
     fetch(`/api/comments/${translationId}`, {method: 'GET'})
@@ -103,13 +104,12 @@ async function getCommentsFromServer(){
         })
 }
 
-async function loadComments(commentsData){
-    for(const commentData of commentsData)
+async function loadComments(commentsData) {
+    for (const commentData of commentsData)
         await addComment(commentData.username, commentData.imageId, commentData.content).then();
 }
-getCommentsFromServer().then(() => console.log("Got comments from the server"));
 
-async function addComment(username, imageId, content){
+async function addComment(username, imageId, content) {
     const commentsList = document.getElementById("comments-list");
     const comment = document.createElement("div");
     comment.classList.add("comment");
@@ -131,8 +131,6 @@ async function addComment(username, imageId, content){
         });
     infAuthor.src = imgLink;
     infAuthor.alt = "Avatar Image";
-    infAuthor.style.width = 'auto';
-    infAuthor.style.height = '60px';
     comment.appendChild(infAuthor);
 
     const commentDetails = document.createElement("div");
@@ -150,15 +148,51 @@ async function addComment(username, imageId, content){
 
     commentsList.appendChild(comment);
 }
-document.addEventListener('DOMContentLoaded', () => {
+
+async function handleComments() {
+    getCommentsFromServer().then(() => console.log("Got comments from the server"));
+
+    const meResponse = await fetch('/api/me', {method: 'GET'});
+    if (!meResponse.ok) {
+        document.querySelector('.input-container').style.display = 'none';
+        return;
+    }
+
+    const meData = await meResponse.json();
+    const userResponse = await fetch(`/api/user/${meData.username}`, {method: 'GET'});
+    const userInfo = await userResponse.json();
+    const imgResponse = await fetch(`/api/image/${userInfo.img_id}`, {method: 'GET'});
+    const imgInfo = await imgResponse.json();
+
+    document.querySelector(".avatar-container img").src = imgInfo.link;
+
     const submitCommentBtn = document.getElementById("submit-comment");
     const commentInput = document.getElementById("comment-input");
 
     submitCommentBtn.addEventListener("click", () => {
         const commentText = commentInput.value.trim();
         if (commentText) {
-            addComment("Ionut", 0, commentText).then();
-            commentInput.value = "";
+            const path = window.location.pathname;
+            const translationId = path.split('/')[2];
+            const content = commentText;
+            fetch(`/api/comments`, {
+                method: `POST`,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({translationId, content})
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Error adding comment: ${response.status}`
+                            + `error is ${response.json()}`);
+                    } else window.location.href = path;
+                })
+                .catch(error => {
+                    console.error("Error adding comment");
+                });
         }
     });
-});
+}
+
+handleComments().then(() => console.log('Comments done'));
