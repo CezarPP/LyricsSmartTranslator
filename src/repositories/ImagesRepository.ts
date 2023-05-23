@@ -79,7 +79,7 @@ export class ImagesRepository {
     }
 
     async getImageById(id: number): Promise<ImageModel | null> {
-        const query = 'SELECT * FROM Images WHERE id = $1';
+        const query = 'SELECT * FROM images WHERE id = $1';
         const values = [id];
         const result = await this.db.query(query, values);
 
@@ -90,4 +90,20 @@ export class ImagesRepository {
         const row = result.rows[0];
         return new ImageModel(row.id, row.link, row.extension);
     }
+
+    async getAllImages() {
+        try {
+            const result = await this.db.query('SELECT * FROM images');
+            const rows = result.rows;
+            const images: ImageModel[] = [];
+            for (let i = 0; i < rows.length; i++) {
+                images.push(new ImageModel(rows[i].id, rows[i].link, rows[i].ext));
+            }
+            return images;
+        } catch (err) {
+            console.error('Error executing query to get all images', err);
+            return [];
+        }
+    }
+
 }

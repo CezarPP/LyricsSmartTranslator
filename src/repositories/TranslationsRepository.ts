@@ -79,4 +79,22 @@ export class TranslationsRepository {
             throw error;
         }
     }
+
+    async updateTranslation(translationId: number, newDescription: string, newLyrics: string) {
+        try {
+            const result = await this.db.query('UPDATE Translations SET description = $1, lyrics = $2 WHERE id = $3', [newDescription, newLyrics, translationId]);
+            console.log('Translation updated successfully');
+        } catch (err) {
+            console.error('Error executing query to update a translation', err);
+        }
+    }
+
+    async deleteTranslation(translationId: number) {
+        try {
+            const result = await this.db.query('DELETE FROM translations WHERE id = $1', [translationId]);
+            console.log('Translation deleted successfully');
+        } catch (err) {
+            console.error('Error executing query to delete translation ', err);
+        }
+    }
 }

@@ -17,20 +17,20 @@ export class TranslationsController {
 
     async handleApiRequest(req: IncomingMessage, res: ServerResponse) {
         if (req.method == 'GET') {
-            await this.handleGetTranslation(req, res);
+            await this.handleGet(req, res);
         } else if (req.method == 'POST') {
-            await this.handleTranslationSubmit(req, res);
+            await this.handlePost(req, res);
         } else if (req.method == 'PUT') {
-
+            await this.handlePut(req, res);
         } else if (req.method == 'DELETE') {
-
+            await this.handleDelete(req, res);
         } else {
-            res.statusCode = 404;
-            res.end('Method not found');
+            res.statusCode = 405;
+            res.end('Method not allowed');
         }
     }
 
-    async handleGetTranslation(req: IncomingMessage, res: ServerResponse) {
+    async handleGet(req: IncomingMessage, res: ServerResponse) {
         if (!req.url) {
             res.statusCode = 500;
             res.end('Invalid url');
@@ -47,7 +47,7 @@ export class TranslationsController {
         res.end(JSON.stringify(translation.toObject()));
     }
 
-    async handleTranslationSubmit(req: IncomingMessage, res: ServerResponse) {
+    async handlePost(req: IncomingMessage, res: ServerResponse) {
         let body = '';
         req.on('data', chunk => {
             body += chunk.toString();
@@ -79,7 +79,7 @@ export class TranslationsController {
 
             const user = await this.usersController.getLoggedUser(req, res);
             if (user === null) {
-                res.statusCode = 200;
+                res.statusCode = 401;
                 const data = {
                     message: 'You need to be authenticated to submit a translation',
                     redirectPage: '/not-auth.html',
@@ -105,6 +105,101 @@ export class TranslationsController {
             }
             res.end(JSON.stringify(data));
         });
+    }
+
+    async handlePut(req: IncomingMessage, res: ServerResponse) {
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+
+        req.on('end', async () => {
+            const postData = JSON.parse(body);
+            const lyrics = postData.lyrics as string;
+            const description = postData.description as string;
+
+            if (!req.url) {
+                res.statusCode = 500;
+                res.end('Server error');
+                return;
+            }
+            const translationId: number = parseInt(req.url.split('/')[3]);
+            console.log('Song id to delete is ' + translationId);
+
+            const translation: Translation | null = await this.translationRepository.getTranslationById(translationId);
+            if (translation === null) {
+                const data = {
+                    message: 'Translation not found'
+                }
+                res.end(JSON.stringify(data));
+                return;
+            }
+
+            const user = await this.usersController.getLoggedUser(req, res);
+            if (user === null) {
+                const data = {
+                    message: 'You need to be authenticated in order to update a translation'
+                }
+                res.end(JSON.stringify(data));
+                return;
+            }
+
+            // Owner or admin
+            if (translation.userId !== user.id || translation.userId === 1) {
+                const data = {
+                    message: 'Only the user that added the translation can update it'
+                }
+                res.end(JSON.stringify(data));
+                return;
+            }
+            await this.translationRepository.updateTranslation(translationId, description, lyrics);
+        });
+    }
+
+    async handleDelete(req: IncomingMessage, res: ServerResponse) {
+        if (!req.url) {
+            res.statusCode = 500;
+            res.end('Server error');
+            return;
+        }
+        const translationId: number = parseInt(req.url.split('/')[3]);
+        console.log('Translation id to delete is ' + translationId);
+
+        const translation: Translation | null = await this.translationRepository.getTranslationById(translationId);
+        if (translation === null) {
+            const data = {
+                message: 'Translation not found'
+            }
+            res.end(JSON.stringify(data));
+            return;
+        }
+
+        const user = await this.usersController.getLoggedUser(req, res);
+        if (user === null) {
+            const data = {
+                message: 'You need to be authenticated in order to delete a translation'
+            }
+            res.end(JSON.stringify(data));
+            return;
+        }
+
+        // Owner or admin
+        if (translation.userId !== user.id || translation.userId === 1) {
+            const data = {
+                message: 'Only the user that added the translation can delete it'
+            }
+            res.end(JSON.stringify(data));
+            return;
+        }
+        // Cascade delete will happen because of trigger in db
+
+        await this.translationRepository.deleteTranslation(translationId);
+
+        res.statusCode = 200;
+        const data = {
+            message: 'Translation deleted successfully!'
+        }
+        res.end(JSON.stringify(data));
     }
 
 }

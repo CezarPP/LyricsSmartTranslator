@@ -8,4 +8,12 @@ export class ImageModel {
         this.link = link;
         this.ext = ext;
     }
+
+    toObject() {
+        return {
+            id: this.id,
+            link: this.link,
+            ext: this.ext
+        };
+    }
 }

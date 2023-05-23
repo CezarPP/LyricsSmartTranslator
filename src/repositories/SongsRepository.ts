@@ -118,4 +118,22 @@ export class SongsRepository {
             throw error;
         }
     }
+
+    async deleteSong(songId: number) {
+        try {
+            const result = await this.db.query('DELETE FROM songs WHERE id = $1', [songId]);
+            console.log('Song deleted successfully');
+        } catch (err) {
+            console.error('Error executing query to delete song ', err);
+        }
+    }
+
+    async updateSong(songId: Number, newArtist: string, newTitle: string, newLink: string) {
+        try {
+            const result = await this.db.query('UPDATE Songs SET artist = $1, title = $2, link = $3 WHERE id = $4', [newArtist, newTitle, newLink, songId]);
+            console.log('Song updated successfully');
+        } catch (err) {
+            console.error('Error executing query', err);
+        }
+    }
 }
