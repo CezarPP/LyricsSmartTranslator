@@ -3,6 +3,7 @@ import {TranslationsRepository} from "../repositories/TranslationsRepository";
 import {IncomingMessage, ServerResponse} from "http";
 import {Translation} from "../models/Translation";
 import {UsersController} from "./UsersController";
+import {sendMessage} from "../util/sendMessage";
 
 export class TranslationsController {
     private songRepository: SongsRepository;
@@ -32,15 +33,20 @@ export class TranslationsController {
 
     async handleGet(req: IncomingMessage, res: ServerResponse) {
         if (!req.url) {
-            res.statusCode = 500;
-            res.end('Invalid url');
+            sendMessage(res, 500, 'Server error');
             return;
         }
         const translationId = parseInt(req.url.split('/')[3]);
+
+        if (isNaN(translationId)) {
+            console.log("Translation id is nan");
+            sendMessage(res, 400, 'Invalid translation id');
+            return;
+        }
+
         const translation: Translation | null = await this.translationRepository.getTranslationById(translationId);
         if (translation === null) {
-            res.statusCode = 404;
-            res.end('No translation found');
+            sendMessage(res, 404, 'Translation not found');
             return;
         }
         res.setHeader('Content-Type', 'application/json');
@@ -60,20 +66,22 @@ export class TranslationsController {
             let language = postData.language as string;
             const description = postData.description as string;
 
+            if (songId === undefined || lyrics === undefined || language === undefined || description === undefined) {
+                sendMessage(res, 400, 'Invalid request');
+            }
+
             language = language.toLowerCase();
 
             const song = await this.songRepository.getSongById(songId);
             if (song === null) {
-                res.statusCode = 500;
-                res.end('Error: not a valid song');
+                sendMessage(res, 404, 'Song not found');
                 return;
             }
             let translation
                 = await this.translationRepository.getTranslationByNameAndLanguage(song.title, language);
 
             if (translation !== null) {
-                res.statusCode = 500;
-                res.end('There exists a translation in this language for this song');
+                sendMessage(res, 409, 'There exists a translation in this language for this song');
                 return;
             }
 
@@ -114,42 +122,37 @@ export class TranslationsController {
         });
 
         req.on('end', async () => {
+            if (!req.url) {
+                sendMessage(res, 500, 'Server error');
+                return;
+            }
+
             const postData = JSON.parse(body);
             const lyrics = postData.lyrics as string;
             const description = postData.description as string;
+            const translationId: number = parseInt(req.url.split('/')[3]);
 
-            if (!req.url) {
-                res.statusCode = 500;
-                res.end('Server error');
+            if (isNaN(translationId) || lyrics === undefined || description === undefined) {
+                console.log("Translation id is nan");
+                sendMessage(res, 400, 'Invalid request');
                 return;
             }
-            const translationId: number = parseInt(req.url.split('/')[3]);
-            console.log('Song id to delete is ' + translationId);
 
             const translation: Translation | null = await this.translationRepository.getTranslationById(translationId);
             if (translation === null) {
-                const data = {
-                    message: 'Translation not found'
-                }
-                res.end(JSON.stringify(data));
+                sendMessage(res, 404, 'Translation not found');
                 return;
             }
 
             const user = await this.usersController.getLoggedUser(req, res);
             if (user === null) {
-                const data = {
-                    message: 'You need to be authenticated in order to update a translation'
-                }
-                res.end(JSON.stringify(data));
+                sendMessage(res, 401, 'You need to be authenticated in order to update a translation');
                 return;
             }
 
             // Owner or admin
-            if (translation.userId !== user.id || translation.userId === 1) {
-                const data = {
-                    message: 'Only the user that added the translation can update it'
-                }
-                res.end(JSON.stringify(data));
+            if (translation.userId !== user.id && user.id !== 1) {
+                sendMessage(res, 403, 'Only the user that added the translation can update it');
                 return;
             }
             await this.translationRepository.updateTranslation(translationId, description, lyrics);
@@ -158,48 +161,40 @@ export class TranslationsController {
 
     async handleDelete(req: IncomingMessage, res: ServerResponse) {
         if (!req.url) {
-            res.statusCode = 500;
-            res.end('Server error');
+            sendMessage(res, 500, 'Server error');
             return;
         }
         const translationId: number = parseInt(req.url.split('/')[3]);
+
+        if (isNaN(translationId)) {
+            console.log("Translation id is nan");
+            sendMessage(res, 400, 'Invalid translation id');
+            return;
+        }
         console.log('Translation id to delete is ' + translationId);
 
         const translation: Translation | null = await this.translationRepository.getTranslationById(translationId);
         if (translation === null) {
-            const data = {
-                message: 'Translation not found'
-            }
-            res.end(JSON.stringify(data));
+            sendMessage(res, 404, 'Translation not found');
             return;
         }
 
         const user = await this.usersController.getLoggedUser(req, res);
         if (user === null) {
-            const data = {
-                message: 'You need to be authenticated in order to delete a translation'
-            }
-            res.end(JSON.stringify(data));
+            sendMessage(res, 401, 'You need to be authenticated in order to delete a translation');
             return;
         }
 
         // Owner or admin
-        if (translation.userId !== user.id || translation.userId === 1) {
-            const data = {
-                message: 'Only the user that added the translation can delete it'
-            }
-            res.end(JSON.stringify(data));
+        if (translation.userId !== user.id && user.id !== 1) {
+            sendMessage(res, 403, 'Only the user that added the translation can delete it');
             return;
         }
-        // Cascade delete will happen because of trigger in db
 
+        // Cascade delete will happen because of trigger in db
         await this.translationRepository.deleteTranslation(translationId);
 
-        res.statusCode = 200;
-        const data = {
-            message: 'Translation deleted successfully!'
-        }
-        res.end(JSON.stringify(data));
+        sendMessage(res, 200, 'Translation deleted successfully!');
     }
 
 }

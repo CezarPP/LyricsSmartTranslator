@@ -6,6 +6,8 @@ import {IncomingMessage, ServerResponse} from "http";
 import {ImagesRepository} from "../repositories/ImagesRepository";
 import assert from "assert";
 import {UsersController} from "./UsersController";
+import {isYoutubeLink} from "../util/validation";
+import {sendMessage} from "../util/sendMessage";
 
 export class SongsController {
     private songRepository: SongsRepository;
@@ -35,8 +37,7 @@ export class SongsController {
         } else if (req.method == 'DELETE') {
             await this.handleDelete(req, res);
         } else {
-            res.statusCode = 405;
-            res.end(`Method not allowed for path ${req.url}`);
+            sendMessage(res, 405, `Method not allowed for path ${req.url}`);
         }
     }
 
@@ -56,6 +57,13 @@ export class SongsController {
             const description = postData.description as string;
             let link = postData['youtube-link'] as string;
             const imageId = postData.imageId as number;
+
+            if (title === undefined || artist === undefined ||
+                link === undefined || imageId === undefined ||
+                lyrics === undefined || description === undefined || !isYoutubeLink(link)) {
+                sendMessage(res, 400, 'Invalid request');
+                return;
+            }
 
             // Link has to be embedded, otherwise it won't load
             link = link.replace('/watch?v=', '/embed/');
@@ -100,13 +108,10 @@ export class SongsController {
 
     async handlePut(req: IncomingMessage, res: ServerResponse) {
         assert(req.url);
-        let songId = 0;
-        try {
-            songId = parseInt(req.url.split('/')[3]);
-        } catch (exception) {
-            console.log("Not a valid song id");
-            res.statusCode = 400;
-            res.end('Bad request');
+        const songId = parseInt(req.url.split('/')[3]);
+        if (isNaN(songId)) {
+            console.log("Song id is nan");
+            sendMessage(res, 400, 'Invalid song id');
             return;
         }
 
@@ -114,11 +119,19 @@ export class SongsController {
         req.on('data', chunk => {
             body += chunk.toString();
         });
+
         req.on('end', async () => {
             const postData = JSON.parse(body);
+
             const title = postData.title as string;
             const artist = postData.artist as string;
             let link = postData['youtube-link'] as string;
+
+            if (title === undefined || artist === undefined
+                || link === undefined || !isYoutubeLink(link)) {
+                sendMessage(res, 400, 'Invalid request');
+                return;
+            }
 
             // Link has to be embedded, otherwise it won't load
             link = link.replace('/watch?v=', '/embed/');
@@ -133,39 +146,49 @@ export class SongsController {
                 res.end(JSON.stringify(data));
                 return;
             }
+
             const song = await this.songRepository.getSongById(songId);
             if (song === null) {
-                res.statusCode = 404;
-                res.end('Song not found');
+                sendMessage(res, 404, 'Song not found');
                 return;
             }
+
             const translationId: number = song.primary_translation;
             const translation = await this.translationRepository.getTranslationById(translationId);
             if (translation == null) {
-                res.statusCode = 500;
-                res.end('Server error');
+                sendMessage(res, 500, 'Server error');
                 return;
             }
+
             // Owner or admin
-            if (translation.userId === user.id || user.id === 1) {
-                await this.songRepository.updateSong(songId, artist, title, link);
+            if (translation.userId !== user.id && user.id !== 1) {
+                sendMessage(res, 403, 'Only the owner of the song can update it');
+                return;
             }
+
+            await this.songRepository.updateSong(songId, artist, title, link);
+            sendMessage(res, 200, 'Song updated successfully!');
         });
     }
 
     async handleGetById(req: IncomingMessage, res: ServerResponse) {
         if (!req.url) {
-            res.statusCode = 500;
-            res.end('Server error');
+            sendMessage(res, 500, 'Server error');
             return;
         }
         const songId: number = parseInt(req.url.split('/')[3]);
+
+        if (isNaN(songId)) {
+            sendMessage(res, 400, 'Invalid song id');
+            return;
+        }
+
         console.log('Song id is ' + songId);
 
         const song: Song | null = await this.songRepository.getSongById(songId);
+
         if (song == null) {
-            res.statusCode = 404;
-            res.end('Song not found');
+            sendMessage(res, 404, 'Song not found');
             return;
         }
         res.statusCode = 200;
@@ -180,50 +203,41 @@ export class SongsController {
             return;
         }
         const songId: number = parseInt(req.url.split('/')[3]);
+
+        if (isNaN(songId)) {
+            console.log("Song id is nan");
+            sendMessage(res, 400, 'Invalid song id');
+            return;
+        }
+
         console.log('Song id to delete is ' + songId);
 
         const song: Song | null = await this.songRepository.getSongById(songId);
         if (song === null) {
-            res.statusCode = 404;
-            const data = {
-                message: 'Song not found'
-            }
-            res.end(JSON.stringify(data));
+            sendMessage(res, 404, 'Song not found');
             return;
         }
 
         const user = await this.usersController.getLoggedUser(req, res);
         if (user === null) {
-            res.statusCode = 401;
-            const data = {
-                message: 'You need to be authenticated in order to delete a song'
-            }
-            res.end(JSON.stringify(data));
+            sendMessage(res, 401, 'You need to be authenticated in order to delete a song');
             return;
         }
 
         const translation: Translation | null = await this.translationRepository.getTranslationById(song.primary_translation);
         if (translation === null) {
-            res.statusCode = 500;
-            res.end('Server error');
+            sendMessage(res, 500, 'Server error');
             return;
         }
-        if (translation.userId !== user.id) {
-            res.statusCode = 403;
-            const data = {
-                message: 'Only the user that added the song can delete it'
-            }
-            res.end(JSON.stringify(data));
+
+        if (translation.userId !== user.id && user.id !== 1) {
+            sendMessage(res, 403, 'Only the user that added the song can delete it');
             return;
         }
         // Cascade delete will happen because of trigger in db
         await this.songRepository.deleteSong(songId);
 
-        res.statusCode = 200;
-        const data = {
-            message: 'Song deleted successfully!'
-        }
-        res.end(JSON.stringify(data));
+        sendMessage(res, 200, 'Song deleted successfully!');
     }
 
 
