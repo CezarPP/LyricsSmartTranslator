@@ -11,7 +11,11 @@ import {StatsController} from "./controllers/StatsController";
 const http = require('http');
 
 const server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
-    const url = req.url as string;
+    if (req.url === undefined || req.method === undefined) {
+        console.log("Undefined url or method");
+        return;
+    }
+    const url = req.url;
     const method = req.method;
     const imagesController = new ImagesController();
     const userController = new UsersController();
@@ -36,7 +40,7 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         imagesController
             .handleApiRequest(req, res)
             .then();
-    } else if(url.startsWith('/api/comments')) {
+    } else if (url.startsWith('/api/comments')) {
         commentsController
             .handleApiRequest(req, res)
             .then();
