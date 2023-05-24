@@ -7,7 +7,6 @@ import {TranslationsController} from "./controllers/TranslationsController";
 import {CommentsController} from "./controllers/CommentsController";
 import {sendFile} from "./util/sendFile";
 import {StatsController} from "./controllers/StatsController";
-import {Comment} from "./models/Comment";
 
 const http = require('http');
 
@@ -73,11 +72,9 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         sendStaticFile(req, res)
             .then()
             .catch(() => console.log("Error sending static file"));
-        // res.writeHead(404, {'Content-Type': 'text/plain'});
-        // res.end('Not Found');
     }
 });
 
-server.listen(3000, () => {
-    console.log('Server is running on port 3000');
+server.listen(80, () => {
+    console.log('Server is running on port 80');
 });
