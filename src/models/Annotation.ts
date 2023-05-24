@@ -1,17 +1,31 @@
-class Annotation {
+export class Annotation {
     id: number;
-    user_id: number;
-    translation_id: number;
-    begin_pos: number;
-    end_pos: number;
+    userId: number;
+    translationId: number;
+    beginPos: number;
+    endPos: number;
     content: string;
+    reviewed: boolean;
 
-    constructor(id: number, user_id: number, translation_id: number, begin_pos: number, end_pos: number, content: string) {
+    constructor(id: number, userId: number, translationId: number, beginPos: number, endPos: number, content: string, reviewed: boolean) {
         this.id = id;
-        this.user_id = user_id;
-        this.translation_id = translation_id;
-        this.begin_pos = begin_pos;
-        this.end_pos = end_pos;
+        this.userId = userId;
+        this.translationId = translationId;
+        this.beginPos = beginPos;
+        this.endPos = endPos;
         this.content = content;
+        this.reviewed = reviewed;
+    }
+
+    toObject() {
+        return {
+            id: this.id,
+            userId: this.userId,
+            translationId: this.translationId,
+            beginPos: this.beginPos,
+            endPos: this.endPos,
+            content: this.content,
+            reviewed: this.reviewed,
+        };
     }
 }

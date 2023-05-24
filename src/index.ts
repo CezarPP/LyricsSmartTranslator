@@ -7,6 +7,7 @@ import {TranslationsController} from "./controllers/TranslationsController";
 import {CommentsController} from "./controllers/CommentsController";
 import {sendFile} from "./util/sendFile";
 import {StatsController} from "./controllers/StatsController";
+import {AnnotationsController} from "./controllers/AnnotationsController";
 
 const http = require('http');
 
@@ -23,6 +24,7 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     const translationsController = new TranslationsController();
     const statsController = new StatsController();
     const commentsController = new CommentsController();
+    const annotationsController = new AnnotationsController();
 
     if (url.startsWith('/api/song')) {
         songsController
@@ -42,6 +44,10 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
             .then();
     } else if (url.startsWith('/api/comments')) {
         commentsController
+            .handleApiRequest(req, res)
+            .then();
+    } else if (url.startsWith('/api/annotations')) {
+        annotationsController
             .handleApiRequest(req, res)
             .then();
     } else if (method === 'GET' && url && url === '/api/me') {
@@ -79,6 +85,6 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     }
 });
 
-server.listen(80, () => {
-    console.log('Server is running on port 80');
+server.listen(3000, () => {
+    console.log('Server is running on port 3000');
 });
