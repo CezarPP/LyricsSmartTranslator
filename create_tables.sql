@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS Updates;
 DROP TABLE IF EXISTS Comments;
 DROP TABLE IF EXISTS Annotations;
 DROP TABLE IF EXISTS Translations;
@@ -47,13 +46,12 @@ CREATE TABLE Translations
     description TEXT,
     lyrics      TEXT,
     no_views    INT,
-    no_likes    INT,
     time        TIMESTAMP
 );
 
 ALTER TABLE Translations
     ADD FOREIGN KEY (song_id)
-        REFERENCES Songs (id);
+        REFERENCES Songs (id) ON DELETE CASCADE;
 
 ALTER TABLE Translations
     ADD FOREIGN KEY (user_id)
@@ -61,7 +59,7 @@ ALTER TABLE Translations
 
 ALTER TABLE Songs
     ADD FOREIGN KEY (primary_translation)
-        REFERENCES Translations (id);
+        REFERENCES Translations (id) ON DELETE CASCADE;
 
 CREATE TABLE Annotations
 (
@@ -97,23 +95,6 @@ ALTER TABLE Comments
     ADD FOREIGN KEY (translation_id)
         REFERENCES Translations (id);
 
-CREATE TABLE Updates (
-                         id SERIAL PRIMARY KEY,
-                         user_id INT,
-                         translation_id INT,
-                         begin_pos INT,
-                         end_pos INT,
-                         content TEXT
-);
-
-ALTER TABLE Updates
-    ADD FOREIGN KEY (user_id)
-        REFERENCES Users(id);
-
-ALTER TABLE Updates
-    ADD FOREIGN KEY (translation_id)
-        REFERENCES Translations(id);
-
 -- we should not keep images in db, will keep them in the cloud
 
 ALTER TABLE images
@@ -123,5 +104,5 @@ ALTER TABLE images
 ALTER TABLE images
     DROP COLUMN img;
 
-ALTER TABLE translations
-    DROP COLUMN no_likes;
+ALTER TABLE Annotations
+    ADD COLUMN reviewed BOOLEAN NOT NULL DEFAULT FALSE;
