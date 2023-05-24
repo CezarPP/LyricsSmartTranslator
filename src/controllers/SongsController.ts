@@ -48,8 +48,6 @@ export class SongsController {
         });
 
         req.on('end', async () => {
-            console.log("Got all data");
-
             const postData = JSON.parse(body);
             const title = postData.title as string;
             const artist = postData.artist as string;
@@ -187,7 +185,7 @@ export class SongsController {
 
         const song: Song | null = await this.songRepository.getSongById(songId);
 
-        if (song == null) {
+        if (song === null) {
             sendMessage(res, 404, 'Song not found');
             return;
         }
@@ -197,11 +195,7 @@ export class SongsController {
     }
 
     async handleDelete(req: IncomingMessage, res: ServerResponse) {
-        if (!req.url) {
-            res.statusCode = 500;
-            res.end('Server error');
-            return;
-        }
+        assert(req.url);
         const songId: number = parseInt(req.url.split('/')[3]);
 
         if (isNaN(songId)) {
@@ -209,8 +203,6 @@ export class SongsController {
             sendMessage(res, 400, 'Invalid song id');
             return;
         }
-
-        console.log('Song id to delete is ' + songId);
 
         const song: Song | null = await this.songRepository.getSongById(songId);
         if (song === null) {
@@ -220,7 +212,7 @@ export class SongsController {
 
         const user = await this.usersController.getLoggedUser(req, res);
         if (user === null) {
-            sendMessage(res, 401, 'You need to be authenticated in order to delete a song');
+            sendMessage(res, 401, 'You need to be authenticated to delete a song');
             return;
         }
 
