@@ -83,4 +83,43 @@ export class UsersRepository {
             throw error;
         }
     }
+
+    async getNumberOfAnnotations(userId: number): Promise<number> {
+        const query = 'SELECT count_user_annotations($1) AS count';
+        const values = [userId];
+
+        try {
+            const result = await this.db.query(query, values);
+            return result.rows[0].count;
+        } catch (error) {
+            console.error(`Failed to get the number of annotations: ${error}`);
+            throw error;
+        }
+    }
+
+    async getNumberOfComments(userId: number): Promise<number> {
+        const query = 'SELECT count_user_comments($1) AS count';
+        const values = [userId];
+
+        try {
+            const result = await this.db.query(query, values);
+            return result.rows[0].count;
+        } catch (error) {
+            console.error(`Failed to get the number of comments: ${error}`);
+            throw error;
+        }
+    }
+
+    async getNumberOfTranslations(userId: number): Promise<number> {
+        const query = 'SELECT count_user_translations($1) AS count';
+        const values = [userId];
+
+        try {
+            const result = await this.db.query(query, values);
+            return result.rows[0].count;
+        } catch (error) {
+            console.error(`Failed to get the number of translations: ${error}`);
+            throw error;
+        }
+    }
 }

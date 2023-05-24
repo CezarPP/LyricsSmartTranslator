@@ -149,9 +149,9 @@ export class UsersController {
                 res.write(JSON.stringify({message: 'User not found'}));
                 res.end();
             } else {
-                const translationsCount = 0;
-                const annotationsCount = 0;
-                const commentsCount = 0;
+                const translationsCount = await this.usersRepository.getNumberOfTranslations(user.id);
+                const annotationsCount = await this.usersRepository.getNumberOfAnnotations(user.id);
+                const commentsCount = await this.usersRepository.getNumberOfComments(user.id);
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.write(JSON.stringify({
                     username: user.username,
@@ -180,9 +180,6 @@ export class UsersController {
                 const usersData = users.map((user) => ({
                     username: user.username,
                     img_id: user.img_id,
-                    translationsCount: 0,
-                    annotationsCount: 0,
-                    commentsCount: 0,
                 }));
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.write(JSON.stringify(usersData));
