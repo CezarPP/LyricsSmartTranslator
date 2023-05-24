@@ -1,0 +1,12 @@
+<rss version="2.0">
+    <channel>
+        <title>Song Feed</title>
+        <description>Stay updated with the latest songs.</description>
+        <item>
+            <title>Waterloo</title>
+            <author>ABBA</author>
+            <description>Check out this amazing new song!</description>
+            <posted_by>ionut</posted_by>
+        </item>
+    </channel>
+</rss>
