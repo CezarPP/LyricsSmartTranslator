@@ -6,12 +6,12 @@ function submitForm(event) {
     }
 }
 
-document.getElementById('myInput').onsubmit = function(event) {
+document.getElementById('myInput').onsubmit = function (event) {
     event.preventDefault();
     submitForm(event);
 };
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const searchedText = document.getElementById('searched-text');
     const resultsTitle = document.getElementById('search-title');
     const urlParams = new URLSearchParams(window.location.search);
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const authorElement = document.createElement('strong');
                     titleElement.innerText = song.title;
                     authorElement.innerText = song.artist;
-                    link.href = `/song-page/${song.id}`;
+                    link.href = `/song-page/${song.primary_translation}`;
                     link.style.color = 'blue'; // Add CSS styling to make the link blue
                     link.appendChild(titleElement);
                     listItem.appendChild(link);
