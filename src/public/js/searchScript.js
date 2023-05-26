@@ -34,13 +34,13 @@ function autocomplete(input, possibilities){
     input.addEventListener("keydown", function(e){
         let element = document.getElementById(this.id + "autocomplete-list");
         if (element) element = element.getElementsByTagName("div");
-        if(e.keyCode == 40) {
+        if(e.keyCode === 40) {
             focus++;
             addActive(element);
-        }else if(e.keyCode == 38){
+        }else if(e.keyCode === 38){
             focus--;
             addActive(element);
-        } else if (e.keyCode == 13){
+        } else if (e.keyCode === 13){
             e.preventDefault();
             if(focus > -1){
                 if(element) element[focus].click();
@@ -83,5 +83,35 @@ function autocomplete(input, possibilities){
     });
 }
 
-const songs = ["Stairway to Heaven", "Bohemian Rhapsody", "Hotel California", "Imagine", "Born to Run", "Thunder Road", "Purple Haze", "Layla", "God Save the Queen", "Like a Rolling Stone", "Smells Like Teen Spirit", "Good Vibrations", "Johnny B. Goode", "Hey Jude", "Billie Jean", "Purple Rain", "Respect", "Yesterday", "London Calling", "I Want to Hold Your Hand", "My Generation", "Superstition", "Bridge Over Troubled Water", "Let It Be", "Maybellene", "Every Breath You Take", "When Doves Cry", "Voodoo Child", "Another Brick in the Wall", "Whole Lotta Love", "When a Man Loves a Woman", "Everyday People", "Summertime Blues", "Boogie Woogie Bugle Boy", "All Along the Watchtower", "Sweet Home Alabama", "Kashmir", "Brown Eyed Girl", "Blowin in the Wind", "I Got You (I Feel Good)", "Dancing in the Street", "California Dreamin", "Respect Yourself", "Walk on By", "Stand by Me", "Dancing Queen", "I Will Survive", "The Twist", "The Weight", "Suspicious Minds", "Light My Fire", "Mississippi Goddam", "Soul Man", "My Girl", "A Change Is Gonna Come", "Born in the U.S.A.", "Good Times", "Jailhouse"]
-autocomplete(document.getElementById("myInput"), songs);
+function getAllSongs() {
+    return new Promise((resolve, reject) => {
+        fetch('/api/song', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.status === 401) {
+                    console.log("Unauthorized");
+                }
+                return response.json();
+            })
+            .then(data => {
+                resolve(data);
+            })
+            .catch(error => {
+                console.error('Error in getAllSongs(): ', error);
+                reject(error);
+            });
+    });
+}
+
+getAllSongs()
+    .then(data => {
+        const songTitles = data.map(song => song.title);
+        autocomplete(document.getElementById("myInput"), songTitles);
+    })
+    .catch(error => {
+        console.error('Error: ', error);
+    });
