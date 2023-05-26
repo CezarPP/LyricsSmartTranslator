@@ -1,4 +1,3 @@
-import fs from "fs";
 import {extname, join} from "path";
 import {IncomingMessage, ServerResponse} from "http";
 import {sendFile} from "./sendFile";
@@ -9,6 +8,10 @@ export const sendStaticFile = async (req: IncomingMessage, res: ServerResponse) 
         return;
     }
     let url = req.url;
+
+    if (url.includes('?')) {
+        url = url.split('?')[0];
+    }
 
     let ext: string = String(extname(url)).toLowerCase();
 
