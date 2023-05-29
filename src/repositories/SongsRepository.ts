@@ -114,7 +114,7 @@ export class SongsRepository {
             }
             return songs;
         } catch (error) {
-            console.error(`Failed to fetch song: ${error}`);
+            console.error(`Failed to fetch all songs: ${error}`);
             throw error;
         }
     }

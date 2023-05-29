@@ -1,5 +1,6 @@
 import {Pool} from "pg";
 import {Translation} from "../models/Translation";
+import {Song} from "../models/Song";
 
 export class TranslationsRepository {
     private db: Pool;
@@ -95,6 +96,24 @@ export class TranslationsRepository {
             console.log('Translation deleted successfully');
         } catch (err) {
             console.error('Error executing query to delete translation ', err);
+        }
+    }
+
+    async getAllTranslations(): Promise<Translation[]> {
+        const query = 'SELECT * FROM translations';
+        try {
+            const result = await this.db.query(query);
+            let translations: Translation[] = [];
+            for (let i = 0; i < result.rows.length; i++) {
+                const translation = result.rows[i];
+                translations.push(new Translation(translation.id, translation.song_id,
+                    translation.user_id, translation.description, translation.lyrics,
+                    translation.no_views, translation.time, translation.language));
+            }
+            return translations;
+        } catch (error) {
+            console.error(`Failed to fetch all translations: ${error}`);
+            throw error;
         }
     }
 }

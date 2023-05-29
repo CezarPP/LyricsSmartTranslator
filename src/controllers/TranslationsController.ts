@@ -4,6 +4,8 @@ import {IncomingMessage, ServerResponse} from "http";
 import {Translation} from "../models/Translation";
 import {UsersController} from "./UsersController";
 import {sendMessage} from "../util/sendMessage";
+import assert from "assert";
+import {Song} from "../models/Song";
 
 export class TranslationsController {
     private songRepository: SongsRepository;
@@ -18,7 +20,12 @@ export class TranslationsController {
 
     async handleApiRequest(req: IncomingMessage, res: ServerResponse) {
         if (req.method == 'GET') {
-            await this.handleGet(req, res);
+            assert(req.url);
+            if (req.url.split('/').length > 3) {
+                await this.handleGet(req, res);
+            } else {
+                await this.handleGetAll(req, res);
+            }
         } else if (req.method == 'POST') {
             await this.handlePost(req, res);
         } else if (req.method == 'PUT') {
@@ -51,6 +58,13 @@ export class TranslationsController {
         }
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(translation.toObject()));
+    }
+
+    async handleGetAll(req: IncomingMessage, res: ServerResponse) {
+        const allTranslations: Translation[] = await this.translationRepository.getAllTranslations();
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(allTranslations));
     }
 
     async handlePost(req: IncomingMessage, res: ServerResponse) {
