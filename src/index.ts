@@ -8,6 +8,7 @@ import {CommentsController} from "./controllers/CommentsController";
 import {sendFile} from "./util/sendFile";
 import {StatsController} from "./controllers/StatsController";
 import {AnnotationsController} from "./controllers/AnnotationsController";
+import {sendMessage} from "./util/sendMessage";
 
 const http = require('http');
 
@@ -82,6 +83,8 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         sendStaticFile(req, res)
             .then()
             .catch(() => console.log("Error sending static file"));
+    } else {
+        sendMessage(res, 404, 'Page not found');
     }
 });
 
