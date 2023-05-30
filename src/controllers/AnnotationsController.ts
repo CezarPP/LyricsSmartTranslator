@@ -5,6 +5,7 @@ import {sendMessage} from "../util/sendMessage";
 import {Annotation} from "../models/Annotation";
 import {UsersController} from "./UsersController";
 import {TranslationsRepository} from "../repositories/TranslationsRepository";
+import * as url from "url";
 
 export class AnnotationsController {
     private annotationsRepository: AnnotationsRepository;
@@ -20,10 +21,14 @@ export class AnnotationsController {
     async handleApiRequest(req: IncomingMessage, res: ServerResponse) {
         if (req.method == 'GET') {
             assert(req.url);
+            const parsedUrl = url.parse(req.url, true);
+            const hasParameters = Object.keys(parsedUrl.query).length > 0;
             if (req.url.split('/').length > 3) {
                 await this.handleGetById(req, res);
-            } else {
+            } else if (!hasParameters) {
                 await this.handleGetAll(req, res);
+            } else {
+                await this.handleFiltering(req, res);
             }
         } else if (req.method == 'POST') {
             await this.handlePost(req, res);
@@ -49,6 +54,45 @@ export class AnnotationsController {
 
     async handleGetAll(req: IncomingMessage, res: ServerResponse) {
         const annotations: Annotation[] = await this.annotationsRepository.getAllAnnotations();
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(annotations));
+    }
+
+    async handleFiltering(req: IncomingMessage, res: ServerResponse) {
+        assert(req.url);
+        const parsedUrl = url.parse(req.url, true);
+        const parameters = parsedUrl.query;
+        const translationIdString = parameters["translationId"] as string;
+        const reviewedString = parameters["reviewed"] as string;
+        let annotations: Annotation[] = [];
+        if (translationIdString === undefined && reviewedString === undefined) {
+            sendMessage(res, 400, 'Invalid request');
+            return;
+        } else if (translationIdString !== undefined && reviewedString === undefined) {
+            const translationId: number = parseInt(translationIdString);
+            if (isNaN(translationId)) {
+                sendMessage(res, 400, 'Invalid request');
+                return;
+            }
+            annotations = await this.annotationsRepository.getByTranslationId(translationId);
+        } else if (translationIdString === undefined && reviewedString !== undefined) {
+            const reviewed: number = parseInt(reviewedString);
+            if (isNaN(reviewed)) {
+                sendMessage(res, 400, 'Invalid request');
+                return;
+            }
+            annotations = await this.annotationsRepository.getByReviewed((reviewed === 1));
+        } else {
+            const translationId: number = parseInt(translationIdString);
+            const reviewed: number = parseInt(reviewedString);
+            if (isNaN(translationId) || isNaN(reviewed)) {
+                sendMessage(res, 400, 'Invalid request');
+                return;
+            }
+            annotations = await this.annotationsRepository.getByTranslationIdAndReviewed(translationId, (reviewed === 1));
+        }
+
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(annotations));

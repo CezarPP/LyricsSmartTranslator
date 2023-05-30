@@ -38,20 +38,7 @@ export class AnnotationsRepository {
 
     async getAllAnnotations() {
         const query = 'SELECT * FROM annotations';
-        try {
-            const result = await this.db.query(query);
-            let annotations: Annotation[] = [];
-            for (let i = 0; i < result.rows.length; i++) {
-                const it = result.rows[i];
-                annotations.push(
-                    new Annotation(it.id, it.user_id, it.translation_id,
-                        it.begin_pos, it.end_pos, it.content, it.reviewed));
-            }
-            return annotations;
-        } catch (error) {
-            console.error(`Failed to fetch all annotations: ${error}`);
-            throw error;
-        }
+        return this.getAllAnnotationsFromQuery(query, []);
     }
 
     async deleteAnnotation(annotationId: number) {
@@ -74,6 +61,38 @@ export class AnnotationsRepository {
         } catch (err) {
             console.error('Error executing query to add annotation ', err);
             throw err;
+        }
+    }
+
+    async getByReviewed(reviewed: boolean): Promise<Annotation[]> {
+        const query = 'SELECT * FROM annotations WHERE reviewed  = $1';
+        return await this.getAllAnnotationsFromQuery(query, [reviewed]);
+    }
+
+    async getByTranslationIdAndReviewed(translationId: number, reviewed: boolean): Promise<Annotation[]> {
+        const query = 'SELECT * FROM annotations WHERE translation_id = $1 AND reviewed = $2';
+        return await this.getAllAnnotationsFromQuery(query, [translationId, reviewed]);
+    }
+
+    async getByTranslationId(translationId: number): Promise<Annotation[]> {
+        const query = 'SELECT * FROM annotations WHERE translation_id = $1';
+        return await this.getAllAnnotationsFromQuery(query, [translationId]);
+    }
+
+    async getAllAnnotationsFromQuery(query: string, values: (string | number | boolean)[]): Promise<Annotation[]> {
+        try {
+            const result = await this.db.query(query, values);
+            let annotations: Annotation[] = [];
+            for (let i = 0; i < result.rows.length; i++) {
+                const it = result.rows[i];
+                annotations.push(
+                    new Annotation(it.id, it.user_id, it.translation_id,
+                        it.begin_pos, it.end_pos, it.content, it.reviewed));
+            }
+            return annotations;
+        } catch (error) {
+            console.error(`Failed to fetch all annotations: ${error}`);
+            throw error;
         }
     }
 
