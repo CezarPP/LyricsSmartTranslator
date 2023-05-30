@@ -1,17 +1,19 @@
-import {extname, join} from "path";
+import {extname, join, resolve, relative} from "path";
 import {IncomingMessage, ServerResponse} from "http";
 import {sendFile} from "./sendFile";
+import {sendMessage} from "./sendMessage";
 
 export const sendStaticFile = async (req: IncomingMessage, res: ServerResponse) => {
-    // TODO(sanitize URL)
     if (!req.url) {
         return;
     }
-    let url = req.url;
 
+    let url = req.url;
     if (url.includes('?')) {
         url = url.split('?')[0];
     }
+
+    const baseDir = resolve(__dirname, '../public');
 
     let ext: string = String(extname(url)).toLowerCase();
 
@@ -29,17 +31,26 @@ export const sendStaticFile = async (req: IncomingMessage, res: ServerResponse) 
 
     let filePath: string = '';
     if (url === '/') {
-        filePath = join('../public', '/index.html');
+        filePath = join(baseDir, 'index.html');
         ext = '.html';
     } else if (ext === '.html' || ext == '.xml' || ext == '.json') {
-        filePath = join('../public/assets/pages', url);
+        filePath = join(baseDir, 'assets/pages', url);
     } else if (ext === '.css' || ext === '.js') {
-        filePath = join('../public', url);
+        filePath = join(baseDir, url);
     } else if (url.startsWith('/song-page/')) {
-        filePath = '../public/assets/pages/song-page.html';
+        filePath = join(baseDir, 'assets/pages/song-page.html');
         ext = '.html';
     } else if (url.startsWith('/img/')) {
-        filePath = join('../public/assets' + url);
+        filePath = join(baseDir, 'assets' + url);
+    }
+
+    filePath = resolve(filePath);
+    const relativeFilePath = relative(baseDir, filePath);
+
+    // Check if the relative path is inside the same dir
+    if (relativeFilePath.startsWith('../')) {
+        sendMessage(res, 403, 'Forbidden');
+        return;
     }
 
     const contentType: string = mimeTypes[ext] || 'application/octet-stream';

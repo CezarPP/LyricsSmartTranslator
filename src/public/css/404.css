@@ -1,0 +1,35 @@
+.error-message-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+    text-align: center;
+    padding: 20px;
+}
+
+.error-message-container h2 {
+    color: var(--background-red);
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.error-message-container p {
+    color: var(--background-lighter);
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.go-home-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: var(--background-orange);
+    color: white;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    transition: background-color 0.3s ease;
+}
+
+.go-home-btn:hover {
+    background-color: var(--background-red);
+}
