@@ -8,6 +8,7 @@ import assert from "assert";
 import {UsersController} from "./UsersController";
 import {isYoutubeLink} from "../util/validation";
 import {sendMessage} from "../util/sendMessage";
+import url from "url";
 
 export class SongsController {
     private songRepository: SongsRepository;
@@ -25,10 +26,14 @@ export class SongsController {
     async handleApiRequest(req: IncomingMessage, res: ServerResponse) {
         if (req.method == 'GET') {
             assert(req.url);
+            const parsedUrl = url.parse(req.url, true);
+            const hasParameters = Object.keys(parsedUrl.query).length > 0;
             if (req.url.split('/').length > 3) {
                 await this.handleGetById(req, res);
-            } else {
+            } else if (!hasParameters) {
                 await this.handleGetAll(req, res);
+            } else {
+                await this.handleFiltering(req, res);
             }
         } else if (req.method == 'POST') {
             await this.handlePost(req, res);
@@ -39,6 +44,38 @@ export class SongsController {
         } else {
             sendMessage(res, 405, `Method not allowed for path ${req.url}`);
         }
+    }
+
+    async handleGetAll(req: IncomingMessage, res: ServerResponse) {
+        const allSongs: Song[] = await this.songRepository.getAllSongs();
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(allSongs));
+    }
+
+    async handleFiltering(req: IncomingMessage, res: ServerResponse) {
+        assert(req.url);
+        const parsedUrl = url.parse(req.url, true);
+        const parameters = parsedUrl.query;
+        const filter = parameters["filter"] as string;
+        const limitString = parameters["limit"] as string;
+        const limit = (limitString === undefined) ? 30 : parseInt(limitString);
+        const filterOptions = ["newest", "mostCommented", "mostViewed"];
+        const filterFunctions = [
+            (limit: number) => this.songRepository.getNewest(limit),
+            (limit: number) => this.songRepository.getMostCommented(limit),
+            (limit: number) => this.songRepository.getMostViewed(limit),
+        ];
+
+        if (filter === undefined || isNaN(limit) || limit < 0 || !filterOptions.includes(filter)) {
+            sendMessage(res, 400, 'Invalid request parameters');
+            return;
+        }
+
+        const songs: Song[] = await filterFunctions[filterOptions.indexOf(filter)](limit);
+
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(songs));
     }
 
     async handlePost(req: IncomingMessage, res: ServerResponse) {
@@ -183,8 +220,6 @@ export class SongsController {
             return;
         }
 
-        console.log('Song id is ' + songId);
-
         const song: Song | null = await this.songRepository.getSongById(songId);
 
         if (song === null) {
@@ -232,13 +267,5 @@ export class SongsController {
         await this.songRepository.deleteSong(songId);
 
         sendMessage(res, 200, 'Song deleted successfully!');
-    }
-
-
-    async handleGetAll(req: IncomingMessage, res: ServerResponse) {
-        const allSongs: Song[] = await this.songRepository.getAllSongs();
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify(allSongs));
     }
 }
