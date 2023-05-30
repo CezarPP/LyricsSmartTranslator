@@ -197,6 +197,44 @@
     width: 20%;
 }
 
+/*FOR YOU*/
+#for-you-container {
+    margin-bottom: 30px;
+}
+
+.for-you-title {
+    font-family: Programme, Arial, sans-serif;
+    font-size: 40px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.for-you-list {
+    font-family: Programme, Arial, sans-serif;
+}
+
+.for-you-list li {
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    padding: 8px 0;
+    border-bottom: 1px solid #ccc;
+}
+
+.for-you-list .song-number {
+    width: 10%;
+}
+
+.for-you-list .song-title {
+    width: 30%;
+}
+
+.for-you-list .song-author {
+    width: 20%;
+}
+
 
 .show-more-button {
     display: block;

@@ -25,9 +25,14 @@ const addMoreCharts = () => {
     for (let i = 1; i <= 5; i++) {
         const newItem = document.createElement('li');
         const index = chartsList.children.length + 1;
+        const id = translationId[index - 1];
+        if(id === undefined) {
+            showMoreButtonCharts.style.display = "none";
+            break;
+        }
         newItem.innerHTML = `
       <span class="song-number">${index}</span>
-      <span class="song-title"><a href="/song-page/${translationId[index]}" style="color:black">${songs[index]}</a></span>
+      <span class="song-title"><a href="/song-page/${id}" style="color:black">${songs[index - 1]}</a></span>
       <span class="song-author">${artists[index]}</span>
     `;
         chartsList.appendChild(newItem);

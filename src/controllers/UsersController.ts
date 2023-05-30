@@ -2,11 +2,14 @@ import {IncomingMessage, ServerResponse} from 'http';
 import {UsersRepository} from '../repositories/UsersRepository';
 import {User} from '../models/User';
 import * as jwt from 'jsonwebtoken';
-import {JwtPayload, verify} from "jsonwebtoken";
+import {JwtPayload, verify} from 'jsonwebtoken';
 import {parse} from "cookie";
-import fs from "fs";
-import {extname, join} from "path";
 import {sendFile} from "../util/sendFile";
+import url from "url";
+import assert from "assert";
+import {sendMessage} from "../util/sendMessage";
+import {userInfo} from "os";
+import {Song} from "../models/Song";
 
 const secretKey = 'ionut';
 
@@ -17,45 +20,47 @@ export class UsersController {
         this.usersRepository = new UsersRepository();
     }
 
-    async handleApiRequest(req: IncomingMessage, res: ServerResponse){
-        if(!req.url){
+    async handleApiRequest(req: IncomingMessage, res: ServerResponse) {
+        if (!req.url) {
             return; // nu are cum sa intre aici niciodata
         }
         console.log(req.url);
         const parsedURL = req.url.split('/');
         console.log(parsedURL);
         console.log(parsedURL.length);
-        if(req.method === 'POST'){
-            if(parsedURL.length === 4) {
+        if (req.url.endsWith('/recommendations')) {
+            await this.getRecommendations(req, res);
+            return;
+        }
+
+        if (req.method === 'POST') {
+            if (parsedURL.length === 4) {
                 if (parsedURL[3] === 'login') {
                     await this.loginUser(req, res);
                     return;
-                }
-                else if (parsedURL[3] === 'logout') {
+                } else if (parsedURL[3] === 'logout') {
                     await this.logoutUser(req, res);
                     return;
-                }
-                else if (parsedURL[3] === 'register') {
+                } else if (parsedURL[3] === 'register') {
                     await this.registerUser(req, res);
                     return;
                 }
             }
-        } else if(req.method === 'GET'){
-            if(parsedURL.length === 3) {
+        } else if (req.method === 'GET') {
+            if (parsedURL.length === 3) {
                 await this.getUsersStats(req, res);
                 return;
-            }
-            else if(parsedURL.length === 4) {
+            } else if (parsedURL.length === 4) {
                 await this.getUserStats(req, res, parsedURL[3]);
                 return;
             }
-        } else if(req.method === 'PUT'){
-            if(parsedURL.length === 4) {
+        } else if (req.method === 'PUT') {
+            if (parsedURL.length === 4) {
                 await this.updateUserProfile(req, res, parsedURL[3]);
                 return;
             }
-        } else if(req.method === 'DELETE'){
-            if(parsedURL.length === 4) {
+        } else if (req.method === 'DELETE') {
+            if (parsedURL.length === 4) {
                 await this.deleteUser(req, res, parsedURL[3]);
                 return;
             }
@@ -64,6 +69,7 @@ export class UsersController {
         res.write(JSON.stringify({message: 'Resource not found'}));
         res.end();
     }
+
     async loginUser(req: IncomingMessage, res: ServerResponse) {
         try {
             let body = '';
@@ -98,11 +104,13 @@ export class UsersController {
             res.end(JSON.stringify({message: 'Internal Server Error'}));
         }
     }
+
     async logoutUser(req: IncomingMessage, res: ServerResponse) {
         res.setHeader('Set-Cookie', 'jwt=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0');
         res.writeHead(200, {'Content-Type': 'application/json'});
         res.end(JSON.stringify({message: 'Logout successful'}));
     }
+
     async registerUser(req: IncomingMessage, res: ServerResponse) {
         try {
             let body = '';
@@ -141,7 +149,8 @@ export class UsersController {
             res.end();
         }
     }
-    async getUserStats(req: IncomingMessage, res: ServerResponse, username:String) {
+
+    async getUserStats(req: IncomingMessage, res: ServerResponse, username: String) {
         try {
             const user = await this.usersRepository.getUserByName(username);
             if (user === null) {
@@ -168,30 +177,32 @@ export class UsersController {
             res.end();
         }
     }
-    async getUsersStats(req: IncomingMessage, res: ServerResponse){
+
+    async getUsersStats(req: IncomingMessage, res: ServerResponse) {
         try {
             let users: User[] | null = null;
             users = await this.usersRepository.getAllUsers();
             if (users === null) {
-                res.writeHead(404, { 'Content-Type': 'application/json' });
-                res.write(JSON.stringify({ message: 'User not found' }));
+                res.writeHead(404, {'Content-Type': 'application/json'});
+                res.write(JSON.stringify({message: 'User not found'}));
                 res.end();
             } else {
                 const usersData = users.map((user) => ({
                     username: user.username,
                     img_id: user.img_id,
                 }));
-                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.writeHead(200, {'Content-Type': 'application/json'});
                 res.write(JSON.stringify(usersData));
                 res.end();
             }
         } catch (error) {
-            res.writeHead(500, { 'Content-Type': 'application/json' });
-            res.write(JSON.stringify({ message: 'Internal Server Error' }));
+            res.writeHead(500, {'Content-Type': 'application/json'});
+            res.write(JSON.stringify({message: 'Internal Server Error'}));
             res.end();
         }
     }
-    async updateUserProfile(req: IncomingMessage, res: ServerResponse, username:String){
+
+    async updateUserProfile(req: IncomingMessage, res: ServerResponse, username: String) {
         try {
             let body = '';
             req.on('data', chunk => {
@@ -210,31 +221,30 @@ export class UsersController {
                     res.end();
                 } else {
                     const loggedUser = await this.getLoggedUser(req, res);
-                    if(loggedUser === null){
+                    if (loggedUser === null) {
                         res.writeHead(401, {'Content-Type': 'application/json'});
                         res.end(JSON.stringify({message: 'Unauthorized'}));
-                    } else if(loggedUser.id === 1 || loggedUser.id === user.id){
+                    } else if (loggedUser.id === 1 || loggedUser.id === user.id) {
                         const oldUser = await this.usersRepository.getUserByName(newUsername);
-                        if(oldUser !== null && oldUser.id !== user.id) {
+                        if (oldUser !== null && oldUser.id !== user.id) {
                             res.writeHead(401, {'Content-Type': 'application/json'});
                             res.end(JSON.stringify({message: 'User with this username already exists'}));
                         } else {
                             // am adaugat asta acum
                             let goodPassword = newPassword;
-                            if(goodPassword.trim().length === 0)
+                            if (goodPassword.trim().length === 0)
                                 goodPassword = user.password;
 
                             const status = await this.usersRepository.updateUser(user.id, newUsername, goodPassword, newImg_id);
-                            if(status){
+                            if (status) {
                                 res.writeHead(200, {'Content-Type': 'application/json'});
                                 res.end(JSON.stringify({message: 'User successfully updated'}));
-                            }
-                            else{
+                            } else {
                                 res.writeHead(500, {'Content-Type': 'application/json'});
                                 res.write(JSON.stringify({message: 'Failed to update user'}));
                             }
                         }
-                    } else{
+                    } else {
                         res.writeHead(401, {'Content-Type': 'application/json'});
                         res.end(JSON.stringify({message: 'Unauthorized'}));
                     }
@@ -245,8 +255,9 @@ export class UsersController {
             res.end(JSON.stringify({message: 'Internal Server Error'}));
         }
     }
+
     async deleteUser(req: IncomingMessage, res: ServerResponse, username: String) {
-        try{
+        try {
             const user = await this.usersRepository.getUserByName(username);
             if (user === null) {
                 res.writeHead(404, {'Content-Type': 'application/json'});
@@ -254,20 +265,19 @@ export class UsersController {
                 res.end();
             } else {
                 const loggedUser = await this.getLoggedUser(req, res);
-                if(loggedUser === null){
+                if (loggedUser === null) {
                     res.writeHead(401, {'Content-Type': 'application/json'});
                     res.end(JSON.stringify({message: 'Unauthorized'}));
-                } else if(loggedUser.id === 1 || loggedUser.id === user.id){
+                } else if (loggedUser.id === 1 || loggedUser.id === user.id) {
                     const status = await this.usersRepository.deleteUser(user.id);
-                    if(status){
+                    if (status) {
                         res.writeHead(200, {'Content-Type': 'application/json'});
                         res.end(JSON.stringify({message: 'User successfully deleted'}));
-                    }
-                    else{
+                    } else {
                         res.writeHead(500, {'Content-Type': 'application/json'});
                         res.write(JSON.stringify({message: 'Failed to delete user'}));
                     }
-                } else{
+                } else {
                     res.writeHead(401, {'Content-Type': 'application/json'});
                     res.end(JSON.stringify({message: 'Unauthorized'}));
                 }
@@ -279,14 +289,15 @@ export class UsersController {
             res.end();
         }
     }
+
     async getUserProfilePage(req: IncomingMessage, res: ServerResponse) {
         try {
-            if(!req.url){
+            if (!req.url) {
                 //nu e posibil sa ajung aici
                 return;
             }
             const parsedURL = req.url.split('/');
-            if(parsedURL.length !== 3){
+            if (parsedURL.length !== 3) {
                 res.writeHead(404, {'Content-Type': 'application/json'});
                 res.write(JSON.stringify({message: 'Resource not found'}));
                 res.end();
@@ -295,14 +306,14 @@ export class UsersController {
             //vad la ce user vreau sa iau profilul
             const username = parsedURL[2];
             const user = await this.usersRepository.getUserByName(username);
-            if(user === null){
+            if (user === null) {
                 res.writeHead(404, {'Content-Type': 'application/json'});
                 res.write(JSON.stringify({message: 'User not found'}));
                 res.end();
                 return;
             }
             const loggedUser = await this.getLoggedUser(req, res);
-            if (loggedUser === null || (loggedUser.id !== 1 && loggedUser.id !== user.id )) {
+            if (loggedUser === null || (loggedUser.id !== 1 && loggedUser.id !== user.id)) {
                 // trebuie sa trimit pagina normala de profil
                 sendFile(req, res,
                     '../public/assets/pages/profile.html', 'text/html')
@@ -319,16 +330,17 @@ export class UsersController {
             res.end();
         }
     }
-    async getLoggedUserUsername(req:IncomingMessage, res: ServerResponse){
+
+    async getLoggedUserUsername(req: IncomingMessage, res: ServerResponse) {
         try {
             const user = await this.getLoggedUser(req, res);
-            if (user === null){
+            if (user === null) {
                 res.writeHead(404, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify({message:'No user is logged in'}));
+                res.write(JSON.stringify({message: 'No user is logged in'}));
                 res.end();
-            } else{
+            } else {
                 res.writeHead(200, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify({ username: user.username}));
+                res.write(JSON.stringify({username: user.username}));
                 res.end();
             }
         } catch (error) {
@@ -337,11 +349,12 @@ export class UsersController {
             res.end();
         }
     }
+
     async getLoggedUser(req: IncomingMessage, res: ServerResponse) {
         const userId = this.authenticateUser(req, res);
-        const user = await this.usersRepository.getUserById(userId);
-        return user;
+        return await this.usersRepository.getUserById(userId);
     }
+
     authenticateUser(req: IncomingMessage, res: ServerResponse): number {
         const cookies = req.headers.cookie;
         console.log(cookies);
@@ -353,13 +366,40 @@ export class UsersController {
             try {
                 // Verify and decode the JWT to access the payload
                 const decodedToken = verify(jwtCookie, secretKey) as JwtPayload;
-                const userId = decodedToken.userId;
-                return userId;
+                return decodedToken.userId;
             } catch (error) {
                 // Handle JWT verification errors
                 console.error('JWT verification failed:', error);
             }
         }
         return -1;
+    }
+
+    async getRecommendations(req: IncomingMessage, res: ServerResponse) {
+        assert(req.url);
+        const parsedUrl = url.parse(req.url, true);
+        const parameters = parsedUrl.query;
+        let limitString = parameters["limit"] as string;
+        if (limitString === undefined) {
+            limitString = "30";
+        }
+        let limit = parseInt(limitString);
+        if (isNaN(limit)) {
+            sendMessage(res, 500, 'Invalid request');
+            return;
+        }
+
+        const user = await this.getLoggedUser(req, res);
+
+        if (user === null) {
+            sendMessage(res, 401, 'Not logged in');
+            return;
+        }
+
+        const songs: Song[] = await this.usersRepository.getRecommendations(user.id, limit);
+        console.log("Songs for user are " + songs);
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(songs));
     }
 }

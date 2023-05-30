@@ -20,6 +20,11 @@ const addMoreCommunity = () => {
     for (let i = 1; i <= 4; i++) {
         const newItem = document.createElement('li');
         const index = communityList.children.length + 1;
+        const user = users[index - 1];
+        if (user === undefined) {
+            showMoreButtonCommunity.style.display = "none";
+            break;
+        }
         newItem.innerHTML = `
       <span class="community-number">${index}</span>
       <span class="community-name"><a href="/profile/${users[index - 1]}" style="color:black">${users[index - 1]}</a></span>
