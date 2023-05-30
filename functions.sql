@@ -13,14 +13,14 @@ AS
 $$
 BEGIN
     RETURN QUERY
-        SELECT u.id                                          AS user_id,
-               u.img_id                                      AS img_id,
-               u.username                                    AS username,
+        SELECT u.id                                                                          AS user_id,
+               u.img_id                                                                      AS img_id,
+               u.username                                                                    AS username,
                (COUNT(DISTINCT t.id) * 10 + COUNT(DISTINCT a.id) * 5 + COUNT(DISTINCT c.id)) AS activity_count
         FROM users u
-                LEFT JOIN translations t ON u.id = t.user_id
-                LEFT JOIN annotations a ON u.id = a.user_id
-                LEFT JOIN comments c ON u.id = c.user_id
+                 LEFT JOIN translations t ON u.id = t.user_id
+                 LEFT JOIN annotations a ON u.id = a.user_id
+                 LEFT JOIN comments c ON u.id = c.user_id
         GROUP BY u.id
         ORDER BY activity_count DESC
         LIMIT max_rows;
@@ -30,23 +30,12 @@ $$;
 ------------------ CHARTS
 
 CREATE OR REPLACE FUNCTION get_newest_songs(max_rows INT)
-    RETURNS TABLE
-            (
-                song_id        INT,
-                artist         VARCHAR,
-                title          VARCHAR,
-                translation_id INT,
-                "time"         TIMESTAMP
-            )
+    RETURNS SETOF Songs
 AS
 $$
 BEGIN
     RETURN QUERY
-        SELECT s.id                  AS song_id,
-               s.artist              AS artist,
-               s.title               AS title,
-               s.primary_translation AS translation_id,
-               t."time"
+        SELECT s.*
         FROM songs s
                  JOIN translations t ON s.primary_translation = t.id
         ORDER BY t."time" DESC
@@ -55,29 +44,19 @@ END;
 $$
     LANGUAGE plpgsql;
 
+
 CREATE OR REPLACE FUNCTION get_most_commented_songs(max_rows INT)
-    RETURNS TABLE
-            (
-                song_id        INT,
-                artist         VARCHAR,
-                title          VARCHAR,
-                translation_id INT,
-                comment_count  INT
-            )
+    RETURNS SETOF Songs
 AS
 $$
 BEGIN
     RETURN QUERY
-        SELECT s.id        AS song_id,
-               s.artist    AS artist,
-               s.title     AS title,
-               s.primary_translation AS translation_id,
-               COUNT(c.id) AS comment_count
+        SELECT s.*
         FROM songs s
                  LEFT JOIN translations t ON s.primary_translation = t.id
                  LEFT JOIN comments c ON t.id = c.translation_id
         GROUP BY s.id
-        ORDER BY comment_count DESC
+        ORDER BY COUNT(c.id) DESC
         LIMIT max_rows;
 END;
 $$
@@ -85,27 +64,16 @@ $$
 
 
 CREATE OR REPLACE FUNCTION get_most_viewed_songs(max_rows INT)
-    RETURNS TABLE
-            (
-                song_id     INT,
-                artist      VARCHAR,
-                title       VARCHAR,
-                translation_id INT,
-                views_count INT
-            )
+    RETURNS SETOF Songs
 AS
 $$
 BEGIN
     RETURN QUERY
-        SELECT s.id            AS song_id,
-               s.artist        AS artist,
-               s.title         AS title,
-               s.primary_translation AS translation_id,
-               SUM(t.no_views) AS views_count
+        SELECT s.*
         FROM songs s
                  JOIN Translations t ON s.primary_translation = t.id
         GROUP BY s.id
-        ORDER BY views_count DESC
+        ORDER BY SUM(t.no_views) DESC
         LIMIT max_rows;
 END;
 $$
