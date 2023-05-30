@@ -1,5 +1,6 @@
 import {Pool} from "pg";
 import {Song} from "../models/Song";
+import fs from "fs";
 
 export class SongsRepository {
     private db: Pool;
@@ -134,6 +135,20 @@ export class SongsRepository {
             console.log('Song updated successfully');
         } catch (err) {
             console.error('Error executing query', err);
+        }
+    }
+    async updateRSSFeed(){
+        try{
+            const queryResult = await this.db.query('SELECT generate_rss_feed();');
+
+            const rssFeed = queryResult.rows[0].generate_rss_feed;
+            console.log(rssFeed);
+
+            fs.writeFileSync('src/public/assets/pages/feed.xml', rssFeed);
+
+            console.log("ok");
+        } catch(err) {
+            console.error('Error updating RSS', err);
         }
     }
 }

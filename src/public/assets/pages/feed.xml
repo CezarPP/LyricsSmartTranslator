@@ -1,12 +1,1 @@
-<rss version="2.0">
-    <channel>
-        <title>Song Feed</title>
-        <description>Stay updated with the latest songs.</description>
-        <item>
-            <title>Waterloo</title>
-            <author>ABBA</author>
-            <description>Check out this amazing new song!</description>
-            <posted_by>ionut</posted_by>
-        </item>
-    </channel>
-</rss>
+<rss version="2.0"><channel><title>Song Feed</title><description>Stay updated with the latest songs.</description><item><title>Minim Doi</title><author>Alex Velea</author><description>Check out this amazing new song!</description><posted_by>alex</posted_by></item><item><title>Lasa-ma, papa, la mare</title><author>Andreea Bălan &amp; Andreea Antonescu</author><description>Check out this amazing new song!</description><posted_by>alex</posted_by></item><item><title>Vara trecuta</title><author>Voltaj</author><description>Check out this amazing new song!</description><posted_by>alex</posted_by></item><item><title>Hora Din Moldova</title><author>Nelly Ciobanu</author><description>Check out this amazing new song!</description><posted_by>alex</posted_by></item><item><title>Veta</title><author>Stefan Banica Jr.</author><description>Check out this amazing new song!</description><posted_by>cezar</posted_by></item><item><title>M-Am Dus Să Tai Un Copac</title><author>Mihai Margineanu</author><description>Check out this amazing new song!</description><posted_by>CezarPP</posted_by></item><item><title>Du-Mă Acasă, Măi Tramvai</title><author>Gica Petrescu</author><description>Check out this amazing new song!</description><posted_by>CezarPP</posted_by></item><item><title>Waterloo</title><author>ABBA</author><description>Check out this amazing new song!</description><posted_by>ionut</posted_by></item></channel></rss>

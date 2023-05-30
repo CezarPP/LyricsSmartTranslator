@@ -92,6 +92,8 @@ export class SongsController {
             await this.songRepository.updatePrimaryTranslation(songId, translationId);
 
             console.log("Song added successfully");
+            await this.songRepository.updateRSSFeed();
+            console.log("RSS feed updated successfully");
 
             res.statusCode = 200;
             const data = {
