@@ -33,7 +33,7 @@ const addMoreCharts = () => {
         newItem.innerHTML = `
       <span class="song-number">${index}</span>
       <span class="song-title"><a href="/song-page/${id}" style="color:black">${songs[index - 1]}</a></span>
-      <span class="song-author">${artists[index]}</span>
+      <span class="song-author">${artists[index - 1]}</span>
     `;
         chartsList.appendChild(newItem);
         if (chartsList.children.length > 20)

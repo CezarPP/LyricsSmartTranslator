@@ -32,7 +32,7 @@ const addMoreForYou = () => {
         newItem.innerHTML = `
       <span class="song-number">${index}</span>
       <span class="song-title"><a href="/song-page/${translationIds[index - 1]}" style="color:black">${song}</a></span>
-      <span class="song-author">${forYouArtists[index]}</span>
+      <span class="song-author">${forYouArtists[index - 1]}</span>
     `;
         forYouList.appendChild(newItem);
         if (forYouList.children.length > 20)
