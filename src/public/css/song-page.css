@@ -1,3 +1,11 @@
+body {
+    user-select: none;
+}
+
+#lyrics-paragraphs {
+    user-select: text;
+}
+
 .song-header-container {
     width: 100%;
     min-height: 10vh;

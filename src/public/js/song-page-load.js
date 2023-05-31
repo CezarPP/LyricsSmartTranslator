@@ -21,7 +21,7 @@ async function getSongFromServer() {
 
 async function loadTranslation(translationData) {
     const songId = translationData.songId;
-    const addTranslationButton = document.getElementById('add-translation-button');
+    const addTranslationButton = document.getElementById('add-translation-link');
     addTranslationButton.href = `/add-translation/${songId}`;
 
     const userId = translationData.userId;
@@ -155,6 +155,7 @@ async function handleComments() {
     const meResponse = await fetch('/api/me', {method: 'GET'});
     if (!meResponse.ok) {
         document.querySelector('.input-container').style.display = 'none';
+        document.getElementById('add-translation-button').style.display = 'none';
         return;
     }
 

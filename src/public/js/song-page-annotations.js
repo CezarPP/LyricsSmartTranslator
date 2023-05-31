@@ -1,15 +1,162 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // annotations feature
-    let activeAnnotationBox;
-    const lyricsContainer = document.querySelector('.lyrics-container');
+function Annotation(id, userId, translationId, beginPos, endPos, content, reviewed) {
+    this.id = id;
+    this.userId = userId;
+    this.translationId = translationId;
+    this.beginPos = beginPos;
+    this.endPos = endPos;
+    this.content = content;
+    this.reviewed = reviewed;
+}
 
-    const annotationsMap = new Map(); // (text, annotation)
+Annotation.prototype.toObject = function () {
+    return {
+        id: this.id,
+        userId: this.userId,
+        translationId: this.translationId,
+        beginPos: this.beginPos,
+        endPos: this.endPos,
+        content: this.content,
+        reviewed: this.reviewed,
+    };
+};
+
+function encodePair(a, b) {
+    return `${a}-${b}`;
+}
+
+function decodePair(pairStr) {
+    return pairStr.split('-').map(Number);
+}
+
+function rangeIntersects(map, start, end) {
+    for (let annotation of map.values()) {
+        if ((start >= annotation.beginPos && start <= annotation.endPos) ||
+            (end >= annotation.beginPos && end <= annotation.endPos) ||
+            (start <= annotation.beginPos && end >= annotation.endPos)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // span start, span length excluding text
+    let spanMap = new Map();
+    // span id, annotation
+    let annotationsMap = new Map();
+
+    let activeAnnotationBox = null;
+    const lyricsContainer = document.querySelector('.content-container');
+
+    const path = window.location.pathname;
+    const translationId = path.split('/')[2];
+    let translation = null;
+
+    fetch(`/api/translation/${translationId}`, {method: 'GET'})
+        .then(response => response.json())
+        .then(data => {
+            translation = data;
+        })
+        .catch(error => console.error('Error:', error));
+
+    fetch(`/api/annotations?translationId=${translationId}`)
+        .then(response => response.json())
+        .then(data => {
+            let annotations = data.map(annotation => new Annotation(
+                annotation.id, annotation.userId, annotation.translationId,
+                annotation.beginPos, annotation.endPos, annotation.content, annotation.reviewed
+            ));
+
+            annotations.forEach((annotation) => addAnnotation(annotation));
+        })
+        .catch(error => console.error('Error:', error));
+
+    function adjustDBToHTMLPosition(position) {
+        let newPosition = position;
+        for (const [key, value] of spanMap) {
+            if (key < position)
+                newPosition += value;
+        }
+        return newPosition;
+    }
+
+    function getContainerOffset(container) {
+        let node = container.parentNode.firstChild;
+        let globalOffset = 0;
+
+        while (node !== container) {
+            if (node.textContent)
+                globalOffset += node.textContent.length;
+            node = node.nextSibling;
+        }
+
+        return globalOffset;
+    }
+
+
+    function addAnnotation(annotation) {
+
+        const lyricParagraphs = document.getElementById('lyrics-paragraphs');
+        const lyricsText = lyricParagraphs.textContent;
+        const annotatedText = lyricsText.slice(annotation.beginPos, annotation.endPos);
+        const span = document.createElement('span');
+        span.id = 'annotation-id-' + encodePair(annotation.beginPos, annotation.endPos);
+        span.style.backgroundColor = 'rgb(233, 233, 233)';
+        span.style.cursor = 'pointer';
+        span.textContent = annotatedText;
+        span.style.userSelect = 'none';
+
+        annotationsMap.set(span.id, annotation);
+
+        const lyricsHTML = lyricParagraphs.innerHTML;
+        const htmlStart = adjustDBToHTMLPosition(annotation.beginPos);
+        const htmlEnd = adjustDBToHTMLPosition(annotation.endPos);
+
+        lyricParagraphs.innerHTML =
+            lyricsHTML.slice(0, htmlStart) +
+            span.outerHTML +
+            lyricsHTML.slice(htmlEnd);
+
+
+        const spanLength = span.outerHTML.length - span.textContent.length;
+        spanMap.set(annotation.beginPos, spanLength);
+
+        document.querySelectorAll('[id^="annotation-id-"]').forEach((element) => {
+            element.addEventListener('click', (e) => {
+                // This is to not trigger the event listener of adding a new annotation
+                e.stopPropagation();
+                showAnnotationBox(e.currentTarget);
+            });
+        });
+
+        return span;
+    }
 
     lyricsContainer.addEventListener('mouseup', () => {
         const selection = window.getSelection();
         const selectedText = selection.toString();
-        if (selectedText && !annotationsMap.has(selectedText)) {
-            showAnnotationBox(selection, selectedText);
+        if (selectedText) {
+            const range = selection.getRangeAt(0);
+            const container = range.startContainer;
+            const containerOffset = getContainerOffset(container);
+            const startOffset = range.startOffset + containerOffset;
+            const endOffset = range.endOffset + containerOffset;
+
+            // Annotation intersects other annotations
+            if (rangeIntersects(annotationsMap, startOffset, endOffset)
+                || range.startContainer !== range.endContainer
+                || (translation !== null && startOffset > translation.lyrics.length)) {
+                return;
+            }
+
+            console.log('New annotation position is ' + startOffset + ' ' + endOffset);
+
+            const span =
+                addAnnotation(new Annotation(0, 0, translationId, startOffset, endOffset, '', false));
+            if (span === null) {
+                console.log("Span is null");
+            }
+            showAnnotationBox(span);
         }
     });
 
@@ -17,93 +164,82 @@ document.addEventListener('DOMContentLoaded', () => {
         hideAnnotationsOnClick(event);
     });
 
-    function hideAnnotationsOnClick(event) {
-        const annotationBoxes = document.querySelectorAll('.annotation-box-active');
-        if (annotationBoxes.length === 0) {
-            return;
-        }
-        let shouldHideAnnotations = true;
-        annotationBoxes.forEach((box) => {
-            if (box.contains(event.target)) {
-                shouldHideAnnotations = false;
-            }
-        });
-        if (shouldHideAnnotations) {
-            annotationBoxes.forEach((box) => {
-                box.classList.remove('annotation-box-active');
-            });
-        }
-    }
+    window.addEventListener('resize', updateAnnotationBoxPosition);
 
     /**
-     * Prints the box that lets you annotate text not annotated before
-     * @param selection
-     * @param selectedText
+     * Prints the box that lets you create or edit an annotation
+     * @param span -> the span that contains the text that was clicked on
      */
-    function showAnnotationBox(selection, selectedText) {
-        const range = selection.getRangeAt(0);
-        const rect = range.getBoundingClientRect();
+    function showAnnotationBox(span) {
+        const rect = span.getBoundingClientRect();
         const annotations = document.getElementById("annotations-container").getBoundingClientRect();
         const box = document.createElement('div');
         box.classList.add('annotation-box', 'annotation-box-active');
         const topValue = rect.top + window.scrollY;
         box.style.left = `${annotations.left}px`;
         box.style.top = `${topValue}px`;
+
         activeAnnotationBox = box;
-        const inputWrapper = document.createElement('div');
-
-        const label = document.createElement('label');
-        label.for = "annotations-input";
-        const textArea = document.createElement('textarea');
-        textArea.id = "annotations-input";
-        textArea.placeholder = "Write your comment here";
-
-        const btnSubmit = document.createElement('button');
-        btnSubmit.id = 'submit-annotation';
-        btnSubmit.textContent = 'Submit';
-        const btnCancel = document.createElement('button');
-        btnCancel.id = 'cancel-annotation';
-        btnCancel.textContent = 'Cancel';
-
-        const btnWrapper = document.createElement('div');
-        btnWrapper.id = 'annotation-btn-wrapper';
-
-        btnSubmit.addEventListener('click', () => {
-            let annotationText = textArea.value.trim();
-            if (annotationText) {
-                annotationsMap.set(selectedText, annotationText);
-                const span = document.createElement('span');
-                span.style.backgroundColor = 'rgb(233, 233, 233)';
-                span.style.cursor = 'pointer';
-                span.textContent = selectedText;
-                span.addEventListener('click', () => {
-                    showAnnotatedBox(span);
-                });
-                range.deleteContents();
-                range.insertNode(span);
-                box.remove();
-            }
-        });
 
         const annotationBoxTitle = document.createElement('h2');
         annotationBoxTitle.textContent = 'Annotation';
         annotationBoxTitle.classList.add('annotation-box-title');
 
-        btnCancel.addEventListener('click', () => {
-            box.remove();
+        const textArea = document.createElement('textarea');
+        textArea.id = "editable-annotation-text";
+        textArea.placeholder = "Write your annotation here";
+        textArea.readOnly = true;
+        const annotation = annotationsMap.get(span.id);
+        if (annotation.content)
+            textArea.value = annotation.content;
+
+        const btnSubmit = document.createElement('button');
+        btnSubmit.id = 'submit-annotation';
+        btnSubmit.textContent = 'Submit';
+        btnSubmit.addEventListener('click', () => {
+            textArea.readOnly = true;
+            let annotationText = textArea.value.trim();
+            if (annotationText) {
+                box.classList.remove('annotation-box-active');
+                const newAnnotation = annotationsMap.get(span.id);
+                newAnnotation.content = annotationText;
+                annotationsMap.set(span.id, newAnnotation);
+            }
         });
 
+        const btnEdit = document.createElement('button');
+        btnEdit.id = 'btn-edit-annotation';
+        btnEdit.textContent = 'Edit';
+        btnEdit.addEventListener('click', () => {
+            textArea.readOnly = !textArea.readOnly;
+        });
+
+        const btnShare = document.createElement('button');
+        btnShare.id = 'btn-share-annotation';
+        btnShare.textContent = 'Share';
+        btnShare.addEventListener('click', () => {
+            textArea.readOnly = true;
+            alert("VLAD");// TODO(Vlad)
+        });
+
+        const btnWrapper = document.createElement('div');
+        btnWrapper.id = 'annotation-btn-wrapper';
+
         box.appendChild(annotationBoxTitle);
-        inputWrapper.appendChild(textArea);
-        box.appendChild(inputWrapper);
+        box.appendChild(textArea);
         btnWrapper.appendChild(btnSubmit);
-        btnWrapper.appendChild(btnCancel);
+        btnWrapper.appendChild(btnEdit);
+        btnWrapper.appendChild(btnShare);
         box.appendChild(btnWrapper);
 
         document.body.appendChild(box);
-        setTimeout(() => {
-            updateAnnotationBoxPosition();
-        }, 0);
+    }
+
+    function hideAnnotationsOnClick(event) {
+        if (activeAnnotationBox !== null && !activeAnnotationBox.contains(event.target)) {
+            activeAnnotationBox.classList.remove('annotation-box-active');
+            activeAnnotationBox = null;
+        }
     }
 
     function updateAnnotationBoxPosition() {
@@ -116,69 +252,4 @@ document.addEventListener('DOMContentLoaded', () => {
             activeAnnotationBox.style.top = `${topValue}px`;
         }
     }
-
-    window.addEventListener('resize', updateAnnotationBoxPosition);
-
-    /**
-     * Prints the box that lets you edit already annotated text
-     * @param span -> the span that contains the text that was clicked on
-     */
-    function showAnnotatedBox(span) {
-        const rect = span.getBoundingClientRect();
-        const annotations = document.getElementById("annotations-container").getBoundingClientRect();
-        const box = document.createElement('div');
-        box.classList.add('annotation-box', 'annotation-box-active');
-        const topValue = rect.top + window.scrollY;
-        box.style.left = `${annotations.left}px`;
-        box.style.top = `${topValue}px`;
-        activeAnnotationBox = box;
-
-        const annotationBoxTitle = document.createElement('h2');
-        annotationBoxTitle.textContent = 'Annotation';
-        annotationBoxTitle.classList.add('annotation-box-title');
-
-        const textArea = document.createElement('textarea');
-        textArea.id = "editable-annotation-text";
-        textArea.readOnly = true;
-        textArea.value = annotationsMap.get(span.textContent);
-
-        const btnEdit = document.createElement('button');
-        btnEdit.id = 'btn-edit-annotation';
-        btnEdit.textContent = 'Edit';
-
-        const btnSave = document.createElement('button');
-        btnSave.id = 'btn-save-annotation';
-        btnSave.textContent = 'Save';
-
-        const btnShare = document.createElement('button');
-        btnShare.id = 'btn-share-annotation';
-        btnShare.textContent = 'Share';
-
-        const btnWrapper = document.createElement('div');
-        btnWrapper.id = 'annotation-btn-wrapper';
-
-        btnEdit.addEventListener('click', () => {
-            textArea.readOnly = !textArea.readOnly;
-        });
-
-        btnSave.addEventListener('click', () => {
-            const newText = textArea.value.trim();
-            annotationsMap.set(span.textContent, newText);
-            textArea.readOnly = !textArea.readOnly;
-        });
-
-        btnShare.addEventListener('click', () => {
-            alert("Sharing is caring");
-        });
-
-        box.appendChild(annotationBoxTitle);
-        box.appendChild(textArea);
-        btnWrapper.appendChild(btnEdit);
-        btnWrapper.appendChild(btnSave);
-        btnWrapper.appendChild(btnShare);
-        box.appendChild(btnWrapper);
-
-        document.body.appendChild(box);
-    }
 });
-
