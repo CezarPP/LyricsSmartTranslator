@@ -10,6 +10,7 @@ import {sendMessage} from "../util/sendMessage";
 import {Song} from "../models/Song";
 import bcrypt from 'bcrypt';
 import {isEmailValid} from "../util/validation";
+import {sendNotFound} from "../util/sendNotFound";
 
 const secretKey = 'ionut';
 
@@ -299,7 +300,7 @@ export class UsersController {
             const username = parsedURL[2];
             const user = await this.usersRepository.getUserByName(username);
             if (user === null) {
-                sendMessage(res, 404, 'User not found');
+                await sendNotFound(req, res);
                 return;
             }
             const loggedUser = await this.getLoggedUser(req, res);

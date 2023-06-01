@@ -20,11 +20,13 @@ async function getUserInfo() {
 async function setUserData(userData){
     const username = userData.username;
     const img_id = userData.img_id;
+    const email = userData.email;
     const translationsCount = userData.translationsCount;
     const annotationsCount = userData.annotationsCount;
     const commentsCount = userData.commentsCount;
 
     document.getElementById('username').textContent = username;
+    document.getElementById('email').textContent = email;
     document.getElementById('translations-count').textContent = translationsCount;
     document.getElementById('annotations-count').textContent = annotationsCount;
     document.getElementById('comments-count').textContent = commentsCount;

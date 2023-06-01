@@ -23,8 +23,10 @@ async function setUserData(userData){
     const translationsCount = userData.translationsCount;
     const annotationsCount = userData.annotationsCount;
     const commentsCount = userData.commentsCount;
+    const email = userData.email;
 
     document.querySelector("#username").value = username;
+    document.querySelector("#email").value = email;
     document.querySelector("#translations-count").textContent = translationsCount;
     document.querySelector("#annotations-count").textContent = annotationsCount;
     document.querySelector("#comments-count").textContent = commentsCount;
@@ -102,9 +104,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function saveChanges(event) {
         event.preventDefault();
-
         const imageFile = document.getElementById('upload-photo');
         const reader = new FileReader();
+        const newUsername = document.getElementById('username').value.trim();
+        const newPassword = document.getElementById('password').value;
+        const newEmail = document.getElementById('email').value.trim();
+
+       if(newUsername === ''){
+           alert('Username field cannot be empty');
+           return;
+       }
+
+       if(newEmail === ''){
+           alert('Email cannot be empty');
+           return;
+       }
+
+       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+       if(!emailPattern.test(newEmail)){
+           alert('Invalid email format');
+           return;
+       }
 
         if(imageId === null) {
             reader.onloadend = function () {
@@ -127,15 +148,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     })
                     .then(data => {
                         const newImgId = data.id;
-                        const newUsername = document.getElementById('username').value;
-                        const newPassword = document.getElementById('password').value;
 
                         return fetch(`/api/user/${username}`, {
                             method: 'PUT',
                             headers: {
                                 'Content-Type': 'application/json'
                             },
-                            body: JSON.stringify({newUsername, newImgId, newPassword})
+                            body: JSON.stringify({newUsername, newImgId, newPassword, newEmail})
                         });
                     })
                     .then(response => {
@@ -151,15 +170,13 @@ document.addEventListener("DOMContentLoaded", function () {
             reader.readAsDataURL(imageFile.files[0]);
         } else {
             const newImgId = imageId;
-            const newUsername = document.getElementById('username').value;
-            const newPassword = document.getElementById('password').value;
 
             fetch(`/api/user/${username}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({newUsername, newImgId, newPassword})
+                body: JSON.stringify({newUsername, newImgId, newPassword, newEmail})
             }).then(response => {
                 if(!response.ok)
                     alert('Failed to change user data');
