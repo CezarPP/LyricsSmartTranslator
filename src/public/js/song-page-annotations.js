@@ -132,7 +132,26 @@ document.addEventListener('DOMContentLoaded', () => {
         return span;
     }
 
-    lyricsContainer.addEventListener('mouseup', () => {
+    let username = null;
+    fetch('/api/me', {method: 'GET'})
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("User not logged in");
+            }
+            return response.json();
+        })
+        .then(user => {
+            username = user.username;
+
+            lyricsContainer.addEventListener('mouseup', () => {
+                annotationSelected();
+            });
+        })
+        .catch(error => {
+            console.log(error);
+        });
+
+    function annotationSelected() {
         const selection = window.getSelection();
         const selectedText = selection.toString();
         if (selectedText) {
@@ -158,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             showAnnotationBox(span);
         }
-    });
+    }
 
     document.addEventListener('mousedown', (event) => {
         hideAnnotationsOnClick(event);
