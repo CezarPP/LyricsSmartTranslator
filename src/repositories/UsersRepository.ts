@@ -153,4 +153,16 @@ export class UsersRepository {
             throw error;
         }
     }
+
+    async changePassword(userId: number, newPassword: string): Promise<boolean> {
+        const query = 'UPDATE users SET password = $1 WHERE id = $2';
+        const values = [newPassword, userId];
+        try {
+            const result = await this.db.query(query, values);
+            return result.rowCount > 0; // Returns true if at least one row was affected
+        } catch (error) {
+            console.error(`Failed to update user in the database: ${error}`);
+            throw error;
+        }
+    }
 }

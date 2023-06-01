@@ -9,6 +9,7 @@ import {sendFile} from "./util/sendFile";
 import {StatsController} from "./controllers/StatsController";
 import {AnnotationsController} from "./controllers/AnnotationsController";
 import {sendMessage} from "./util/sendMessage";
+import {RecoverController} from "./controllers/RecoverController";
 
 const http = require('http');
 
@@ -19,6 +20,7 @@ const translationsController = new TranslationsController();
 const statsController = new StatsController();
 const commentsController = new CommentsController();
 const annotationsController = new AnnotationsController();
+const recoverController = new RecoverController();
 
 const server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
     if (req.url === undefined || req.method === undefined) {
@@ -50,6 +52,10 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
             .then();
     } else if (url.startsWith('/api/annotations')) {
         annotationsController
+            .handleApiRequest(req, res)
+            .then();
+    } else if(url.startsWith('/api/recover')){
+        recoverController
             .handleApiRequest(req, res)
             .then();
     } else if (method === 'GET' && url && url === '/api/me') {

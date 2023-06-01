@@ -11,14 +11,17 @@ import {Song} from "../models/Song";
 import bcrypt from 'bcrypt';
 import {isEmailValid} from "../util/validation";
 import {sendNotFound} from "../util/sendNotFound"
+import {RecoverRepository} from "../repositories/RecoverRepository";
 
 const secretKey = 'ionut';
 
 export class UsersController {
     private usersRepository: UsersRepository;
+    private recoverRepository: RecoverRepository;
 
     constructor() {
         this.usersRepository = new UsersRepository();
+        this.recoverRepository = new RecoverRepository();
     }
 
     async handleApiRequest(req: IncomingMessage, res: ServerResponse) {
@@ -37,9 +40,6 @@ export class UsersController {
                     return;
                 } else if (parsedURL[3] === 'register') {
                     await this.registerUser(req, res);
-                    return;
-                } else if(parsedURL[3] === 'recover') {
-                    await this.recoverPassword(req, res);
                     return;
                 }
             }
@@ -94,6 +94,7 @@ export class UsersController {
                     if (!match) {
                         sendMessage(res, 401, 'Invalid credentials');
                     } else {
+                        this.recoverRepository.deleteRecoverRequestUserId(user.id).then();
                         const token = jwt.sign({userId: user.id}, secretKey, {expiresIn: '20d'});
                         res.setHeader('Set-Cookie', `jwt=${token}; Path=/; HttpOnly; SameSite=Strict`);
                         sendMessage(res, 200, 'Login successful');
@@ -316,7 +317,6 @@ export class UsersController {
             sendMessage(res, 500, 'Internal server error');
         }
     }
-
     async getLoggedUsersInfo(req: IncomingMessage, res: ServerResponse) {
         try {
             const user = await this.getLoggedUser(req, res);
@@ -331,12 +331,10 @@ export class UsersController {
             sendMessage(res, 500, 'Internal server error');
         }
     }
-
     async getLoggedUser(req: IncomingMessage, res: ServerResponse) {
         const userId = this.authenticateUser(req);
         return await this.usersRepository.getUserById(userId);
     }
-
     authenticateUser(req: IncomingMessage): number {
         const cookies = req.headers.cookie;
         console.log(cookies);
@@ -356,7 +354,6 @@ export class UsersController {
         }
         return -1;
     }
-
     async getRecommendations(req: IncomingMessage, res: ServerResponse) {
         assert(req.url);
         const parsedUrl = url.parse(req.url, true);
@@ -385,25 +382,4 @@ export class UsersController {
         res.end(JSON.stringify(songs));
     }
 
-
-    async recoverPassword(req:IncomingMessage, res:ServerResponse){
-        try {
-            let body = '';
-            req.on('data', chunk => {
-                body += chunk.toString();
-            });
-
-            req.on('end', async () => {
-                const parsedData = JSON.parse(body);
-                const email = parsedData.email;
-
-                if (!email || !isEmailValid(email)) {
-                    sendMessage(res, 400, 'Invalid input data');
-                    return;
-                }
-            });
-        } catch (error) {
-            sendMessage(res, 500, 'Internal server error');
-        }
-    }
 }
