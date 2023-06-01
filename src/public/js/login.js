@@ -1,6 +1,4 @@
-
-
-document.querySelector('.login-container form').addEventListener('submit', function (event) {
+document.querySelector('.login-container form').addEventListener('submit', function(event) {
     event.preventDefault();
     console.log("Logging in...");
 
@@ -37,39 +35,54 @@ document.querySelector('.login-container form').addEventListener('submit', funct
         });
 });
 
-document
-    .querySelector('.sign-up-container form')
-    .addEventListener('submit', function (event) {
-        event.preventDefault();
-        console.log("Registering...");
+document.querySelector('.sign-up-container form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    console.log("Registering...");
 
-        // Get the form data
-        const formData = new FormData(event.target);
+    // Get the form data
+    const formData = new FormData(event.target);
 
-        // Create an object with selected fields
-        const jsonData = {
-            username: formData.get('username'),
-            password: formData.get('password'),
-            email: formData.get('email')
-        };
+    // Create an object with selected fields
+    const jsonData = {
+        username: formData.get('username'),
+        password: formData.get('password'),
+        email: formData.get('email')
+    };
 
-        // Send the form data as JSON to the server
-        fetch('/api/user/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(jsonData)
+    // Send the form data as JSON to the server
+    fetch('/api/user/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(jsonData)
+    })
+        .then(response => {
+            if(response.ok){
+                window.location.href = "/register-page.html";
+            }
+            else{
+                alert('Failed to register');
+            }
         })
-            .then(response => {
-                if(response.ok){
-                    window.location.href = "/register-page.html";
-                }
-                else{
-                    alert('Failed to register');
-                }
-            })
-            .catch(error => {
-                console.error('Error registering:', error);
-            });
-    });
+        .catch(error => {
+            console.error('Error registering:', error);
+        });
+});
+
+document.querySelector('#forgot-password-button').addEventListener('click', function() {
+    document.querySelector('#forgot-password-popup').style.display = 'block';
+});
+document.addEventListener('click', function(event) {
+    if (event.target.closest('#forgot-password-popup') === null) {
+        document.querySelector('#forgot-password-popup').style.display = 'none';
+    }
+});
+
+document.querySelector('#forgot-password-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const email = document.querySelector('#forgot-password-email').value;
+    // Process the email and perform the necessary actions (e.g., send password reset email)
+    console.log('Email:', email);
+    document.querySelector('#forgot-password-popup').style.display = 'none';
+});
