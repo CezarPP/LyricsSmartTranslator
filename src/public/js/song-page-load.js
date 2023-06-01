@@ -75,7 +75,17 @@ async function loadTranslation(translationData) {
     const description = translationData.description;
     const lyrics = translationData.lyrics;
     const no_views = translationData.no_views;
-    const time = translationData.time;
+    const date = new Date(translationData.time);
+    const time = date.toLocaleString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true,
+    });
+
 
     fetch(`/api/songs/${songId}`, {method: 'GET'})
         .then(response => {
