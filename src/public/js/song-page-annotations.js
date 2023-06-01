@@ -56,10 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
             translation = data;
-        })
-        .catch(error => console.error('Error:', error));
 
-    fetch(`/api/annotations?translationId=${translationId}`)
+            return fetch(`/api/annotations?translationId=${translationId}`);
+        })
         .then(response => response.json())
         .then(data => {
             let annotations = data.map(annotation => new Annotation(
@@ -67,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 annotation.beginPos, annotation.endPos, annotation.content, annotation.reviewed
             ));
 
-            annotations.forEach((annotation) => addAnnotation(annotation));
+            annotations.forEach((annotation) => addAnnotationLocally(annotation));
         })
         .catch(error => console.error('Error:', error));
 
@@ -93,9 +92,45 @@ document.addEventListener('DOMContentLoaded', () => {
         return globalOffset;
     }
 
+    async function sendAnnotationPost(annotation) {
+        console.log("Body is " + JSON.stringify(annotation.toObject()));
+        fetch('/api/annotations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(annotation.toObject()),
+        })
+            .then(response => response.json())
+            .then(data => {
+                annotation.id = data.id;
+                return annotation;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
 
-    function addAnnotation(annotation) {
+    async function sendAnnotationPut(annotation) {
+        console.log("Body is " + JSON.stringify(annotation.toObject()));
+        fetch(`/api/annotations/${annotation.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(annotation.toObject()),
+        })
+            .then(response => response.json())
+            .then(data => {
+                annotation.id = data.id;
+                return annotation;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
 
+    function addAnnotationLocally(annotation) {
         const lyricParagraphs = document.getElementById('lyrics-paragraphs');
         const lyricsText = lyricParagraphs.textContent;
         const annotatedText = lyricsText.slice(annotation.beginPos, annotation.endPos);
@@ -170,12 +205,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             console.log('New annotation position is ' + startOffset + ' ' + endOffset);
 
-            const span =
-                addAnnotation(new Annotation(0, 0, translationId, startOffset, endOffset, '', false));
-            if (span === null) {
-                console.log("Span is null");
-            }
-            showAnnotationBox(span);
+            const annotation = new Annotation(0, 0, translationId, startOffset, endOffset, '', false);
+            sendAnnotationPost(annotation)
+                .then(() => {
+                    const span = addAnnotationLocally(annotation);
+                    showAnnotationBox(span);
+                });
         }
     }
 
@@ -219,11 +254,14 @@ document.addEventListener('DOMContentLoaded', () => {
             textArea.readOnly = true;
             let annotationText = textArea.value.trim();
             if (annotationText) {
-                box.classList.remove('annotation-box-active');
                 const newAnnotation = annotationsMap.get(span.id);
                 newAnnotation.content = annotationText;
                 annotationsMap.set(span.id, newAnnotation);
+                sendAnnotationPut(newAnnotation)
+                    .then();
             }
+
+            box.classList.remove('annotation-box-active');
         });
 
         const btnEdit = document.createElement('button');

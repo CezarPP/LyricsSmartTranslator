@@ -106,9 +106,9 @@ export class AnnotationsController {
 
         req.on('end', async () => {
             const postData = JSON.parse(body);
-            const translationId = postData.translation_id as number;
-            const beginPos = postData.begin_pos as number;
-            const endPos = postData.end_pos as number;
+            const translationId = postData.translationId as number;
+            const beginPos = postData.beginPos as number;
+            const endPos = postData.endPos as number;
             const content = postData.content as string;
 
             if (translationId === undefined || beginPos === undefined ||
@@ -160,7 +160,7 @@ export class AnnotationsController {
 
         req.on('end', async () => {
             const putData = JSON.parse(body);
-            const content = putData.constructor as string;
+            const content = putData.content as string;
             if (content === undefined) {
                 sendMessage(res, 400, 'Invalid request');
                 return;

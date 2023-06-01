@@ -1,4 +1,4 @@
-import {Pool} from "pg";
+import {Pool, QueryResult} from "pg";
 import {Annotation} from "../models/Annotation";
 
 export class AnnotationsRepository {
@@ -38,7 +38,8 @@ export class AnnotationsRepository {
 
     async getAllAnnotations() {
         const query = 'SELECT * FROM annotations';
-        return this.getAllAnnotationsFromQuery(query, []);
+        const result = await this.db.query(query);
+        return this.getAllAnnotationsFromResult(result);
     }
 
     async deleteAnnotation(annotationId: number) {
@@ -66,22 +67,24 @@ export class AnnotationsRepository {
 
     async getByReviewed(reviewed: boolean): Promise<Annotation[]> {
         const query = 'SELECT * FROM annotations WHERE reviewed  = $1';
-        return await this.getAllAnnotationsFromQuery(query, [reviewed]);
+        const result = await this.db.query(query, [reviewed]);
+        return await this.getAllAnnotationsFromResult(result);
     }
 
     async getByTranslationIdAndReviewed(translationId: number, reviewed: boolean): Promise<Annotation[]> {
         const query = 'SELECT * FROM annotations WHERE translation_id = $1 AND reviewed = $2';
-        return await this.getAllAnnotationsFromQuery(query, [translationId, reviewed]);
+        const result = await this.db.query(query, [translationId, reviewed]);
+        return await this.getAllAnnotationsFromResult(result);
     }
 
     async getByTranslationId(translationId: number): Promise<Annotation[]> {
         const query = 'SELECT * FROM annotations WHERE translation_id = $1';
-        return await this.getAllAnnotationsFromQuery(query, [translationId]);
+        const result = await this.db.query(query, [translationId]);
+        return await this.getAllAnnotationsFromResult(result);
     }
 
-    async getAllAnnotationsFromQuery(query: string, values: (string | number | boolean)[]): Promise<Annotation[]> {
+    async getAllAnnotationsFromResult(result: QueryResult): Promise<Annotation[]> {
         try {
-            const result = await this.db.query(query, values);
             let annotations: Annotation[] = [];
             for (let i = 0; i < result.rows.length; i++) {
                 const it = result.rows[i];

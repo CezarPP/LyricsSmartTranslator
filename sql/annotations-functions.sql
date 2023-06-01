@@ -15,19 +15,18 @@ $$
     LANGUAGE plpgsql;
 
 
-
 CREATE OR REPLACE FUNCTION check_overlap_annotations(p_begin_pos INT, p_end_pos INT, p_translation_id INT)
     RETURNS BOOLEAN AS
 $$
 DECLARE
     overlap_exists BOOLEAN;
 BEGIN
-    SELECT EXISTS(
-                   SELECT 1
-                   FROM Annotations
-                   WHERE translation_id = p_translation_id
-                     AND (begin_pos, end_pos) OVERLAPS (p_begin_pos, p_end_pos)
-               )
+    SELECT EXISTS(SELECT 1
+                  FROM Annotations
+                  WHERE translation_id = p_translation_id
+                    AND ((begin_pos BETWEEN p_begin_pos AND p_end_pos)
+                      OR (end_pos BETWEEN p_begin_pos AND p_end_pos)
+                      OR (begin_pos < p_begin_pos AND end_pos > p_end_pos)))
     INTO overlap_exists;
 
     RETURN overlap_exists;
