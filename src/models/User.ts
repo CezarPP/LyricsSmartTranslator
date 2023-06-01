@@ -12,6 +12,14 @@ export class User {
         this.password = password;
         this.email = email;
     }
+
+
+    toObject(){
+        return{
+            id: this.id,
+            username: this.username,
+        };
+    }
 }
 
 

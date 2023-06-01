@@ -10,7 +10,7 @@ import {sendMessage} from "../util/sendMessage";
 import {Song} from "../models/Song";
 import bcrypt from 'bcrypt';
 import {isEmailValid} from "../util/validation";
-import {sendNotFound} from "../util/sendNotFound";
+import {sendNotFound} from "../util/sendNotFound"
 
 const secretKey = 'ionut';
 
@@ -37,6 +37,9 @@ export class UsersController {
                     return;
                 } else if (parsedURL[3] === 'register') {
                     await this.registerUser(req, res);
+                    return;
+                } else if(parsedURL[3] === 'recover') {
+                    await this.recoverPassword(req, res);
                     return;
                 }
             }
@@ -314,14 +317,14 @@ export class UsersController {
         }
     }
 
-    async getLoggedUserUsername(req: IncomingMessage, res: ServerResponse) {
+    async getLoggedUsersInfo(req: IncomingMessage, res: ServerResponse) {
         try {
             const user = await this.getLoggedUser(req, res);
             if (user === null) {
                 sendMessage(res, 404, 'No user is logged in');
             } else {
                 res.writeHead(200, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify({username: user.username}));
+                res.write(JSON.stringify(user.toObject()));
                 res.end();
             }
         } catch (error) {
@@ -380,5 +383,27 @@ export class UsersController {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(songs));
+    }
+
+
+    async recoverPassword(req:IncomingMessage, res:ServerResponse){
+        try {
+            let body = '';
+            req.on('data', chunk => {
+                body += chunk.toString();
+            });
+
+            req.on('end', async () => {
+                const parsedData = JSON.parse(body);
+                const email = parsedData.email;
+
+                if (!email || !isEmailValid(email)) {
+                    sendMessage(res, 400, 'Invalid input data');
+                    return;
+                }
+            });
+        } catch (error) {
+            sendMessage(res, 500, 'Internal server error');
+        }
     }
 }
