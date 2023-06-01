@@ -1,5 +1,5 @@
 async function fetchNewsData() {
-    const response = await fetch('/api/song?filter=newest&limit=4');
+    const response = await fetch('/api/songs?filter=newest&limit=4');
     if (!response.ok) {
         throw new Error(`ERROR getting data from API : ${response.status}`);
     }
@@ -7,7 +7,7 @@ async function fetchNewsData() {
 }
 
 async function setImage(imageId, img) {
-    fetch(`/api/image/${imageId}`, {method: 'GET'})
+    fetch(`/api/images/${imageId}`, {method: 'GET'})
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`

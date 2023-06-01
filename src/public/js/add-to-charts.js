@@ -9,7 +9,7 @@ const getNewestSongsData = async () => {
     songs.length = 0;
     artists.length = 0;
     translationId.length = 0;
-    await fetch('/api/song?filter=newest&limit=30', {method: 'GET'})
+    await fetch('/api/songs?filter=newest&limit=30', {method: 'GET'})
         .then(response => response.json())
         .then(data => {
             data.forEach(song => {

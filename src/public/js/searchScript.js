@@ -85,7 +85,7 @@ function autocomplete(input, possibilities){
 
 function getAllSongs() {
     return new Promise((resolve, reject) => {
-        fetch('/api/song', {
+        fetch('/api/songs', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

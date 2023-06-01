@@ -20,7 +20,7 @@ document
             const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
 
             // Send the image tot the server
-            fetch('/api/image', {
+            fetch('/api/images', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -32,7 +32,7 @@ document
                     // Get the image id back from the server
                     formObject['imageId'] = data.id;
                     // Send the rest of the form data to the server
-                    return fetch('/api/song', {
+                    return fetch('/api/songs', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'

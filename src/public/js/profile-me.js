@@ -35,7 +35,7 @@ async function setUserData(userData){
 
 async function setImage(img_id) {
     // o sa pun o constanta aici
-    fetch(`/api/image/${img_id}`, {method: 'GET'})
+    fetch(`/api/images/${img_id}`, {method: 'GET'})
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`
@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
             reader.onloadend = function () {
                 const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
                 // Send the image to the server
-                fetch('/api/image', {
+                fetch('/api/images', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

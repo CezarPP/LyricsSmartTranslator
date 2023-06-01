@@ -12,7 +12,7 @@ async function setTitleAuthor() {
     const titleElement = document.getElementById("song");
     const artistElement = document.getElementById("artist");
 
-    fetch(`/api/song/${songId}`, {method: 'GET'})
+    fetch(`/api/songs/${songId}`, {method: 'GET'})
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`
@@ -44,7 +44,7 @@ form.addEventListener("submit", async function (event) {
         language: languageElement.value
     }
 
-    await fetch('/api/translation', {
+    await fetch('/api/translations', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

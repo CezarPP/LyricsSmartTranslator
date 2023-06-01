@@ -77,7 +77,7 @@ async function loadTranslation(translationData) {
     const no_views = translationData.no_views;
     const time = translationData.time;
 
-    fetch(`/api/song/${songId}`, {method: 'GET'})
+    fetch(`/api/songs/${songId}`, {method: 'GET'})
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`
@@ -112,7 +112,7 @@ async function setSongElements(link, imageId, artist, title) {
 }
 
 async function setImage(imageId) {
-    fetch(`/api/image/${imageId}`, {method: 'GET'})
+    fetch(`/api/images/${imageId}`, {method: 'GET'})
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`
@@ -161,7 +161,7 @@ async function addComment(username, imageId, content) {
     comment.classList.add("comment");
 
     const infAuthor = document.createElement("img");
-    const imgLink = await fetch(`/api/image/${imageId}`, {method: 'GET'})
+    const imgLink = await fetch(`/api/images/${imageId}`, {method: 'GET'})
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`
@@ -208,7 +208,7 @@ async function handleComments() {
     const meData = await meResponse.json();
     const userResponse = await fetch(`/api/user/${meData.username}`, {method: 'GET'});
     const userInfo = await userResponse.json();
-    const imgResponse = await fetch(`/api/image/${userInfo.img_id}`, {method: 'GET'});
+    const imgResponse = await fetch(`/api/images/${userInfo.img_id}`, {method: 'GET'});
     const imgInfo = await imgResponse.json();
 
     document.querySelector(".avatar-container img").src = imgInfo.link;

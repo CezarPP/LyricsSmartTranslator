@@ -34,7 +34,7 @@ async function setUserData(userData){
 
 async function setImage(img_id) {
     // o sa pun o constanta aici
-    fetch( `/api/image/19`, {method:'GET'})
+    fetch( `/api/images/19`, {method:'GET'})
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`
