@@ -5,15 +5,20 @@ async function loadNavbar() {
 
         const loginButton = document.getElementById('loginButton');
         const addSongButton = document.getElementById('add-song-button');
-        const userStatus = await fetch('/api/me', {method: 'GET'});
 
-        if (userStatus.ok) {
-            const data = await userStatus.json(); // Await the JSON data
-            loginButton.textContent = data.username;
-            loginButton.href = '/profile/' + data.username;
-        } else {
+        try {
+            const userStatus = await fetch('/api/me', {method: 'GET'});
+            if (userStatus.ok) {
+                const data = await userStatus.json(); // Await the JSON data
+                loginButton.textContent = data.username;
+                loginButton.href = '/profile/' + data.username;
+            } else {
+                addSongButton.style.display = 'none';
+            }
+        } catch (error) {
             addSongButton.style.display = 'none';
         }
+
     } catch (error) {
         console.error('Error fetching navbar:', error);
     }

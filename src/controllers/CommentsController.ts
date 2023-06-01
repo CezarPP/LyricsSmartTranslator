@@ -2,9 +2,7 @@ import {IncomingMessage, ServerResponse} from "http";
 import {CommentsRepository} from "../repositories/CommentsRepository";
 import {Comment} from "../models/Comment";
 import {UsersRepository} from "../repositories/UsersRepository";
-import {InstanceResponseCallback} from "@google-cloud/storage/build/src/nodejs-common";
 import {UsersController} from "./UsersController";
-import {TranslationsController} from "./TranslationsController";
 import {TranslationsRepository} from "../repositories/TranslationsRepository";
 
 export class CommentsController {
@@ -97,17 +95,10 @@ export class CommentsController {
 
     async getAllComments(req: IncomingMessage, res: ServerResponse) {
         try {
-            let comments: Comment[] | null = null;
-            comments = await this.commentsRepository.getAllComments();
-            if (comments == null) {
-                res.writeHead(404, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify({message: 'No comments yet'}));
-                res.end();
-            } else {
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify(comments));
-                res.end();
-            }
+            const comments = await this.commentsRepository.getAllComments();
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.write(JSON.stringify(comments));
+            res.end();
         } catch (error) {
             res.writeHead(500, {'Content-Type': 'application/json'});
             res.write(JSON.stringify({message: 'Internal Server Error'}));
@@ -131,33 +122,27 @@ export class CommentsController {
                 return;
             }
 
-            let comments: Comment[] | null = null;
-            comments = await this.commentsRepository.getCommentsByTranslationId(transId);
 
-            if (comments == null) {
-                res.writeHead(404, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify({message: 'No comments yet'}));
-                res.end();
-            } else {
-                let commentsData = [];
-                for (let i = 0; i < comments.length; i++) {
-                    const comment = comments[i];
-                    const user = await this.userRepository.getUserById(comment.userId);
-                    if(user === null)
-                        continue;
-                    const commentData = {
-                        id: comment.id,
-                        username: user.username,
-                        imageId: user.img_id,
-                        translationId: comment.translationId,
-                        content: comment.content
-                    }
-                    commentsData.push(commentData)
+            const comments = await this.commentsRepository.getCommentsByTranslationId(transId);
+
+            let commentsData = [];
+            for (let i = 0; i < comments.length; i++) {
+                const comment = comments[i];
+                const user = await this.userRepository.getUserById(comment.userId);
+                if (user === null)
+                    continue;
+                const commentData = {
+                    id: comment.id,
+                    username: user.username,
+                    imageId: user.img_id,
+                    translationId: comment.translationId,
+                    content: comment.content
                 }
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify(commentsData));
-                res.end();
+                commentsData.push(commentData)
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.write(JSON.stringify(commentsData));
+            res.end();
         } catch (error) {
             res.writeHead(500, {'Content-Type': 'application/json'});
             res.write(JSON.stringify({message: 'Internal Server Error'}));

@@ -38,12 +38,12 @@ export class CommentsRepository {
         const row = result.rows[0];
         return new Comment(row.id, row.user_id, row.translation_id, row.content);
     }
-    async getAllComments(): Promise<Comment[] | null> {
+    async getAllComments(): Promise<Comment[]> {
         const query = 'SELECT * FROM comments ORDER BY id ASC';
         try{
             const result = await this.db.query(query);
             if(result.rows.length === 0){
-                return null;
+                return [];
             }
             const comments: Comment[] = result.rows.map((row: any) => {
                 return new Comment(row.id, row.user_id, row.translation_id, row.content);
@@ -56,13 +56,13 @@ export class CommentsRepository {
         }
     }
 
-    async getCommentsByTranslationId(translationId: number): Promise<Comment[] | null> {
+    async getCommentsByTranslationId(translationId: number): Promise<Comment[]> {
         const query = `SELECT * FROM comments WHERE translation_id = $1 ORDER BY id ASC`;
         const values = [translationId];
         try {
             const result = await this.db.query(query, values);
             if (result.rows.length === 0) {
-                return null;
+                return [];
             }
             const comments: Comment[] = result.rows.map((row: any) => {
                 return new Comment(row.id, row.user_id, row.translation_id, row.content);
