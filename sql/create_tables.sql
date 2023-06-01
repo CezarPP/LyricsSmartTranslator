@@ -55,7 +55,7 @@ ALTER TABLE Translations
 
 ALTER TABLE Translations
     ADD FOREIGN KEY (user_id)
-        REFERENCES Users (id);
+        REFERENCES Users (id) ON DELETE CASCADE;
 
 ALTER TABLE Songs
     ADD FOREIGN KEY (primary_translation)
@@ -73,11 +73,11 @@ CREATE TABLE Annotations
 
 ALTER TABLE Annotations
     ADD FOREIGN KEY (user_id)
-        REFERENCES Users (id);
+        REFERENCES Users (id) ON DELETE CASCADE;
 
 ALTER TABLE Annotations
     ADD FOREIGN KEY (translation_id)
-        REFERENCES Translations (id);
+        REFERENCES Translations (id) ON DELETE CASCADE;
 
 CREATE TABLE Comments
 (
@@ -89,16 +89,16 @@ CREATE TABLE Comments
 
 ALTER TABLE Comments
     ADD FOREIGN KEY (user_id)
-        REFERENCES Users (id);
+        REFERENCES Users (id) ON DELETE CASCADE;
 
 ALTER TABLE Comments
     ADD FOREIGN KEY (translation_id)
-        REFERENCES Translations (id);
+        REFERENCES Translations (id) ON DELETE CASCADE;
 
 -- we should not keep images in db, will keep them in the cloud
 
 ALTER TABLE images
-    ADD COLUMN link TEXT,
+    ADD COLUMN link      TEXT,
     ADD COLUMN extension TEXT;
 
 ALTER TABLE images
