@@ -53,7 +53,7 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
             .then();
     } else if (method === 'GET' && url && url === '/api/me') {
         userController
-            .getLoggedUserUsername(req, res)
+            .getLoggedUsersInfo(req, res)
             .then();
     } else if (method == 'GET' && url && url.startsWith('/api/stats')) {
         statsController
