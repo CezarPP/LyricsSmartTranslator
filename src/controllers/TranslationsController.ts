@@ -6,6 +6,7 @@ import {UsersController} from "./UsersController";
 import {sendMessage} from "../util/sendMessage";
 import assert from "assert";
 import {Song} from "../models/Song";
+import url from "url";
 
 export class TranslationsController {
     private songRepository: SongsRepository;
@@ -21,10 +22,14 @@ export class TranslationsController {
     async handleApiRequest(req: IncomingMessage, res: ServerResponse) {
         if (req.method == 'GET') {
             assert(req.url);
+            const parsedUrl = url.parse(req.url, true);
+            const hasParameters = Object.keys(parsedUrl.query).length > 0;
             if (req.url.split('/').length > 3) {
-                await this.handleGet(req, res);
-            } else {
+                await this.handleGetById(req, res);
+            } else if (!hasParameters) {
                 await this.handleGetAll(req, res);
+            } else {
+                await this.handleFiltering(req, res);
             }
         } else if (req.method == 'POST') {
             await this.handlePost(req, res);
@@ -33,12 +38,11 @@ export class TranslationsController {
         } else if (req.method == 'DELETE') {
             await this.handleDelete(req, res);
         } else {
-            res.statusCode = 405;
-            res.end('Method not allowed');
+            sendMessage(res, 405, `Method not allowed for path ${req.url}`);
         }
     }
 
-    async handleGet(req: IncomingMessage, res: ServerResponse) {
+    async handleGetById(req: IncomingMessage, res: ServerResponse) {
         if (!req.url) {
             sendMessage(res, 500, 'Server error');
             return;
@@ -65,6 +69,23 @@ export class TranslationsController {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(allTranslations));
+    }
+
+    async handleFiltering(req: IncomingMessage, res: ServerResponse) {
+        assert(req.url);
+        const parsedUrl = url.parse(req.url, true);
+        const parameters = parsedUrl.query;
+        const songIdString = parameters["songId"] as string;
+        const songId = (songIdString === undefined) ? 0 : parseInt(songIdString);
+        if (songIdString === undefined || isNaN(songId)) {
+            sendMessage(res, 400, 'Invalid request parameters');
+            return;
+        }
+
+        const translations: Translation[] = await this.translationRepository.getAllBySongId(songId);
+
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(translations));
     }
 
     async handlePost(req: IncomingMessage, res: ServerResponse) {

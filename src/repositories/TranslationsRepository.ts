@@ -1,6 +1,5 @@
-import {Pool} from "pg";
+import {Pool, QueryResult} from "pg";
 import {Translation} from "../models/Translation";
-import {Song} from "../models/Song";
 
 export class TranslationsRepository {
     private db: Pool;
@@ -42,14 +41,7 @@ export class TranslationsRepository {
 
         try {
             const result = await this.db.query(query, values);
-            if (result.rows.length === 0) {
-                return null;
-            }
-
-            const row = result.rows[0];
-            return new Translation(row.id, row.song_id, row.user_id,
-                row.language, row.description, row.lyrics,
-                row.no_views, row.time);
+            return await this.getTranslationFromResult(result);
         } catch (error) {
             console.error(`Failed to fetch translation: ${error}`);
             throw error;
@@ -66,15 +58,7 @@ export class TranslationsRepository {
 
         try {
             const result = await this.db.query(query, values);
-            if (result.rows.length === 0) {
-                return null;
-            }
-
-            const row = result.rows[0];
-            return new Translation(
-                row.id, row.song_id, row.user_id,
-                row.description, row.lyrics, row.no_views,
-                row.time, row.language);
+            return await this.getTranslationFromResult(result);
         } catch (error) {
             console.error(`Failed to fetch translation: ${error}`);
             throw error;
@@ -83,7 +67,7 @@ export class TranslationsRepository {
 
     async updateTranslation(translationId: number, newDescription: string, newLyrics: string) {
         try {
-            const result = await this.db.query('UPDATE Translations SET description = $1, lyrics = $2 WHERE id = $3', [newDescription, newLyrics, translationId]);
+            await this.db.query('UPDATE Translations SET description = $1, lyrics = $2 WHERE id = $3', [newDescription, newLyrics, translationId]);
             console.log('Translation updated successfully');
         } catch (err) {
             console.error('Error executing query to update a translation', err);
@@ -92,10 +76,22 @@ export class TranslationsRepository {
 
     async deleteTranslation(translationId: number) {
         try {
-            const result = await this.db.query('DELETE FROM translations WHERE id = $1', [translationId]);
+            await this.db.query('DELETE FROM translations WHERE id = $1', [translationId]);
             console.log('Translation deleted successfully');
         } catch (err) {
             console.error('Error executing query to delete translation ', err);
+        }
+    }
+
+    async getAllBySongId(songId: number): Promise<Translation[]> {
+        const query = 'SELECT * FROM translations WHERE song_id = $1';
+        const values = [songId];
+        try {
+            const result = await this.db.query(query, values);
+            return await this.getAllTranslationsFromResult(result);
+        } catch (error) {
+            console.error(`Failed to fetch all translations: ${error}`);
+            throw error;
         }
     }
 
@@ -103,17 +99,30 @@ export class TranslationsRepository {
         const query = 'SELECT * FROM translations';
         try {
             const result = await this.db.query(query);
-            let translations: Translation[] = [];
-            for (let i = 0; i < result.rows.length; i++) {
-                const translation = result.rows[i];
-                translations.push(new Translation(translation.id, translation.song_id,
-                    translation.user_id, translation.description, translation.lyrics,
-                    translation.no_views, translation.time, translation.language));
-            }
-            return translations;
+            return await this.getAllTranslationsFromResult(result);
         } catch (error) {
             console.error(`Failed to fetch all translations: ${error}`);
             throw error;
         }
+    }
+
+    async getTranslationFromResult(result: QueryResult): Promise<Translation | null> {
+        if (result.rows.length === 0) {
+            return null;
+        }
+
+        const row = result.rows[0];
+        return new Translation(row.id, row.song_id, row.user_id, row.language, row.description,
+            row.lyrics, row.no_views, row.time);
+    }
+
+    async getAllTranslationsFromResult(result: QueryResult): Promise<Translation[]> {
+        if (result.rows.length === 0) {
+            return [];
+        }
+        return result.rows.map((row: any) => {
+            return new Translation(row.id, row.song_id, row.user_id, row.language, row.description,
+                row.lyrics, row.no_views, row.time);
+        });
     }
 }

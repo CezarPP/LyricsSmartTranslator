@@ -3,7 +3,7 @@
 async function getSongFromServer() {
     const path = window.location.pathname;
     const translationId = path.split('/')[2];
-    fetch(`/api/translation/${translationId}`, {method: 'GET'})
+    fetch(`/api/translations/${translationId}`, {method: 'GET'})
         .then(response => {
             if (!response.ok) {
                 throw new Error(`Error getting translation from server status: ${response.status}`
@@ -19,12 +19,58 @@ async function getSongFromServer() {
         })
 }
 
+/*async function setUserTranslation(userId) {
+    fetch(`/api/user/${userId}`, {method: 'GET'})
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`
+                    + `error is ${response.json()}`);
+            }
+            return response.json();
+        })
+        .then(user => {
+            document.getElementById('by-user').textContent = user.username;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}*/
+
+async function setTranslationLanguages(songId) {
+    // get all translation for this song
+    fetch(`/api/translations?songId=${songId}`, {method: 'GET'})
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`
+                    + `error is ${response.json()}`);
+            }
+            return response.json();
+        })
+        .then(translations => {
+            const languageOptions = document.getElementById('language-options');
+            for (const translation of translations) {
+                const language = document.createElement('a');
+                language.href = `/song-page/${translation.id}`;
+                language.textContent = translation.language;
+                languageOptions.appendChild(language);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
+
 async function loadTranslation(translationData) {
     const songId = translationData.songId;
+    setTranslationLanguages(songId)
+        .then();
     const addTranslationButton = document.getElementById('add-translation-link');
     addTranslationButton.href = `/add-translation/${songId}`;
 
     const userId = translationData.userId;
+    /*    setUserTranslation(userId)
+            .then();*/
     const language = translationData.language;
     const description = translationData.description;
     const lyrics = translationData.lyrics;

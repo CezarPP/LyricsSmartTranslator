@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const translationId = path.split('/')[2];
     let translation = null;
 
-    fetch(`/api/translation/${translationId}`, {method: 'GET'})
+    fetch(`/api/translations/${translationId}`, {method: 'GET'})
         .then(response => response.json())
         .then(data => {
             translation = data;
