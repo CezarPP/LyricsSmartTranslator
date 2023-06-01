@@ -151,6 +151,7 @@ async function getCommentsFromServer() {
 }
 
 async function loadComments(commentsData) {
+    document.getElementById('no-comments').textContent = commentsData.length;
     for (const commentData of commentsData)
         await addComment(commentData.username, commentData.imageId, commentData.content).then();
 }
