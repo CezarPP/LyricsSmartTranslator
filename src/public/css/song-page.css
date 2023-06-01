@@ -148,6 +148,9 @@ a.song-page-button:hover {
     background-color: var(--background-lighter);
 }
 
+#no-views, #no-comments {
+    padding: 5px;
+}
 
 .like-comment-share {
     display: flex;

@@ -27,11 +27,11 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     const commentsController = new CommentsController();
     const annotationsController = new AnnotationsController();
 
-    if (url.startsWith('/api/song')) {
+    if (url.startsWith('/api/songs')) {
         songsController
             .handleApiRequest(req, res)
             .then();
-    } else if (url.startsWith('/api/translation')) {
+    } else if (url.startsWith('/api/translations')) {
         translationsController
             .handleApiRequest(req, res)
             .then();
@@ -39,7 +39,7 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         userController
             .handleApiRequest(req, res)
             .then();
-    } else if (url.startsWith('/api/image')) {
+    } else if (url.startsWith('/api/images')) {
         imagesController
             .handleApiRequest(req, res)
             .then();

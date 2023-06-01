@@ -1,5 +1,3 @@
-// TODO(add no_comments)
-// TODO(about should be a short description)
 async function getSongFromServer() {
     const path = window.location.pathname;
     const translationId = path.split('/')[2];
@@ -75,7 +73,17 @@ async function loadTranslation(translationData) {
     const description = translationData.description;
     const lyrics = translationData.lyrics;
     const no_views = translationData.no_views;
-    const time = translationData.time;
+    const date = new Date(translationData.time);
+    const time = date.toLocaleString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true,
+    });
+
 
     fetch(`/api/songs/${songId}`, {method: 'GET'})
         .then(response => {
@@ -95,9 +103,25 @@ async function loadTranslation(translationData) {
     await setTranslationElements(lyrics, description, no_views, time);
 }
 
+async function setDescription(description) {
+    const maxLength = 100;
+    let shortDescription;
+    if (description.length > maxLength) {
+        shortDescription = description.substring(0, maxLength) + "...";
+        document.getElementById('read-more').style.display = 'block';
+    } else {
+        shortDescription = description;
+        document.getElementById('read-more').style.display = 'none';
+    }
+
+    document.getElementById('about-short').innerText = shortDescription;
+    document.getElementById('about-content').innerText = description;
+}
+
 async function setTranslationElements(lyrics, description, no_views, time) {
     document.getElementById('about-content').textContent = description;
-    document.getElementById('song-description').textContent = description;
+    setDescription(description)
+        .then();
     document.getElementById('lyrics-paragraphs').textContent = lyrics;
     document.getElementById('no-views').textContent = no_views;
     document.getElementById('song-date').textContent = time;
@@ -151,6 +175,7 @@ async function getCommentsFromServer() {
 }
 
 async function loadComments(commentsData) {
+    document.getElementById('no-comments').textContent = commentsData.length;
     for (const commentData of commentsData)
         await addComment(commentData.username, commentData.imageId, commentData.content).then();
 }
