@@ -117,7 +117,6 @@ export class AnnotationsRepository {
             const query: string = 'UPDATE annotations SET content = $1, reviewed = FALSE WHERE id = $2';
             const values = [content, annotationId];
             await this.db.query(query, values);
-            console.log('Annotation content updated successfully');
         } catch (err) {
             console.error('Error executing query to update annotation ', err);
             throw err;

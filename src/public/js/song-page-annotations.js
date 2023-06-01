@@ -130,6 +130,21 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
+    async function sendDeleteAnnotation(annotation) {
+        fetch(`/api/annotations/${annotation.id}`, {method: 'DELETE'})
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+            })
+            .catch((error) => {
+                console.error('Error in sendDeleteAnnotation:', error);
+                console.error('Error type:', error.name);
+                console.error('Error message:', error.message);
+            });
+    }
+
+
     function addAnnotationLocally(annotation) {
         const lyricParagraphs = document.getElementById('lyrics-paragraphs');
         const lyricsText = lyricParagraphs.textContent;
@@ -168,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let username = null;
+    let userId = 0;
     fetch('/api/me', {method: 'GET'})
         .then(response => {
             if (!response.ok) {
@@ -177,6 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(user => {
             username = user.username;
+            userId = user.id;
 
             lyricsContainer.addEventListener('mouseup', () => {
                 annotationSelected();
@@ -205,11 +222,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             console.log('New annotation position is ' + startOffset + ' ' + endOffset);
 
-            const annotation = new Annotation(0, 0, translationId, startOffset, endOffset, '', false);
+            const annotation = new Annotation(0, userId, translationId, startOffset, endOffset, '', false);
+            const span = addAnnotationLocally(annotation);
+            showAnnotationBox(span);
             sendAnnotationPost(annotation)
-                .then(() => {
-                    const span = addAnnotationLocally(annotation);
-                    showAnnotationBox(span);
+                .then(response => response.json())
+                .then((newAnnotation) => {
+                    annotationsMap.set(span.id, newAnnotation);
                 });
         }
     }
@@ -250,14 +269,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const btnSubmit = document.createElement('button');
         btnSubmit.id = 'submit-annotation';
         btnSubmit.textContent = 'Submit';
-        btnSubmit.addEventListener('click', () => {
+        btnSubmit.addEventListener('click', async () => {
             textArea.readOnly = true;
             let annotationText = textArea.value.trim();
             if (annotationText) {
-                const newAnnotation = annotationsMap.get(span.id);
-                newAnnotation.content = annotationText;
-                annotationsMap.set(span.id, newAnnotation);
-                sendAnnotationPut(newAnnotation)
+                const annotation = annotationsMap.get(span.id);
+                annotation.content = annotationText;
+                annotationsMap.set(span.id, annotation);
+                sendAnnotationPut(annotation)
                     .then();
             }
 
@@ -279,13 +298,31 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("VLAD");// TODO(Vlad)
         });
 
+        const btnDelete = document.createElement('button');
+        btnDelete.id = 'btn-delete-annotation';
+        btnDelete.textContent = 'Delete';
+        btnDelete.addEventListener('click', () => {
+            const confirmDelete = window.confirm("Are you sure you want to delete this annotation?");
+            if (confirmDelete) {
+                const annotation = annotationsMap.get(span.id);
+                annotationsMap.delete(span.id);
+                sendDeleteAnnotation(annotation)
+                    .then(() => {
+                        location.reload();
+                    });
+            }
+        });
+
         const btnWrapper = document.createElement('div');
         btnWrapper.id = 'annotation-btn-wrapper';
 
         box.appendChild(annotationBoxTitle);
         box.appendChild(textArea);
-        btnWrapper.appendChild(btnSubmit);
-        btnWrapper.appendChild(btnEdit);
+        if (userId === annotation.userId || userId === 1) {
+            btnWrapper.appendChild(btnSubmit);
+            btnWrapper.appendChild(btnEdit);
+            btnWrapper.appendChild(btnDelete);
+        }
         btnWrapper.appendChild(btnShare);
         box.appendChild(btnWrapper);
 

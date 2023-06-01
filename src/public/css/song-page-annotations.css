@@ -53,6 +53,7 @@
 #cancel-annotation,
 #btn-edit-annotation,
 #btn-save-annotation,
+#btn-delete-annotation,
 #btn-share-annotation {
     flex: 1;
     margin: 20px;

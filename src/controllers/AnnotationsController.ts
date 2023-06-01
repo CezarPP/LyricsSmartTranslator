@@ -138,15 +138,12 @@ export class AnnotationsController {
             const annotation =
                 new Annotation(0, user.id, translationId, beginPos, endPos, content, false);
 
-            const annotationId = await this.annotationsRepository.addAnnotation(annotation);
-            console.log("Annotation added with id " + annotationId);
+            annotation.id = await this.annotationsRepository.addAnnotation(annotation);
+            console.log("Annotation added with id " + annotation.id);
 
-            res.statusCode = 200;
-            const data = {
-                message: 'Annotation added successfully!',
-                annotationId: annotationId
-            }
-            res.end(JSON.stringify(data));
+            res.statusCode = 201;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(annotation.toObject()));
         });
     }
 
@@ -182,6 +179,8 @@ export class AnnotationsController {
 
             await this.annotationsRepository.updateAnnotationContent(annotation.id, content);
 
+            console.log("Annotation with id " + annotation.id + " updated successfully");
+
             sendMessage(res, 200, 'Annotation updated successfully!');
         });
     }
@@ -202,6 +201,7 @@ export class AnnotationsController {
             return;
         }
         await this.annotationsRepository.deleteAnnotation(annotation.id);
+        console.log("Annotation with id " + annotation.id + " deleted successfully")
 
         sendMessage(res, 200, 'Annotation deleted successfully!');
     }
