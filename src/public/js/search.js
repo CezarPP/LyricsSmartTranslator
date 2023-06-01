@@ -1,6 +1,6 @@
 function submitForm(event) {
     event.preventDefault();
-    var query = document.getElementById('myInput').value;
+    let query = document.getElementById('myInput').value;
     if (query.trim() !== '') {
         window.location.href = 'search.html?q=' + encodeURIComponent(query);
     }

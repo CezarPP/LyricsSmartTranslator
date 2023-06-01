@@ -49,7 +49,8 @@ document
         // Create an object with selected fields
         const jsonData = {
             username: formData.get('username'),
-            password: formData.get('password')
+            password: formData.get('password'),
+            email: formData.get('email')
         };
 
         // Send the form data as JSON to the server

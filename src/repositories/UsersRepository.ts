@@ -27,19 +27,30 @@ export class UsersRepository {
             return null;
         }
         const row = result.rows[0];
-        return new User(row.id, row.img_id, row.username, row.password);
+        return new User(row.id, row.img_id, row.username, row.password, row.email);
     }
 
-    async getAllUsers(): Promise<User[] | null> {
+    async getUserByEmail(email: String): Promise<User | null> {
+        const query = 'SELECT * FROM users WHERE email = $1';
+        const values = [email];
+        const result = await this.db.query(query, values);
+
+        if(result.rows.length === 0){
+            return null;
+        }
+        const row = result.rows[0];
+        return new User(row.id, row.img_id, row.username, row.password, row.email);
+    }
+
+    async getAllUsers(): Promise<User[]> {
         const query = 'SELECT * FROM users';
         const result = await this.db.query(query);
         if (result.rows.length === 0) {
-            return null;
+            return [];
         }
-        const users: User[] = result.rows.map((row: any) => {
-            return new User(row.id, row.img_id, row.username, row.password);
+        return result.rows.map((row: any) => {
+            return new User(row.id, row.img_id, row.username, row.password, row.email);
         });
-        return users;
     }
 
     async getUserById(id: number): Promise<User | null> {
@@ -51,12 +62,12 @@ export class UsersRepository {
             return null;
         }
         const row = result.rows[0];
-        return new User(row.id, row.img_id, row.username, row.password);
+        return new User(row.id, row.img_id, row.username, row.password, row.email);
     }
 
-    async addUser(username: String, password: String): Promise<number> {
-        const query = 'INSERT INTO users(username, password, img_id) VALUES($1, $2, $3) RETURNING id';
-        const values = [username, password, 81];
+    async addUser(username: String, password: String, email: String): Promise<number> {
+        const query = 'INSERT INTO users(username, password, img_id, email) VALUES($1, $2, $3, $4) RETURNING id';
+        const values = [username, password, 81, email];
         try {
             const result = await this.db.query(query, values);
             return result.rows[0].id;
@@ -66,9 +77,9 @@ export class UsersRepository {
         }
     }
 
-    async updateUser(id: number, newUsername: string, newPassword: string, newImg_id: number): Promise<boolean> {
+    async updateUser(id: number, newUsername: string, newPassword: string, newEmail: string, newImgId: number): Promise<boolean> {
         const query = 'UPDATE users SET username = $1, password = $2, img_id = $3 WHERE id = $4';
-        const values = [newUsername, newPassword, newImg_id, id];
+        const values = [newUsername, newPassword, newImgId, id];
         try {
             const result = await this.db.query(query, values);
             return result.rowCount > 0; // Returns true if at least one row was affected

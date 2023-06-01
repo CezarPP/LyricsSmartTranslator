@@ -1,6 +1,5 @@
 import {IncomingMessage, ServerResponse} from 'http';
 import {UsersRepository} from '../repositories/UsersRepository';
-import {User} from '../models/User';
 import * as jwt from 'jsonwebtoken';
 import {JwtPayload, verify} from 'jsonwebtoken';
 import {parse} from "cookie";
@@ -8,8 +7,9 @@ import {sendFile} from "../util/sendFile";
 import url from "url";
 import assert from "assert";
 import {sendMessage} from "../util/sendMessage";
-import {userInfo} from "os";
 import {Song} from "../models/Song";
+import bcrypt from 'bcrypt';
+import {isEmailValid} from "../util/validation";
 
 const secretKey = 'ionut';
 
@@ -22,17 +22,10 @@ export class UsersController {
 
     async handleApiRequest(req: IncomingMessage, res: ServerResponse) {
         if (!req.url) {
-            return; // nu are cum sa intre aici niciodata
-        }
-        console.log(req.url);
-        const parsedURL = req.url.split('/');
-        console.log(parsedURL);
-        console.log(parsedURL.length);
-        if (req.url.endsWith('/recommendations')) {
-            await this.getRecommendations(req, res);
+            sendMessage(res, 500, 'Internal server error');
             return;
         }
-
+        const parsedURL = req.url.split('/');
         if (req.method === 'POST') {
             if (parsedURL.length === 4) {
                 if (parsedURL[3] === 'login') {
@@ -48,10 +41,13 @@ export class UsersController {
             }
         } else if (req.method === 'GET') {
             if (parsedURL.length === 3) {
-                await this.getUsersStats(req, res);
+                await this.getAllUserStats(req, res);
                 return;
             } else if (parsedURL.length === 4) {
-                await this.getUserStats(req, res, parsedURL[3]);
+                if (parsedURL[3].startsWith('recommendations'))
+                    await this.getRecommendations(req, res);
+                else
+                    await this.getUserStats(req, res, parsedURL[3]);
                 return;
             }
         } else if (req.method === 'PUT') {
@@ -65,9 +61,7 @@ export class UsersController {
                 return;
             }
         }
-        res.writeHead(404, {'Content-Type': 'application/json'});
-        res.write(JSON.stringify({message: 'Resource not found'}));
-        res.end();
+        sendMessage(res, 405, `Method not allowed for path ${req.url}`);
     }
 
     async loginUser(req: IncomingMessage, res: ServerResponse) {
@@ -79,36 +73,44 @@ export class UsersController {
 
             req.on('end', async () => {
                 console.log(body);
-                const {username, password} = JSON.parse(body);
+                const parsedData = JSON.parse(body);
+                const username = parsedData.username as string;
+                const password = parsedData.password as string;
+
+                if (!username || !password) {
+                    sendMessage(res, 400, 'Invalid request');
+                    return;
+                }
 
                 const user = await this.usersRepository.getUserByName(username);
                 if (user) {
                     const userPassword = user.password;
-                    if (!(userPassword === password)) {
-                        res.writeHead(401, {'Content-Type': 'application/json'});
-                        res.end(JSON.stringify({message: 'Invalid credentials'}));
+                    const match = await bcrypt.compare(password, userPassword);
+
+                    if (!match) {
+                        sendMessage(res, 401, 'Invalid credentials');
                     } else {
                         const token = jwt.sign({userId: user.id}, secretKey, {expiresIn: '20d'});
-
                         res.setHeader('Set-Cookie', `jwt=${token}; Path=/; HttpOnly; SameSite=Strict`);
-                        res.writeHead(200, {'Content-Type': 'application/json'});
-                        res.end(JSON.stringify({token, message: 'Login successful'}));
+                        sendMessage(res, 200, 'Login successful');
                     }
                 } else {
-                    res.writeHead(401, {'Content-Type': 'application/json'});
-                    res.end(JSON.stringify({message: 'Invalid credentials'}));
+                    sendMessage(res, 401, 'Invalid credentials');
                 }
             });
         } catch (error) {
-            res.writeHead(500, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({message: 'Internal Server Error'}));
+            sendMessage(res, 500, 'Internal server error');
         }
     }
 
     async logoutUser(req: IncomingMessage, res: ServerResponse) {
-        res.setHeader('Set-Cookie', 'jwt=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0');
-        res.writeHead(200, {'Content-Type': 'application/json'});
-        res.end(JSON.stringify({message: 'Logout successful'}));
+        const user = await this.getLoggedUser(req, res);
+        if (!user)
+            sendMessage(res, 404, 'No user is logged in');
+        else {
+            res.setHeader('Set-Cookie', 'jwt=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0');
+            sendMessage(res, 200, 'Logout successful');
+        }
     }
 
     async registerUser(req: IncomingMessage, res: ServerResponse) {
@@ -120,33 +122,37 @@ export class UsersController {
             });
 
             req.on('end', async () => {
-                const {username, password} = JSON.parse(body);
-
-                if (!username || !password) {
-                    res.writeHead(400, {'Content-Type': 'application/json'});
-                    res.write(JSON.stringify({message: 'Invalid input data'}));
-                    res.end();
+                const parsedData = JSON.parse(body);
+                const username = parsedData.username as string;
+                const email = parsedData.email as string;
+                const password = parsedData.password as string;
+                if (!username || !email || !password || !isEmailValid(email)) {
+                    sendMessage(res, 400, 'Invalid input data');
                     return;
                 }
 
-                const existingUser = await this.usersRepository.getUserByName(username);
-                if (existingUser) {
-                    res.writeHead(400, {'Content-Type': 'application/json'});
-                    res.write(JSON.stringify({message: 'User already exists'}));
-                    res.end();
+                const existingUsername = await this.usersRepository.getUserByName(username);
+                if (existingUsername) {
+                    sendMessage(res, 400, 'User already exists');
                     return;
                 }
 
-                const userId: number = await this.usersRepository.addUser(username, password);
+                const existingUserMail = await this.usersRepository.getUserByEmail(email);
+                if (existingUserMail) {
+                    sendMessage(res, 400, 'User with this email already exists');
+                    return;
+                }
 
+                //I need to encrypt the password:
+                const saltRounds = 10;
+                const hashedPassword = await bcrypt.hash(password, saltRounds);
+                const userId: number = await this.usersRepository.addUser(username, hashedPassword, email);
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.write(JSON.stringify({message: 'User registered successfully', id: userId}));
                 res.end();
             });
         } catch (error) {
-            res.writeHead(500, {'Content-Type': 'application/json'});
-            res.write(JSON.stringify({message: 'Internal Server Error'}));
-            res.end();
+            sendMessage(res, 500, 'Internal server error');
         }
     }
 
@@ -154,9 +160,7 @@ export class UsersController {
         try {
             const user = await this.usersRepository.getUserByName(username);
             if (user === null) {
-                res.writeHead(404, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify({message: 'User not found'}));
-                res.end();
+                sendMessage(res, 404, 'User not found');
             } else {
                 const translationsCount = await this.usersRepository.getNumberOfTranslations(user.id);
                 const annotationsCount = await this.usersRepository.getNumberOfAnnotations(user.id);
@@ -165,40 +169,31 @@ export class UsersController {
                 res.write(JSON.stringify({
                     username: user.username,
                     img_id: user.img_id,
+                    email: user.email,
                     translationsCount,
                     annotationsCount,
                     commentsCount
                 }));
+                res.end();
             }
-            res.end();
         } catch (error) {
-            res.writeHead(500, {'Content-Type': 'application/json'});
-            res.write(JSON.stringify({message: 'Internal Server Error'}));
-            res.end();
+            sendMessage(res, 500, 'Internal server error');
         }
     }
 
-    async getUsersStats(req: IncomingMessage, res: ServerResponse) {
+    async getAllUserStats(req: IncomingMessage, res: ServerResponse) {
         try {
-            let users: User[] | null = null;
-            users = await this.usersRepository.getAllUsers();
-            if (users === null) {
-                res.writeHead(404, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify({message: 'User not found'}));
-                res.end();
-            } else {
-                const usersData = users.map((user) => ({
-                    username: user.username,
-                    img_id: user.img_id,
-                }));
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify(usersData));
-                res.end();
-            }
-        } catch (error) {
-            res.writeHead(500, {'Content-Type': 'application/json'});
-            res.write(JSON.stringify({message: 'Internal Server Error'}));
+            const users = await this.usersRepository.getAllUsers();
+            const usersData = users.map((user) => ({
+                username: user.username,
+                img_id: user.img_id,
+                email: user.email
+            }));
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            res.write(JSON.stringify(usersData));
             res.end();
+        } catch (error) {
+            sendMessage(res, 500, 'Internal server error');
         }
     }
 
@@ -210,49 +205,57 @@ export class UsersController {
             });
 
             req.on('end', async () => {
-                const {newUsername, newImg_id, newPassword} = JSON.parse(body);
-                console.log(newImg_id);
-                console.log(newUsername);
-                console.log(newPassword);
+                const parsedData = JSON.parse(body);
+                const newUsername = parsedData.newUsername as string;
+                const newImgId = parsedData.newImgId as number;
+                const newPassword = parsedData.newPassword as string;
+                const newEmail = parsedData.newEmail as string;
+
+                if (!newUsername || !newImgId || newPassword === undefined || !newEmail || !isEmailValid(newEmail)) {
+                    sendMessage(res, 400, 'Invalid input data');
+                    return;
+                }
+
                 const user = await this.usersRepository.getUserByName(username);
                 if (user === null) {
-                    res.writeHead(404, {'Content-Type': 'application/json'});
-                    res.write(JSON.stringify({message: 'User not found'}));
-                    res.end();
+                    sendMessage(res, 404, 'User not found');
                 } else {
                     const loggedUser = await this.getLoggedUser(req, res);
                     if (loggedUser === null) {
-                        res.writeHead(401, {'Content-Type': 'application/json'});
-                        res.end(JSON.stringify({message: 'Unauthorized'}));
+                        sendMessage(res, 401, 'Unauthorized');
                     } else if (loggedUser.id === 1 || loggedUser.id === user.id) {
-                        const oldUser = await this.usersRepository.getUserByName(newUsername);
-                        if (oldUser !== null && oldUser.id !== user.id) {
-                            res.writeHead(401, {'Content-Type': 'application/json'});
-                            res.end(JSON.stringify({message: 'User with this username already exists'}));
-                        } else {
-                            // am adaugat asta acum
-                            let goodPassword = newPassword;
-                            if (goodPassword.trim().length === 0)
-                                goodPassword = user.password;
-
-                            const status = await this.usersRepository.updateUser(user.id, newUsername, goodPassword, newImg_id);
-                            if (status) {
-                                res.writeHead(200, {'Content-Type': 'application/json'});
-                                res.end(JSON.stringify({message: 'User successfully updated'}));
-                            } else {
-                                res.writeHead(500, {'Content-Type': 'application/json'});
-                                res.write(JSON.stringify({message: 'Failed to update user'}));
-                            }
+                        const existingUsername = await this.usersRepository.getUserByName(newUsername);
+                        if (existingUsername !== null && existingUsername.id !== user.id) {
+                            sendMessage(res, 401, 'User with this username already exists');
+                            return;
                         }
+                        const existingUserMail = await this.usersRepository.getUserByEmail(newEmail);
+                        if (existingUserMail !== null && existingUserMail.id !== user.id) {
+                            sendMessage(res, 401, 'User with this email already exists');
+                            return;
+                        }
+
+                        let goodPassword = newPassword;
+                        if (goodPassword.trim().length === 0)
+                            goodPassword = user.password;
+                        else{
+                            const saltRounds = 10;
+                            goodPassword = await bcrypt.hash(goodPassword, saltRounds);
+                        }
+                        const status = await this.usersRepository.updateUser(user.id, newUsername, goodPassword, newEmail, newImgId);
+                        if (status){
+                            sendMessage(res, 200, 'User succesfully updated');
+                        } else {
+                            sendMessage(res, 500, 'Failed to update user');
+                        }
+
                     } else {
-                        res.writeHead(401, {'Content-Type': 'application/json'});
-                        res.end(JSON.stringify({message: 'Unauthorized'}));
+                        sendMessage(res, 401, 'Unauthorized');
                     }
                 }
             });
         } catch (error) {
-            res.writeHead(500, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({message: 'Internal Server Error'}));
+            sendMessage(res, 500, 'Internal server error');
         }
     }
 
@@ -260,74 +263,53 @@ export class UsersController {
         try {
             const user = await this.usersRepository.getUserByName(username);
             if (user === null) {
-                res.writeHead(404, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify({message: 'User not found'}));
-                res.end();
+                sendMessage(res, 404, 'User not found');
             } else {
                 const loggedUser = await this.getLoggedUser(req, res);
                 if (loggedUser === null) {
-                    res.writeHead(401, {'Content-Type': 'application/json'});
-                    res.end(JSON.stringify({message: 'Unauthorized'}));
+                    sendMessage(res, 401, 'Unauthorized');
                 } else if (loggedUser.id === 1 || loggedUser.id === user.id) {
                     const status = await this.usersRepository.deleteUser(user.id);
                     if (status) {
-                        res.writeHead(200, {'Content-Type': 'application/json'});
-                        res.end(JSON.stringify({message: 'User successfully deleted'}));
+                        sendMessage(res, 200, 'User successfully deleted');
                     } else {
-                        res.writeHead(500, {'Content-Type': 'application/json'});
-                        res.write(JSON.stringify({message: 'Failed to delete user'}));
+                        sendMessage(res, 500, 'Failed to delete user');
                     }
                 } else {
-                    res.writeHead(401, {'Content-Type': 'application/json'});
-                    res.end(JSON.stringify({message: 'Unauthorized'}));
+                    sendMessage(res, 401, 'Unauthorized');
                 }
             }
-            res.end();
         } catch (error) {
-            res.writeHead(500, {'Content-Type': 'application/json'});
-            res.write(JSON.stringify({message: 'Internal Server Error'}));
-            res.end();
+            sendMessage(res, 500, 'Internal server error');
         }
     }
 
     async getUserProfilePage(req: IncomingMessage, res: ServerResponse) {
         try {
             if (!req.url) {
-                //nu e posibil sa ajung aici
+                sendMessage(res, 500, 'Internal server error');
                 return;
             }
             const parsedURL = req.url.split('/');
             if (parsedURL.length !== 3) {
-                res.writeHead(404, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify({message: 'Resource not found'}));
-                res.end();
+                sendMessage(res, 404, 'Resource not found');
                 return;
             }
             //vad la ce user vreau sa iau profilul
             const username = parsedURL[2];
             const user = await this.usersRepository.getUserByName(username);
             if (user === null) {
-                res.writeHead(404, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify({message: 'User not found'}));
-                res.end();
+                sendMessage(res, 404, 'User not found');
                 return;
             }
             const loggedUser = await this.getLoggedUser(req, res);
             if (loggedUser === null || (loggedUser.id !== 1 && loggedUser.id !== user.id)) {
-                // trebuie sa trimit pagina normala de profil
-                sendFile(req, res,
-                    '../public/assets/pages/profile.html', 'text/html')
-                    .then();
+                await sendFile(req, res, '../public/assets/pages/profile.html', 'text/html');
             } else {
-                // trimit pagina lui
-                sendFile(req, res,
-                    '../public/assets/pages/profile-me.html', 'text/html')
-                    .then();
+                await sendFile(req, res, '../public/assets/pages/profile-me.html', 'text/html');
             }
         } catch (error) {
-            res.writeHead(500, {'Content-Type': 'application/json'});
-            res.write(JSON.stringify({message: 'Internal Server Error'}));
-            res.end();
+            sendMessage(res, 500, 'Internal server error');
         }
     }
 
@@ -335,27 +317,23 @@ export class UsersController {
         try {
             const user = await this.getLoggedUser(req, res);
             if (user === null) {
-                res.writeHead(404, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify({message: 'No user is logged in'}));
-                res.end();
+                sendMessage(res, 404, 'No user is logged in');
             } else {
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.write(JSON.stringify({username: user.username}));
                 res.end();
             }
         } catch (error) {
-            res.writeHead(500, {'Content-Type': 'application/json'});
-            res.write(JSON.stringify({message: 'Internal Server Error'}));
-            res.end();
+            sendMessage(res, 500, 'Internal server error');
         }
     }
 
     async getLoggedUser(req: IncomingMessage, res: ServerResponse) {
-        const userId = this.authenticateUser(req, res);
+        const userId = this.authenticateUser(req);
         return await this.usersRepository.getUserById(userId);
     }
 
-    authenticateUser(req: IncomingMessage, res: ServerResponse): number {
+    authenticateUser(req: IncomingMessage): number {
         const cookies = req.headers.cookie;
         console.log(cookies);
         // Parse the cookie to retrieve the JWT

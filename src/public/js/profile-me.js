@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         }
                     })
                     .then(data => {
-                        const newImg_id = data.id;
+                        const newImgId = data.id;
                         const newUsername = document.getElementById('username').value;
                         const newPassword = document.getElementById('password').value;
 
@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             headers: {
                                 'Content-Type': 'application/json'
                             },
-                            body: JSON.stringify({newUsername, newImg_id, newPassword})
+                            body: JSON.stringify({newUsername, newImgId, newPassword})
                         });
                     })
                     .then(response => {
@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             reader.readAsDataURL(imageFile.files[0]);
         } else {
-            const newImg_id = imageId;
+            const newImgId = imageId;
             const newUsername = document.getElementById('username').value;
             const newPassword = document.getElementById('password').value;
 
@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({newUsername, newImg_id, newPassword})
+                body: JSON.stringify({newUsername, newImgId, newPassword})
             }).then(response => {
                 if(!response.ok)
                     alert('Failed to change user data');

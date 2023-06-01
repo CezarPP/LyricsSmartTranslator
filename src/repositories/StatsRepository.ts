@@ -25,7 +25,7 @@ export class StatsRepository {
             const users: User[] = [];
             const rows = result.rows;
             for (let i = 0; i < rows.length; i++) {
-                users.push(new User(rows[i].user_id, rows[i].img_id, rows[i].username, rows[i].activity_count));
+                users.push(new User(rows[i].user_id, rows[i].img_id, rows[i].username, rows[i].activity_count, rows[i].email));
             }
             return users;
         } catch (err) {
