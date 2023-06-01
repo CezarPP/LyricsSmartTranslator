@@ -1,32 +1,47 @@
 const showMoreButtonCharts = document.querySelector('#charts-container .show-more-button');
 const chartsList = document.querySelector('#charts-container .charts-list');
 
-const songs = [];
-const translationId = [];
-const artists = [];
+let songs = [];
+let translationId = [];
+let artists = [];
 
-const getNewestSongsData = async () => {
-    songs.length = 0;
-    artists.length = 0;
-    translationId.length = 0;
-    await fetch('/api/songs?filter=newest&limit=30', {method: 'GET'})
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(song => {
-                songs.push(song.title);
-                translationId.push(song.primary_translation);
-                artists.push(song.artist);
-            });
+let dataMap = new Map();
 
-        })
-        .catch(err => console.log('Error getting the newest songs ' + err));
+const getSongsData = async () => {
+    const methods = ['newest', 'mostCommented', 'mostViewed'];
+    for (let method of methods) {
+        await fetch(`/api/songs?filter=${method}`, {method: 'GET'})
+            .then(response => response.json())
+            .then(data => {
+                let songData = [];
+                let artistData = [];
+                let translationIdData = [];
+                data.forEach(song => {
+                    songData.push(song.title);
+                    translationIdData.push(song.primary_translation);
+                    artistData.push(song.artist);
+                });
+                dataMap.set(method, {songs: songData, artists: artistData, translationId: translationIdData});
+            })
+            .catch(err => console.log('Error getting the charts songs ' + err));
+    }
 }
+
+const loadFromDataMap = (filterMethod) => {
+    let data = dataMap.get(filterMethod);
+    if (data !== undefined) {
+        songs = data.songs;
+        artists = data.artists;
+        translationId = data.translationId;
+    }
+}
+
 const addMoreCharts = () => {
     for (let i = 1; i <= 5; i++) {
         const newItem = document.createElement('li');
         const index = chartsList.children.length + 1;
         const id = translationId[index - 1];
-        if(id === undefined) {
+        if (id === undefined) {
             showMoreButtonCharts.style.display = "none";
             break;
         }
@@ -42,11 +57,44 @@ const addMoreCharts = () => {
 };
 
 const addMoreChartsFirstTime = async () => {
-    await getNewestSongsData();
+    while (chartsList.firstChild) {
+        chartsList.removeChild(chartsList.firstChild);
+    }
     await addMoreCharts();
 }
 
 showMoreButtonCharts.addEventListener('click', addMoreCharts);
+document.addEventListener('DOMContentLoaded', async () => {
+    await getSongsData();
 
-addMoreChartsFirstTime()
-    .then();
+    const newest = document.getElementById('newest');
+    const mostCommented = document.getElementById('most-commented');
+    const mostViewed = document.getElementById('most-viewed');
+
+    newest.addEventListener('click', function (e) {
+        e.preventDefault();
+        loadFromDataMap('newest');
+        addMoreChartsFirstTime()
+            .then();
+
+    });
+    mostCommented.addEventListener('click', function (e) {
+        e.preventDefault();
+        loadFromDataMap('mostCommented');
+        addMoreChartsFirstTime()
+            .then();
+    });
+    mostViewed.addEventListener('click', function (e) {
+        e.preventDefault();
+        loadFromDataMap('mostViewed');
+        addMoreChartsFirstTime()
+            .then();
+    });
+
+    // default
+    loadFromDataMap('newest');
+    addMoreChartsFirstTime()
+        .then();
+})
+
+
