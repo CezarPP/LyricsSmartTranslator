@@ -74,6 +74,15 @@ export class TranslationsRepository {
         }
     }
 
+    async updateNoViews(translationId: number, no_views: number) {
+        try {
+            const query = 'UPDATE Translations SET no_views = $1 WHERE id = $2';
+            await this.db.query(query, [no_views, translationId]);
+        } catch (err) {
+            console.error('Error executing query to update a translation', err);
+        }
+    }
+
     async deleteTranslation(translationId: number) {
         try {
             await this.db.query('DELETE FROM translations WHERE id = $1', [translationId]);

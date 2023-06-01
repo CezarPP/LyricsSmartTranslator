@@ -12,6 +12,14 @@ import {sendMessage} from "./util/sendMessage";
 
 const http = require('http');
 
+const imagesController = new ImagesController();
+const userController = new UsersController();
+const songsController = new SongsController();
+const translationsController = new TranslationsController();
+const statsController = new StatsController();
+const commentsController = new CommentsController();
+const annotationsController = new AnnotationsController();
+
 const server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
     if (req.url === undefined || req.method === undefined) {
         console.log("Undefined url or method");
@@ -19,13 +27,6 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     }
     const url = req.url;
     const method = req.method;
-    const imagesController = new ImagesController();
-    const userController = new UsersController();
-    const songsController = new SongsController();
-    const translationsController = new TranslationsController();
-    const statsController = new StatsController();
-    const commentsController = new CommentsController();
-    const annotationsController = new AnnotationsController();
 
     if (url.startsWith('/api/songs')) {
         songsController
@@ -74,11 +75,14 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
             '../public/assets/pages/add-translation.html', 'text/html')
             .then();
     } else if (method == 'POST' && url == '/login') {
-        userController.loginUser(req, res);
+        userController.loginUser(req, res)
+            .then();
     } else if (method == 'POST' && url == '/register') {
-        userController.registerUser(req, res);
+        userController.registerUser(req, res)
+            .then();
     } else if (method == 'POST' && url == '/logout') {
-        userController.logoutUser(req, res);
+        userController.logoutUser(req, res)
+            .then();
     } else if (method == 'GET') {
         sendStaticFile(req, res)
             .then()

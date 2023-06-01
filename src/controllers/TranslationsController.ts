@@ -5,10 +5,10 @@ import {Translation} from "../models/Translation";
 import {UsersController} from "./UsersController";
 import {sendMessage} from "../util/sendMessage";
 import assert from "assert";
-import {Song} from "../models/Song";
 import url from "url";
 
 export class TranslationsController {
+    private nrViews: Map<number, number> = new Map();
     private songRepository: SongsRepository;
     private translationRepository: TranslationsRepository;
     private usersController: UsersController;
@@ -62,6 +62,21 @@ export class TranslationsController {
         }
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(translation.toObject()));
+
+        await this.incrementNumberOfViews(translation);
+    }
+
+    async incrementNumberOfViews(translation: Translation) {
+        let cntViews = this.nrViews.get(translation.id);
+        if (cntViews === undefined) {
+            this.nrViews.set(translation.id, translation.no_views + 1);
+        } else {
+            cntViews++;
+            if (cntViews % 10 === 0) {
+                await this.translationRepository.updateNoViews(translation.id, cntViews);
+            }
+            this.nrViews.set(translation.id, cntViews);
+        }
     }
 
     async handleGetAll(req: IncomingMessage, res: ServerResponse) {
