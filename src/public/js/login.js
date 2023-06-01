@@ -69,20 +69,3 @@ document.querySelector('.sign-up-container form').addEventListener('submit', fun
             console.error('Error registering:', error);
         });
 });
-
-document.querySelector('#forgot-password-button').addEventListener('click', function() {
-    document.querySelector('#forgot-password-popup').style.display = 'block';
-});
-document.addEventListener('click', function(event) {
-    if (event.target.closest('#forgot-password-popup') === null) {
-        document.querySelector('#forgot-password-popup').style.display = 'none';
-    }
-});
-
-document.querySelector('#forgot-password-form').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const email = document.querySelector('#forgot-password-email').value;
-    // Process the email and perform the necessary actions (e.g., send password reset email)
-    console.log('Email:', email);
-    document.querySelector('#forgot-password-popup').style.display = 'none';
-});
