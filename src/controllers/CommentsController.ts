@@ -4,96 +4,50 @@ import {Comment} from "../models/Comment";
 import {UsersRepository} from "../repositories/UsersRepository";
 import {UsersController} from "./UsersController";
 import {TranslationsRepository} from "../repositories/TranslationsRepository";
+import {BaseController} from "./BaseController";
+import {sendMessage} from "../util/sendMessage";
+import url from "url";
 
-export class CommentsController {
+export class CommentsController extends BaseController{
     private commentsRepository: CommentsRepository;
-    private userRepository: UsersRepository;
+    private usersRepository: UsersRepository;
     private usersController: UsersController;
     private translationsRepository: TranslationsRepository;
 
     constructor() {
+        super();
         this.commentsRepository = new CommentsRepository();
+        this.usersRepository = new UsersRepository();
         this.usersController = new UsersController();
         this.translationsRepository = new TranslationsRepository();
-        this.userRepository = new UsersRepository();
     }
 
-    async handleApiRequest(req: IncomingMessage, res: ServerResponse) {
-        if (!req.url) {
-            return; // nu are cum sa intre aici niciodata;
+    async handleGetById(req:IncomingMessage, res:ServerResponse){
+        if(!req.url){
+            sendMessage(res, 500, 'Internal server error');
+            return;
         }
-        console.log(req.url);
-        const parsedURL = req.url.split('/');
-        if (req.method == 'POST') {
-            if (parsedURL.length === 3) {
-                await this.postComment(req, res);
-                return;
-            }
-        } else if (req.method == 'GET') {
-            if (parsedURL.length === 3) {
-                await this.getAllComments(req, res);
-                return;
-            } else if (parsedURL.length === 4) {
-                await this.getCommentsFromTranslation(req, res);
-                return;
-            }
-        } else if (req.method == 'PUT') {
-            if (parsedURL.length === 4) {
-                await this.updateComment(req, res);
-                return;
-            }
-        } else if (req.method == 'DELETE') {
-            if (parsedURL.length === 4) {
-                await this.deleteComment(req, res);
-                return;
-            }
+
+        const commentId = parseInt(req.url.split('/')[3]);
+
+        if(isNaN(commentId)){
+            console.log("Comment id is nan");
+            sendMessage(res, 400, 'Invalid comment id');
+            return;
         }
-        res.writeHead(404, {'Content-Type': 'application/json'});
-        res.write(JSON.stringify({message: 'Resource not found'}));
-        res.end();
+
+        const comment = await this.commentsRepository.getCommentById(commentId);
+
+        if(comment === null){
+            sendMessage(res, 404, 'Comment not found');
+            return;
+        }
+
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(comment.toObject()));
     }
 
-    async postComment(req: IncomingMessage, res: ServerResponse) {
-        try {
-            let body = '';
-
-            req.on('data', (chunk) => {
-                body += chunk.toString();
-            });
-            req.on('end', async () => {
-                const {translationId, content} = JSON.parse(body);
-                const user = await this.usersController.getLoggedUser(req, res);
-                if (user === null) {
-                    res.writeHead(401, {'Content-Type': 'application/json'});
-                    res.write(JSON.stringify({message: 'You need to be logged in to comment'}));
-                    res.end();
-                    return;
-                }
-
-                const transId = parseInt(translationId);
-                const translation = await this.translationsRepository.getTranslationById(transId);
-                if (translation === null) {
-                    res.writeHead(404, {'Content-Type': 'application/json'});
-                    res.write(JSON.stringify({message: 'Translation not found'}));
-                    res.end();
-                    return;
-                }
-
-                const comment = new Comment(0, user.id, translation.id, content);
-                console.log(comment);
-                const commentId = await this.commentsRepository.addComment(comment);
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify({message: 'Comment added successfully', id: commentId}));
-                res.end();
-            });
-        } catch (error) {
-            res.writeHead(500, {'Content-Type': 'application/json'});
-            res.write(JSON.stringify({message: 'Internal Server Error'}));
-            res.end();
-        }
-    }
-
-    async getAllComments(req: IncomingMessage, res: ServerResponse) {
+    async handleGetAll(req:IncomingMessage, res:ServerResponse){
         try {
             const comments = await this.commentsRepository.getAllComments();
             res.writeHead(200, {'Content-Type': 'application/json'});
@@ -106,29 +60,35 @@ export class CommentsController {
         }
     }
 
-    async getCommentsFromTranslation(req: IncomingMessage, res: ServerResponse) {
+    async handleFiltering(req:IncomingMessage, res: ServerResponse){
+        if(!req.url){
+            sendMessage(res, 500, 'Internal server error');
+            return;
+        }
+
+        const parsedURL = url.parse(req.url, true);
+        const parameters = parsedURL.query;
+        const translationIdString = parameters["translationId"] as string;
+        const translationId = (translationIdString === undefined) ? 0 : parseInt(translationIdString);
+
+        if(translationId === undefined || isNaN(translationId)){
+            sendMessage(res, 500, 'Invalid Request parameters');
+            return;
+        }
+
+        const translation = await this.translationsRepository.getTranslationById(translationId);
+
+        if(translation === null){
+            sendMessage(res, 404, 'Translation not found');
+            return;
+        }
         try {
-            if (!req.url) {
-                return // nu are cum sa fie aici
-            }
-            const transId = parseInt(req.url.split('/')[3]);
-
-            const translation = await this.translationsRepository.getTranslationById(transId);
-
-            if (translation === null) {
-                res.writeHead(404, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify({message: 'Translation not found'}));
-                res.end();
-                return;
-            }
-
-
-            const comments = await this.commentsRepository.getCommentsByTranslationId(transId);
+            const comments = await this.commentsRepository.getCommentsByTranslationId(translationId);
 
             let commentsData = [];
             for (let i = 0; i < comments.length; i++) {
                 const comment = comments[i];
-                const user = await this.userRepository.getUserById(comment.userId);
+                const user = await this.usersRepository.getUserById(comment.userId);
                 if (user === null)
                     continue;
                 const commentData = {
@@ -143,14 +103,56 @@ export class CommentsController {
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.write(JSON.stringify(commentsData));
             res.end();
-        } catch (error) {
-            res.writeHead(500, {'Content-Type': 'application/json'});
-            res.write(JSON.stringify({message: 'Internal Server Error'}));
-            res.end();
+        } catch(error){
+            sendMessage(res, 500, 'Internal server error');
+            return;
         }
     }
 
-    async updateComment(req: IncomingMessage, res: ServerResponse) {
+    async handlePost(req:IncomingMessage, res:ServerResponse) {
+        try {
+            let body = '';
+
+            req.on('data', (chunk) => {
+                body += chunk.toString();
+            });
+            req.on('end', async () => {
+                const parsedData = JSON.parse(body);
+                const translationId = parsedData.translationId;
+                const content = parsedData.content;
+
+                if(!translationId || !content){
+                    sendMessage(res, 400, 'Invalid request parameters');
+                    return;
+                }
+
+                const user = await this.usersController.getLoggedUser(req, res);
+                if (user === null) {
+                    sendMessage(res, 401, 'You need to be logged in to comment');
+                    return;
+                }
+
+                const transId = parseInt(translationId);
+                const translation = await this.translationsRepository.getTranslationById(transId);
+                if (translation === null) {
+                    sendMessage(res, 404, 'Translation not found');
+                    return;
+                }
+
+                const comment = new Comment(0, user.id, translation.id, content);
+                console.log(comment);
+                const commentId = await this.commentsRepository.addComment(comment);
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.write(JSON.stringify({message: 'Comment added successfully', id: commentId}));
+                res.end();
+            });
+        } catch (error) {
+            sendMessage(res, 500, 'Internal server error');
+        }
+    }
+
+
+    async handlePut(req: IncomingMessage, res: ServerResponse) {
         try {
             let body = '';
             req.on('data', chunk => {
@@ -158,81 +160,75 @@ export class CommentsController {
             });
 
             req.on('end', async () => {
-                const {newContent} = JSON.parse(body);
-                console.log(newContent);
-
-                if (!req.url) {
-                    return; // nu are cum sa ajung aici
+                if(!req.url){
+                    sendMessage(res, 500, 'Internal server error');
+                    return;
                 }
+
+                const parsedData = JSON.parse(body);
+                const newContent = parsedData.newContent;
+
+                if(!newContent){
+                    sendMessage(res, 400, 'Invalid reqest parameters');
+                    return;
+                }
+
                 const commId = parseInt(req.url.split('/')[3]);
                 const comment = await this.commentsRepository.getCommentById(commId);
 
                 if (comment === null) {
-                    res.writeHead(404, {'Content-Type': 'application/json'});
-                    res.write(JSON.stringify({message: 'Comment not found'}));
-                    res.end();
+                    sendMessage(res, 404, 'Comment not found');
+                    return;
                 } else {
                     const loggedUser = await this.usersController.getLoggedUser(req, res);
                     if (loggedUser === null) {
-                        res.writeHead(401, {'Content-Type': 'application/json'});
-                        res.end(JSON.stringify({message: 'Unauthorized'}));
+                        sendMessage(res, 401, 'Unauthorized');
                     } else if (loggedUser.id === 1 || loggedUser.id === comment.userId) {
                         const status = await this.commentsRepository.updateComment(commId, newContent);
-
                         if (status) {
-                            res.writeHead(200, {'Content-Type': 'application/json'});
-                            res.end(JSON.stringify({message: 'Comment successfully updated'}));
+                            sendMessage(res, 200, 'Comment successfully updated');
                         } else {
-                            res.writeHead(500, {'Content-Type': 'application/json'});
-                            res.write(JSON.stringify({message: 'Failed to update comment'}));
+                            sendMessage(res, 500, 'Failed to update comment');
                         }
                     } else {
-                        res.writeHead(401, {'Content-Type': 'application/json'});
-                        res.end(JSON.stringify({message: 'Unauthorized'}));
+                        sendMessage(res, 401, 'Unauthorized');
                     }
                 }
             });
         } catch (error) {
-            res.writeHead(500, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({message: 'Internal Server Error'}));
+            sendMessage(res, 500, 'Internal server error');
         }
     }
 
-    async deleteComment(req: IncomingMessage, res: ServerResponse) {
+    async handleDelete(req: IncomingMessage, res: ServerResponse) {
         try {
             if (!req.url) {
-                return; // nu are cum sa ajung aici
+                sendMessage(res, 500, 'Internal server error');
+                return;
             }
+
             const commId = parseInt(req.url.split('/')[3]);
             const comment = await this.commentsRepository.getCommentById(commId);
-
             if (comment === null) {
-                res.writeHead(404, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify({message: 'Comment not found'}));
-                res.end();
+                sendMessage(res, 404, 'Comment not found');
             } else {
                 const loggedUser = await this.usersController.getLoggedUser(req, res);
                 if (loggedUser === null) {
-                    res.writeHead(401, {'Content-Type': 'application/json'});
-                    res.end(JSON.stringify({message: 'Unauthorized'}));
+                    sendMessage(res, 401, 'Unauthorized');
                 } else if (loggedUser.id === 1 || loggedUser.id === comment.userId) {
                     const status = await this.commentsRepository.deleteComment(commId);
 
                     if (status) {
-                        res.writeHead(200, {'Content-Type': 'application/json'});
-                        res.end(JSON.stringify({message: 'Comment successfully updated'}));
+                        sendMessage(res, 200, 'Comment deleted successfully');
                     } else {
-                        res.writeHead(500, {'Content-Type': 'application/json'});
-                        res.write(JSON.stringify({message: 'Failed to delete comment'}));
+                        sendMessage(res, 500, 'Failed to delete comment');
                     }
                 } else {
-                    res.writeHead(401, {'Content-Type': 'application/json'});
-                    res.end(JSON.stringify({message: 'Unauthorized'}));
+                    sendMessage(res, 401, 'Unauthorized');
                 }
             }
         } catch (error) {
-            res.writeHead(500, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({message: 'Internal Server Error'}));
+            sendMessage(res, 500, 'Internal server error');
         }
     }
 }
