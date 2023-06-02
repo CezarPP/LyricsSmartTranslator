@@ -1,7 +1,7 @@
 async function getCommentsFromServer() {
     const path = window.location.pathname;
     const translationId = path.split('/')[2];
-    fetch(`/api/comments/${translationId}`, {method: 'GET'})
+    fetch(`/api/comments?translationId=${translationId}`, {method: 'GET'})
         .then(response => {
             if (!response.ok) {
                 throw new Error(`Error getting translation from server status: ${response.status}`

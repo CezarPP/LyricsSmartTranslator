@@ -48,7 +48,6 @@ export class CommentsRepository {
             const comments: Comment[] = result.rows.map((row: any) => {
                 return new Comment(row.id, row.user_id, row.translation_id, row.content);
             });
-            console.log(comments);
             return comments;
         } catch (error) {
             console.error(`Failed to retrieve comments from the database: ${error}`);
