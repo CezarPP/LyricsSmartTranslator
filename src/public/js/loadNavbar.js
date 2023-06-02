@@ -5,6 +5,7 @@ async function loadNavbar() {
 
         const loginButton = document.getElementById('loginButton');
         const addSongButton = document.getElementById('add-song-button');
+        const updatesButton = document.getElementById('updates-button');
 
         try {
             const userStatus = await fetch('/api/me', {method: 'GET'});
@@ -12,8 +13,11 @@ async function loadNavbar() {
                 const data = await userStatus.json(); // Await the JSON data
                 loginButton.textContent = data.username;
                 loginButton.href = '/profile/' + data.username;
+                if (data.id !== 1)
+                    updatesButton.style.display = 'none';
             } else {
                 addSongButton.style.display = 'none';
+                updatesButton.style.display = 'none';
             }
         } catch (error) {
             addSongButton.style.display = 'none';
