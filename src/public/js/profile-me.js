@@ -88,18 +88,23 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     function removeAccount(event) {
         event.preventDefault();
-        fetch(`/api/user/${username}`, {method: 'DELETE'})
-            .then(response => {
-                if(!response.ok){
-                    throw new Error(`Error deleting user from server status: ${response.status}`
-                        + `error is ${response.json()}`);
-                }
-                else
-                    window.location.href = '/';
-            })
-            .catch(error =>{
-                console.error("Error: ", error);
-            })
+        const confirmDelete
+            = window.confirm("Are you sure you want to delete your account");
+
+        if(confirmDelete) {
+            fetch(`/api/user/${username}`, {method: 'DELETE'})
+                .then(response => {
+                    if(!response.ok){
+                        throw new Error(`Error deleting user from server status: ${response.status}`
+                            + `error is ${response.json()}`);
+                    }
+                    else
+                        window.location.href = '/';
+                })
+                .catch(error =>{
+                    console.error("Error: ", error);
+                })
+        }
     }
 
     function saveChanges(event) {
