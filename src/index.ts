@@ -10,6 +10,7 @@ import {StatsController} from "./controllers/StatsController";
 import {AnnotationsController} from "./controllers/AnnotationsController";
 import {sendMessage} from "./util/sendMessage";
 import {RecoverController} from "./controllers/RecoverController";
+import {sendUpdatesPage} from "./util/sendUpdatesPage";
 
 const http = require('http');
 
@@ -54,7 +55,7 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         annotationsController
             .handleApiRequest(req, res)
             .then();
-    } else if(url.startsWith('/api/recover')){
+    } else if (url.startsWith('/api/recover')) {
         recoverController
             .handleApiRequest(req, res)
             .then();
@@ -62,7 +63,7 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         userController
             .getLoggedUsersInfo(req, res)
             .then();
-    } else if (method == 'GET' && url && url.startsWith('/api/stats')) {
+    } else if (method === 'GET' && url && url.startsWith('/api/stats')) {
         statsController
             .handleApiRequest(req, res)
             .then();
@@ -76,20 +77,23 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         sendStaticFile(req, res)
             .then()
             .catch(() => console.log("Error sending static file"));
-    } else if (method == 'GET' && url.startsWith('/add-translation/')) {
+    } else if (method === 'GET' && url.startsWith('/add-translation/')) {
         sendFile(req, res,
             '../public/assets/pages/add-translation.html', 'text/html')
             .then();
-    } else if (method == 'POST' && url == '/login') {
+    } else if (method === 'POST' && url == '/login') {
         userController.loginUser(req, res)
             .then();
-    } else if (method == 'POST' && url == '/register') {
+    } else if (method === 'POST' && url == '/register') {
         userController.registerUser(req, res)
             .then();
-    } else if (method == 'POST' && url == '/logout') {
+    } else if (method === 'POST' && url == '/logout') {
         userController.logoutUser(req, res)
             .then();
-    } else if (method == 'GET') {
+    } else if (method === 'GET' && url === '/updates') {
+        sendUpdatesPage(req, res)
+            .then();
+    } else if (method === 'GET') {
         sendStaticFile(req, res)
             .then()
             .catch(() => console.log("Error sending static file"));
