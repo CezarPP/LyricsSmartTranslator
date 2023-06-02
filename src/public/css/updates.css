@@ -1,0 +1,73 @@
+* {
+    box-sizing: border-box;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 2rem auto;
+    padding: 2rem;
+    width: 98%;
+}
+
+.annotation .content {
+    display: flex;
+    justify-content: space-between;
+}
+
+.annotation .content .annotated-text,
+.annotation .content .annotation-text {
+    width: 45%;
+}
+
+.annotation {
+    background-color: var(--background-pink);
+    margin: 1rem 2rem;
+    padding: 1rem;
+    border: 1px solid var(--background-orange);
+    border-radius: 5px;
+    width: calc(100% - 4rem);
+}
+
+.annotation h2 {
+    color: black; /* Changed the color to black */
+    margin-bottom: 1rem;
+}
+
+.annotation p {
+    color: black; /* Changed the color to black */
+    margin-bottom: 1rem;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.accept, .reject {
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    text-transform: uppercase;
+    color: black;
+}
+
+.accept {
+    background-color: #00cc00; /* Green color */
+}
+
+.reject {
+    background-color: #ff3300; /* Red color */
+}
+
+.accept:hover {
+    background-color: #009900; /* Darker Green color */
+}
+
+.reject:hover {
+    background-color: #cc2900; /* Darker Red color */
+}

@@ -109,12 +109,12 @@ export class SongsController extends BaseController {
             await this.songRepository.updateRSSFeed();
             console.log("RSS feed updated successfully");
 
-            const finalSong = await this.songRepository.getSongById(song.id);
-            assert(finalSong !== null);
+            song.primary_translation = translationId;
+            song.id = songId;
 
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(finalSong.toObject()));
+            res.end(JSON.stringify(song.toObject()));
         });
     }
 

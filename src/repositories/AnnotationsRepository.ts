@@ -112,10 +112,10 @@ export class AnnotationsRepository {
         return true;
     }
 
-    async updateAnnotationContent(annotationId: number, content: string) {
+    async updateAnnotationContent(annotationId: number, content: string, reviewed: boolean) {
         try {
-            const query: string = 'UPDATE annotations SET content = $1, reviewed = FALSE WHERE id = $2';
-            const values = [content, annotationId];
+            const query: string = 'UPDATE annotations SET content = $1, reviewed = $2 WHERE id = $3';
+            const values = [content, reviewed, annotationId];
             await this.db.query(query, values);
         } catch (err) {
             console.error('Error executing query to update annotation ', err);

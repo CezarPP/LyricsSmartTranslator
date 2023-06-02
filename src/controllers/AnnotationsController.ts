@@ -123,7 +123,7 @@ export class AnnotationsController extends BaseController {
     }
 
     // You can only change the content, not its position
-    // Changing an annotation will make it unverified
+    // Changing an annotation will make it unverified unless you are the admin
     async handlePut(req: IncomingMessage, res: ServerResponse) {
         let body = '';
         req.on('data', chunk => {
@@ -133,7 +133,8 @@ export class AnnotationsController extends BaseController {
         req.on('end', async () => {
             const putData = JSON.parse(body);
             const content = putData.content as string;
-            if (content === undefined) {
+            let reviewed = putData.reviewed as boolean;
+            if (content === undefined || reviewed === undefined) {
                 sendMessage(res, 400, 'Invalid request');
                 return;
             }
@@ -152,7 +153,11 @@ export class AnnotationsController extends BaseController {
                 return;
             }
 
-            await this.annotationsRepository.updateAnnotationContent(annotation.id, content);
+            if (user.id !== 1)
+                reviewed = false;
+
+            console.log("Setting reviewed to " + reviewed);
+            await this.annotationsRepository.updateAnnotationContent(annotation.id, content, reviewed);
 
             console.log("Annotation with id " + annotation.id + " updated successfully");
 
