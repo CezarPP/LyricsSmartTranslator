@@ -22,7 +22,6 @@
 .news-container {
     width: 100%;
     min-height: 10vh;
-    background-color: #ffffff;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -38,10 +37,11 @@
 
 .news-container .news-content .news-card {
     flex: 1;
-    border-right: 2px solid black;
+    /*border-right: 2px solid black;*/
     padding: 0 30px;
     align-self: normal;
     margin-bottom: 20px;
+    box-sizing: border-box;
 }
 
 .news-container .news-content .news-card:last-child {
