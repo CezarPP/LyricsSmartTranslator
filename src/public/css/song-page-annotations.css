@@ -30,7 +30,12 @@
 
 .annotation-box-title {
     text-align: left;
-    margin: 20px;
+    margin: 20px 20px 0;
+}
+
+.review-status {
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 #annotations-input,
@@ -38,6 +43,7 @@
     text-indent: 10px;
     line-height: 30px;
     font-size: 1rem;
+    padding: 20px;
     background-color: rgb(233, 233, 233);
     border: 1px solid black;
     width: 300px;

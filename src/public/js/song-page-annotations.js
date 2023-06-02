@@ -246,6 +246,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (annotation.content)
             textArea.value = annotation.content;
 
+        // Create a new paragraph for the review status.
+        const reviewStatusParagraph = document.createElement('p');
+        reviewStatusParagraph.classList.add('review-status');
+        reviewStatusParagraph.textContent = annotation.reviewed ? 'Reviewed' : 'Not Reviewed';
+        reviewStatusParagraph.style.color = annotation.reviewed ? 'green' : '#DAA520';
+        reviewStatusParagraph.style.fontSize = '0.8rem';
+
+
         const btnSubmit = document.createElement('button');
         btnSubmit.id = 'submit-annotation';
         btnSubmit.textContent = 'Submit';
@@ -297,6 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnWrapper.id = 'annotation-btn-wrapper';
 
         box.appendChild(annotationBoxTitle);
+        box.appendChild(reviewStatusParagraph);
         box.appendChild(textArea);
         if (userId === annotation.userId || userId === 1) {
             btnWrapper.appendChild(btnSubmit);
