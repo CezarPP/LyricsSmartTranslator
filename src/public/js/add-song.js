@@ -1,53 +1,62 @@
-document
-    .querySelector('.add-song-container form')
-    .addEventListener('submit', function (event) {
-        event.preventDefault();
-        console.log("Got to event");
+function sendFormToServer() {
+    document
+        .querySelector('.add-song-container form')
+        .addEventListener('submit', function (event) {
+            event.preventDefault();
 
-        const formData = new FormData(event.target);
+            // display loader
+            const loader = document.getElementById('preloader');
+            loader.style.display = 'flex';
 
-        // Convert formData to a regular object
-        let formObject = {};
-        formData.forEach((value, key) => formObject[key] = value);
+            const formData = new FormData(event.target);
 
-        delete formObject['cover-photo'];
+            // Convert formData to a regular object
+            let formObject = {};
+            formData.forEach((value, key) => formObject[key] = value);
 
-        const imageFile = document.getElementById('cover-photo');
+            delete formObject['cover-photo'];
 
-        const reader = new FileReader();
+            const imageFile = document.getElementById('cover-photo');
 
-        reader.onloadend = function () {
-            const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
+            const reader = new FileReader();
 
-            // Send the image tot the server
-            fetch('/api/images', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({image: base64String}),
-            })
-                .then(response => response.json())
-                .then(data => {
-                    // Get the image id back from the server
-                    formObject['imageId'] = data.id;
-                    // Send the rest of the form data to the server
-                    return fetch('/api/songs', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(formObject)
-                    });
+            reader.onloadend = function () {
+                const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
+
+                // Send the image tot the server
+                fetch('/api/images', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({image: base64String}),
                 })
-                .then(response => {
-                    if (response.ok) {
-                        window.location.href = '/submit-song.html';
-                    } else
-                        alert('Failed to add song');
-                })
-                .catch(error => console.error(error));
-        }
+                    .then(response => response.json())
+                    .then(data => {
+                        // Get the image id back from the server
+                        formObject['imageId'] = data.id;
+                        // Send the rest of the form data to the server
+                        return fetch('/api/songs', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(formObject)
+                        });
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.href = '/submit-song.html';
+                        } else
+                            alert('Failed to add song');
+                    })
+                    .catch(error => console.error(error));
+            }
 
-        reader.readAsDataURL(imageFile.files[0]);
-    });
+            reader.readAsDataURL(imageFile.files[0]);
+        });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    sendFormToServer();
+});

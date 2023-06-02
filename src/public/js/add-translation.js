@@ -29,41 +29,45 @@ async function setTitleAuthor() {
         });
 }
 
-const form = document.getElementById("submit-form");
-form.addEventListener("submit", async function (event) {
-    event.preventDefault();
+document.addEventListener('DOMContentLoaded', async () => {
+    await setTitleAuthor();
+    const form = document.getElementById("submit-form");
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
 
-    let descriptionElement = document.getElementById("description");
-    let translatedLyricsElement = document.getElementById("translated-lyrics");
-    let languageElement = document.getElementById("language");
+        // display loader
+        const loader = document.getElementById('preloader');
+        loader.style.display = 'flex';
 
-    let formData = {
-        songId: getSongId(),
-        description: descriptionElement.value,
-        lyrics: translatedLyricsElement.value,
-        language: languageElement.value
-    }
+        let descriptionElement = document.getElementById("description");
+        let translatedLyricsElement = document.getElementById("translated-lyrics");
+        let languageElement = document.getElementById("language");
 
-    await fetch('/api/translations', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-    })
-        .then(response => response.json())
-        .then(data => {
-            // Redirect the user to a success page
-            if (data.translationId !== undefined) {
-                window.location.href = data.redirectPage;
-            } else {
-                alert('Failed to add translation');
-            }
+        let formData = {
+            songId: getSongId(),
+            description: descriptionElement.value,
+            lyrics: translatedLyricsElement.value,
+            language: languageElement.value
+        }
+
+        await fetch('/api/translations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
         })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-});
-
-setTitleAuthor()
-    .then(() => console.log("Title and author set"))
+            .then(response => response.json())
+            .then(data => {
+                // Redirect the user to a success page
+                if (data.translationId !== undefined) {
+                    window.location.href = data.redirectPage;
+                } else {
+                    alert('Failed to add translation');
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    });
+})
