@@ -90,13 +90,20 @@ export class SongsController {
             const artist = postData.artist as string;
             const lyrics = postData.lyrics as string;
             const description = postData.description as string;
+            const language = postData.language as string;
             let link = postData['youtube-link'] as string;
             const imageId = postData.imageId as number;
 
             if (title === undefined || artist === undefined ||
                 link === undefined || imageId === undefined ||
-                lyrics === undefined || description === undefined || !isYoutubeLink(link)) {
+                lyrics === undefined || description === undefined
+                || language === undefined) {
                 sendMessage(res, 400, 'Invalid request');
+                return;
+            }
+
+            if (!isYoutubeLink(link)) {
+                sendMessage(res, 422, 'Invalid youtube link');
                 return;
             }
 
@@ -121,7 +128,7 @@ export class SongsController {
             console.log("Added song to repo with id " + songId);
 
             const translation = new Translation(0, songId, user.id,
-                'english', description, lyrics, 0, new Date());
+                language, description, lyrics, 0, new Date());
             console.log("Preparing to add translation to repo");
             const translationId = await this.translationRepository.addTranslation(translation);
             console.log("Added translation to repo with id " + translationId);
@@ -132,14 +139,12 @@ export class SongsController {
             await this.songRepository.updateRSSFeed();
             console.log("RSS feed updated successfully");
 
+            const finalSong = await this.songRepository.getSongById(song.id);
+            assert(finalSong !== null);
+
             res.statusCode = 200;
-            const data = {
-                message: 'Song added successfully!',
-                redirectPage: '/submit-song.html',
-                songId: songId,
-                translationId: translationId
-            }
-            res.end(JSON.stringify(data));
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(finalSong.toObject()));
         });
     }
 

@@ -40,11 +40,9 @@ document
                         body: JSON.stringify(formObject)
                     });
                 })
-                .then(response => response.json())
-                .then(data => {
-                    // redirect to success page
-                    if (data.songId !== undefined) {
-                        window.location.href = data.redirectPage;
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/submit-song.html';
                     } else
                         alert('Failed to add song');
                 })

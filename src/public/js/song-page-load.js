@@ -49,7 +49,7 @@ async function setTranslationLanguages(songId) {
             for (const translation of translations) {
                 const language = document.createElement('a');
                 language.href = `/song-page/${translation.id}`;
-                language.textContent = translation.language;
+                language.textContent = translation.language.charAt(0).toUpperCase() + translation.language.slice(1);
                 languageOptions.appendChild(language);
             }
         })

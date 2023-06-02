@@ -31,7 +31,11 @@ async function createNewsCard(song) {
     setImage(song.imageId, img)
         .then();
     img.alt = 'Album cover';
-    newsCard.appendChild(img);
+    const a = document.createElement('a');
+    a.href = '/song-page/' + song.primary_translation;
+    a.appendChild(img);
+
+    newsCard.appendChild(a);
 
     const title = document.createElement('p');
     title.classList.add('news-title');
