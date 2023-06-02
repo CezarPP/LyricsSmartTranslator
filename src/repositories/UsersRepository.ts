@@ -7,10 +7,10 @@ export class UsersRepository {
 
     constructor() {
         this.db = new Pool({
-            user: 'ionut',
-            host: 'dpg-chf53k2k728trctjdjtg-a.frankfurt-postgres.render.com',
-            database: 'postdb_r5n0',
-            password: 'WbYko7SeIKZW1Ao1ISubLFZplAJEG4nA',
+            user: 'postgres',
+            host: 'post-translations.czgheu3bschd.eu-north-1.rds.amazonaws.com',
+            database: 'postgres',
+            password: process.env.AWSPASSWORD,
             port: 5432,
             ssl: {
                 rejectUnauthorized: false
@@ -67,7 +67,7 @@ export class UsersRepository {
 
     async addUser(username: String, password: String, email: String): Promise<number> {
         const query = 'INSERT INTO users(username, password, img_id, email) VALUES($1, $2, $3, $4) RETURNING id';
-        const values = [username, password, 81, email];
+        const values = [username, password, 1, email];
         try {
             const result = await this.db.query(query, values);
             return result.rows[0].id;
