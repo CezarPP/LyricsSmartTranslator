@@ -130,8 +130,8 @@ async function addAnnotation(annotationData) {
     container.appendChild(annotation);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    fetch('/api/annotations?reviewed=0')
+async function getAnnotations() {
+    return await fetch('/api/annotations?reviewed=0')
         .then(response => {
             console.log("Got response");
             if (!response.ok)
@@ -139,16 +139,26 @@ document.addEventListener('DOMContentLoaded', () => {
             return response.json();
         })
         .then(data => {
-            let annotations = data.map(annotation => new Annotation(
+            return data.map(annotation => new Annotation(
                 annotation.id, annotation.userId, annotation.translationId,
                 annotation.beginPos, annotation.endPos, annotation.content, annotation.reviewed
             ));
-            annotations.forEach((annotation) => {
-                addAnnotation(annotation);
-            })
         })
         .catch(error => {
             console.error("Error: " + error);
             alert('Error getting annotations to be reviewed' + error);
         })
+}
+
+async function loadContent() {
+    const annotations = await getAnnotations();
+    for (let i = 0; i < annotations.length; i++) {
+        await addAnnotation(annotations[i]);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadContent();
+    const preloader = document.getElementById('preloader');
+    preloader.style.display = 'none';
 })

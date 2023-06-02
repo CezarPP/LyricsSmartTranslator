@@ -1,16 +1,13 @@
-async function getSongFromServer() {
+async function getTranslation() {
     const path = window.location.pathname;
     const translationId = path.split('/')[2];
-    fetch(`/api/translations/${translationId}`, {method: 'GET'})
+    return await fetch(`/api/translations/${translationId}`, {method: 'GET'})
         .then(response => {
             if (!response.ok) {
                 throw new Error(`Error getting translation from server status: ${response.status}`
                     + `error is ${response.json()}`);
             }
             return response.json();
-        })
-        .then(translationData => {
-            loadTranslation(translationData);
         })
         .catch(error => {
             console.error('Error:', error);
@@ -84,8 +81,11 @@ async function loadTranslation(translationData) {
         hour12: true,
     });
 
+    await setTranslationElements(lyrics, description, no_views, time);
+}
 
-    fetch(`/api/songs/${songId}`, {method: 'GET'})
+async function loadSong(songId) {
+    const song = await fetch(`/api/songs/${songId}`, {method: 'GET'})
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`
@@ -93,14 +93,10 @@ async function loadTranslation(translationData) {
             }
             return response.json();
         })
-        .then(async data => {
-            await setSongElements(data.link, data.imageId, data.artist, data.title);
-        })
         .catch(error => {
             console.error('Error:', error);
         });
-
-    await setTranslationElements(lyrics, description, no_views, time);
+    await setSongElements(song.link, song.imageId, song.artist, song.title);
 }
 
 async function setDescription(description) {
@@ -152,4 +148,10 @@ async function setImage(imageId) {
         })
 }
 
-getSongFromServer().then(() => console.log("Got data from the server"));
+document.addEventListener('DOMContentLoaded', async () => {
+    const translation = await getTranslation();
+    await loadTranslation(translation);
+    await loadSong(translation.songId);
+    const preloader = document.getElementById('preloader');
+    preloader.style.display = 'none';
+});
