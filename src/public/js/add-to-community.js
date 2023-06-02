@@ -36,10 +36,8 @@ const addMoreCommunity = () => {
     }
 };
 
-const addMoreFirstTime = async () => {
+export async function addMoreFirstTime() {
+    showMoreButtonCommunity.addEventListener('click', addMoreCommunity);
     await getUsersData();
     await addMoreCommunity();
 }
-
-showMoreButtonCommunity.addEventListener('click', addMoreCommunity);
-addMoreFirstTime().then(() => console.log(users));

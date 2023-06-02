@@ -50,7 +50,7 @@ async function createNewsCard(song) {
     return newsCard;
 }
 
-async function loadNewsCards() {
+export async function loadNewsCards() {
     const newsData = await fetchNewsData();
 
     const newsContainer = document.querySelector('.news-container .news-content');
@@ -60,5 +60,3 @@ async function loadNewsCards() {
         await newsContainer.appendChild(await newsCard);
     }
 }
-
-window.addEventListener('DOMContentLoaded', loadNewsCards);

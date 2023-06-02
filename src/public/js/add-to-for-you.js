@@ -43,12 +43,8 @@ const addMoreForYou = () => {
     }
 };
 
-const addMoreForYouFirstTime = async () => {
+export async function addMoreForYouFirstTime() {
+    showMoreButtonForYou.addEventListener('click', addMoreForYou);
     await getForYouSongsData();
     await addMoreForYou();
 }
-
-showMoreButtonForYou.addEventListener('click', addMoreForYou);
-
-addMoreForYouFirstTime()
-    .then();

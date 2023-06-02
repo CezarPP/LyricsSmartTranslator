@@ -8,16 +8,18 @@
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/main-page.css">
     <link rel="stylesheet" href="/css/searchBar.css">
-    <script type="application/ld+json" src="/index.json"></script>
+    <link rel="stylesheet" href="/css/preloader.css">
+    <!-- <script type="application/ld+json" src="/index.json"></script> -->
     <script src="/js/loadNavbar.js"></script>
     <script src="/js/loadFooter.js" defer></script>
-    <script src="/js/add-to-charts.js" defer></script>
-    <script src="/js/add-to-community.js" defer></script>
     <script src="/js/searchScript.js" defer></script>
-    <script src="/js/add-to-for-you.js" defer></script>
-    <script src="/js/add-news.js" defer></script>
+    <script type="module" src="/js/load-index.js" defer></script>
 </head>
 <body>
+<div id="preloader">
+    <img src="/img/equalizer.svg" alt="Loading..."/>
+</div>
+
 <header id="navbar-container"></header>
 
 <article class="content-container">

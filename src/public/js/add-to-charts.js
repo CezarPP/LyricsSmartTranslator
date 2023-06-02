@@ -63,8 +63,9 @@ const addMoreChartsFirstTime = async () => {
     await addMoreCharts();
 }
 
-showMoreButtonCharts.addEventListener('click', addMoreCharts);
-document.addEventListener('DOMContentLoaded', async () => {
+export async function loadCharts() {
+    showMoreButtonCharts.addEventListener('click', addMoreCharts);
+
     await getSongsData();
 
     const newest = document.getElementById('newest');
@@ -95,6 +96,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadFromDataMap('newest');
     addMoreChartsFirstTime()
         .then();
-})
-
-
+}
