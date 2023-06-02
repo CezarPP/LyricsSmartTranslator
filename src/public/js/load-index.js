@@ -3,12 +3,24 @@ import {addMoreFirstTime} from "./add-to-community.js";
 import {loadCharts} from "./add-to-charts.js";
 import {addMoreForYouFirstTime} from "./add-to-for-you.js";
 
-document.addEventListener('DOMContentLoaded', async () => {
-    await loadNewsCards();
-    await addMoreFirstTime();
-    await loadCharts();
-    await addMoreForYouFirstTime();
+let counter = 0;
 
-    const preloader = document.getElementById('preloader');
-    preloader.style.display = 'none';
+function incrementAndCheck() {
+    counter++;
+    if (counter === 4) {
+        const preloader = document.getElementById('preloader');
+        preloader.style.display = 'none';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    loadNewsCards()
+        .then(incrementAndCheck)
+    addMoreFirstTime()
+        .then(incrementAndCheck)
+    loadCharts()
+        .then(incrementAndCheck);
+    addMoreForYouFirstTime()
+        .then(incrementAndCheck);
+
 });

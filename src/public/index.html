@@ -9,15 +9,14 @@
     <link rel="stylesheet" href="/css/main-page.css">
     <link rel="stylesheet" href="/css/searchBar.css">
     <link rel="stylesheet" href="/css/preloader.css">
-    <script type="application/ld+json" src="/index.json"></script>
-    <script src="/js/loadNavbar.js" defer></script>
-    <script src="/js/loadFooter.js" defer></script>
-    <script src="/js/searchScript.js" defer></script>
+    <script type="module" src="/js/loadNavbar.js" defer></script>
+    <script type="module" src="/js/loadFooter.js" defer></script>
+    <script async type="module" src="/js/searchScript.js" defer></script>
     <script type="module" src="/js/load-index.js" defer></script>
 </head>
 <body>
 <div id="preloader">
-    <img src="/img/equalizer.svg" alt="Loading..."/>
+    <img src="/img/equalizer.svg" alt="Loading..." loading="lazy"/>
 </div>
 
 <header id="navbar-container"></header>
@@ -27,11 +26,6 @@
         <h2 class="featured-title">FEATURED</h2>
         <div class="news-container">
             <div class="news-content">
-                <!--<div class="news-card">
-                    <img src="/img/Slipknot_Iowa.jpg" alt="Album cover">
-                    <p class="news-title">New song by Slipknot</p>
-                    <p class="news-author">by Alex Dumitrescu</p>
-                </div>-->
             </div>
         </div>
     </div>
@@ -75,8 +69,6 @@
         </ul>
         <button class="show-more-button">Show More</button>
     </section>
-
-
 </article>
 
 <footer id="footer-container"></footer>

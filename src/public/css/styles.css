@@ -175,7 +175,7 @@ footer {
 
 .footer-content .github-logo img {
     width: 30px;
-    height: auto;
+    height: 30px;
 }
 
 .footer-copyright {
@@ -213,4 +213,5 @@ footer {
 
 .rss-icon {
     width: 20px;
+    height: 20px;
 }
