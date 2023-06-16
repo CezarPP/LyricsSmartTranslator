@@ -5,18 +5,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> PoST </title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/main-page.css">
-    <link rel="stylesheet" href="/css/searchBar.css">
+    <link rel="preconnect" href="https://storage.googleapis.com">
+    <link rel="stylesheet" href="/css/styles.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="/css/main-page.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="/css/searchBar.css" media="print">
     <link rel="stylesheet" href="/css/preloader.css">
     <script type="module" src="/js/loadNavbar.js" defer></script>
     <script type="module" src="/js/loadFooter.js" defer></script>
-    <script async type="module" src="/js/searchScript.js" defer></script>
+    <script async type="module" src="/js/searchScript.js"></script>
     <script type="module" src="/js/load-index.js" defer></script>
 </head>
 <body>
 <div id="preloader">
-    <img src="/img/equalizer.svg" alt="Loading..." loading="lazy"/>
+    <img src="/img/equalizer.svg" alt="Loading..."/>
 </div>
 
 <header id="navbar-container"></header>

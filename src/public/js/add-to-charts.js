@@ -72,24 +72,20 @@ export async function loadCharts() {
     const mostCommented = document.getElementById('most-commented');
     const mostViewed = document.getElementById('most-viewed');
 
-    newest.addEventListener('click', function (e) {
+    newest.addEventListener('click', async function (e) {
         e.preventDefault();
         loadFromDataMap('newest');
-        addMoreChartsFirstTime()
-            .then();
-
+        await addMoreChartsFirstTime();
     });
-    mostCommented.addEventListener('click', function (e) {
+    mostCommented.addEventListener('click', async function (e) {
         e.preventDefault();
         loadFromDataMap('mostCommented');
-        addMoreChartsFirstTime()
-            .then();
+        await addMoreChartsFirstTime();
     });
-    mostViewed.addEventListener('click', function (e) {
+    mostViewed.addEventListener('click', async function (e) {
         e.preventDefault();
         loadFromDataMap('mostViewed');
-        addMoreChartsFirstTime()
-            .then();
+        await addMoreChartsFirstTime();
     });
 
     // default

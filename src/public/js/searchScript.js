@@ -1,14 +1,16 @@
-function autocomplete(input, possibilities){
+function autocomplete(input, possibilities) {
 
     let focus;
 
-    input.addEventListener("input", function(e){
+    input.addEventListener("input", function () {
         let addList, addItem;
         let value = this.value;
 
-
         closeList();
-        if(!value){ return false; }
+
+        if (!value) {
+            return false;
+        }
 
         focus = -1;
         addList = document.createElement("div");
@@ -17,8 +19,8 @@ function autocomplete(input, possibilities){
 
         this.parentNode.appendChild(addList);
 
-        for(let i = 0; i<possibilities.length; i++){
-            if(possibilities[i].toUpperCase().startsWith(value.toUpperCase())) {
+        for (let i = 0; i < possibilities.length; i++) {
+            if (possibilities[i].toUpperCase().startsWith(value.toUpperCase())) {
                 addItem = document.createElement("div");
                 addItem.innerHTML = possibilities[i];
                 addItem.innerHTML += "<input type='hidden' value='" + possibilities[i] + "'>";
@@ -31,19 +33,19 @@ function autocomplete(input, possibilities){
         }
     });
 
-    input.addEventListener("keydown", function(e){
+    input.addEventListener("keydown", function (e) {
         let element = document.getElementById(this.id + "autocomplete-list");
         if (element) element = element.getElementsByTagName("div");
-        if(e.keyCode === 40) {
+        if (e.keyCode === 40) {
             focus++;
             addActive(element);
-        }else if(e.keyCode === 38){
+        } else if (e.keyCode === 38) {
             focus--;
             addActive(element);
-        } else if (e.keyCode === 13){
+        } else if (e.keyCode === 13) {
             e.preventDefault();
-            if(focus > -1){
-                if(element) element[focus].click();
+            if (focus > -1) {
+                if (element) element[focus].click();
             }
         }
     });
@@ -64,21 +66,22 @@ function autocomplete(input, possibilities){
         }
     }
 
-    function removeActive(element){
-        for(let i = 0; i < element.length; i++){
+    function removeActive(element) {
+        for (let i = 0; i < element.length; i++) {
             element[i].classList.remove("autocomplete-active");
         }
     }
-    function closeList(element){
+
+    function closeList(element) {
         let list = document.getElementsByClassName("autocomplete-items");
-        for(let i = 0; i < list.length; i++){
-            if(element != list[i] && element != input){
-                list[i].parentNode.removeChild(list[i]);
+        for (let i = 0; i < list.length; i++) {
+            if (element !== list[i] && element !== input) {
+                list[i].style.display = 'none'; // instead of parentNode.removeChild()
             }
         }
     }
 
-    document.addEventListener("click", function(e){
+    document.addEventListener("click", function (e) {
         closeList(e.target);
     });
 }

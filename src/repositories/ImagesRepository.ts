@@ -22,6 +22,22 @@ export class ImagesRepository {
         });
     }
 
+    async setCacheControlForAllImages() {
+        const bucket = this.storage.bucket(this.bucketName);
+        const [files] = await bucket.getFiles();
+
+        for (const file of files) {
+            try {
+                await file.setMetadata({
+                    cacheControl: 'public, max-age=31536000',
+                });
+                console.log(`Cache-Control set for ${file.name}`);
+            } catch (error) {
+                console.error(`Failed to set Cache-Control for ${file.name}: ${error}`);
+            }
+        }
+    }
+
     async addImage(imageBuffer: Buffer): Promise<ImageModel | null> {
         const bucket = this.storage.bucket(this.bucketName);
         // either jpeg or png
@@ -37,6 +53,9 @@ export class ImagesRepository {
         try {
             await file.save(imageBuffer, {
                 contentType: contentType,
+                metadata: {
+                    cacheControl: 'public, max-age=31536000',
+                },
             });
 
             const imageUrl = `https://storage.googleapis.com/${bucket.name}/${filename}`;

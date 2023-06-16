@@ -7,23 +7,15 @@ async function fetchNewsData() {
 }
 
 async function setImage(imageId, img) {
-    fetch(`/api/images/${imageId}`, {method: 'GET'})
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`
-                    + `error is ${response.json()}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            img.src = data.link;
-        })
-        .catch(error => {
-            console.error('Error: ' + error);
-        })
+    const response = await fetch(`/api/images/${imageId}`, {method: 'GET'});
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    img.src = data.link;
 }
 
-async function createNewsCard(song) {
+function createNewsCard(song) {
     const newsCard = document.createElement('div');
     newsCard.classList.add('news-card');
 
@@ -57,6 +49,6 @@ export async function loadNewsCards() {
 
     for (const newsItem of newsData) {
         const newsCard = createNewsCard(newsItem);
-        await newsContainer.appendChild(await newsCard);
+        await newsContainer.appendChild(newsCard);
     }
 }
