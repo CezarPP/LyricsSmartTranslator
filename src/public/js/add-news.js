@@ -14,41 +14,23 @@ async function setImage(imageId, img) {
     const data = await response.json();
     img.src = data.link;
 }
-
-function createNewsCard(song) {
-    const newsCard = document.createElement('div');
-    newsCard.classList.add('news-card');
-
-    const img = document.createElement('img');
-    setImage(song.imageId, img)
-        .then();
-    img.alt = 'Album cover';
-    const a = document.createElement('a');
-    a.href = '/song-page/' + song.primary_translation;
-    a.appendChild(img);
-
-    newsCard.appendChild(a);
-
-    const title = document.createElement('p');
-    title.classList.add('news-title');
-    title.textContent = song.title;
-    newsCard.appendChild(title);
-
-    const artist = document.createElement('p');
-    artist.classList.add('news-author');
-    artist.textContent = 'by ' + song.artist;
-    newsCard.appendChild(artist);
-
-    return newsCard;
-}
-
 export async function loadNewsCards() {
     const newsData = await fetchNewsData();
 
-    const newsContainer = document.querySelector('.news-container .news-content');
+    for (let i = 0; i < newsData.length; i++) {
+        const newsItem = newsData[i];
+        const newsCard = document.getElementById(`news-card-${i + 1}`);
 
-    for (const newsItem of newsData) {
-        const newsCard = createNewsCard(newsItem);
-        await newsContainer.appendChild(newsCard);
+        const img = newsCard.querySelector('img');
+        await setImage(newsItem.imageId, img);
+
+        const a = newsCard.querySelector('a');
+        a.href = '/song-page/' + newsItem.primary_translation;
+
+        const title = newsCard.querySelector('.news-title');
+        title.textContent = newsItem.title;
+
+        const artist = newsCard.querySelector('.news-author');
+        artist.textContent = 'by ' + newsItem.artist;
     }
 }
