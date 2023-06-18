@@ -5,7 +5,7 @@ const users = []
 const contrib = []
 
 const getUsersData = async () => {
-    await fetch('/api/stats/users', {method: 'GET'})
+    await fetch('/api/user/mostActive', {method: 'GET'})
         .then(response => response.json())
         .then(data => {
             data.forEach(user => {

@@ -4,6 +4,7 @@ import {Song} from "../models/Song";
 
 export class UsersRepository {
     private db: Pool;
+    private cache: any;
 
     constructor() {
         this.db = new Pool({
@@ -16,6 +17,11 @@ export class UsersRepository {
                 rejectUnauthorized: false
             }
         });
+        this.cache = {};
+    }
+
+    invalidateCache() {
+        this.cache = {};
     }
 
     async getUserByName(username: String): Promise<User | null> {
@@ -35,11 +41,37 @@ export class UsersRepository {
         const values = [email];
         const result = await this.db.query(query, values);
 
-        if(result.rows.length === 0){
+        if (result.rows.length === 0) {
             return null;
         }
         const row = result.rows[0];
         return new User(row.id, row.img_id, row.username, row.password, row.email);
+    }
+
+    async getMostActiveUsers(maxRows: number) {
+        const cacheKey = `mostActive-${maxRows}`;
+
+        if (this.cache[cacheKey]) {
+            return this.cache[cacheKey];
+        }
+
+        try {
+            const result
+                = await this.db.query('SELECT * FROM get_most_active_users($1);', [maxRows]);
+
+            const users: User[] = [];
+            const rows = result.rows;
+            for (let i = 0; i < rows.length; i++) {
+                users.push(new User(rows[i].user_id, rows[i].img_id, rows[i].username, rows[i].activity_count, rows[i].email));
+            }
+
+            this.cache[cacheKey] = users;
+
+            return users;
+        } catch (err) {
+            console.error('Error executing query ' + err);
+            throw err;
+        }
     }
 
     async getAllUsers(): Promise<User[]> {
@@ -66,6 +98,8 @@ export class UsersRepository {
     }
 
     async addUser(username: String, password: String, email: String): Promise<number> {
+        this.invalidateCache();
+
         const query = 'INSERT INTO users(username, password, img_id, email) VALUES($1, $2, $3, $4) RETURNING id';
         const values = [username, password, 1, email];
         try {
@@ -78,6 +112,8 @@ export class UsersRepository {
     }
 
     async updateUser(id: number, newUsername: string, newPassword: string, newEmail: string, newImgId: number): Promise<boolean> {
+        this.invalidateCache();
+
         const query = 'UPDATE users SET username = $1, password = $2, img_id = $3 WHERE id = $4';
         const values = [newUsername, newPassword, newImgId, id];
         try {
@@ -90,6 +126,8 @@ export class UsersRepository {
     }
 
     async deleteUser(id: number): Promise<boolean> {
+        this.invalidateCache();
+
         const query = 'DELETE FROM users WHERE id = $1';
         const values = [id];
         try {

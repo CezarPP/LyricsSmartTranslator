@@ -6,7 +6,6 @@ import {SongsController} from "./controllers/SongsController";
 import {TranslationsController} from "./controllers/TranslationsController";
 import {CommentsController} from "./controllers/CommentsController";
 import {sendFile} from "./util/sendFile";
-import {StatsController} from "./controllers/StatsController";
 import {AnnotationsController} from "./controllers/AnnotationsController";
 import {sendMessage} from "./util/sendMessage";
 import {RecoverController} from "./controllers/RecoverController";
@@ -18,7 +17,6 @@ const imagesController = new ImagesController();
 const userController = new UsersController();
 const songsController = new SongsController();
 const translationsController = new TranslationsController();
-const statsController = new StatsController();
 const commentsController = new CommentsController();
 const annotationsController = new AnnotationsController();
 const recoverController = new RecoverController();
@@ -62,10 +60,6 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     } else if (method === 'GET' && url && url === '/api/me') {
         userController
             .getLoggedUsersInfo(req, res)
-            .then();
-    } else if (method === 'GET' && url && url.startsWith('/api/stats')) {
-        statsController
-            .handleApiRequest(req, res)
             .then();
     } else if (method === 'GET' && url.startsWith('/profile')) {
         userController

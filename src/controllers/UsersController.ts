@@ -50,6 +50,8 @@ export class UsersController {
             } else if (parsedURL.length === 4) {
                 if (parsedURL[3].startsWith('recommendations'))
                     await this.getRecommendations(req, res);
+                else if (parsedURL[3].startsWith("mostActive"))
+                    await this.getMostActiveUsers(req, res);
                 else
                     await this.getUserStats(req, res, parsedURL[3]);
                 return;
@@ -243,12 +245,12 @@ export class UsersController {
                         let goodPassword = newPassword;
                         if (goodPassword.trim().length === 0)
                             goodPassword = user.password;
-                        else{
+                        else {
                             const saltRounds = 10;
                             goodPassword = await bcrypt.hash(goodPassword, saltRounds);
                         }
                         const status = await this.usersRepository.updateUser(user.id, newUsername, goodPassword, newEmail, newImgId);
-                        if (status){
+                        if (status) {
                             sendMessage(res, 200, 'User succesfully updated');
                         } else {
                             sendMessage(res, 500, 'Failed to update user');
@@ -317,6 +319,7 @@ export class UsersController {
             sendMessage(res, 500, 'Internal server error');
         }
     }
+
     async getLoggedUsersInfo(req: IncomingMessage, res: ServerResponse) {
         try {
             const user = await this.getLoggedUser(req, res);
@@ -331,10 +334,12 @@ export class UsersController {
             sendMessage(res, 500, 'Internal server error');
         }
     }
+
     async getLoggedUser(req: IncomingMessage, res: ServerResponse) {
         const userId = this.authenticateUser(req);
         return await this.usersRepository.getUserById(userId);
     }
+
     authenticateUser(req: IncomingMessage): number {
         const cookies = req.headers.cookie;
         console.log(cookies);
@@ -354,6 +359,7 @@ export class UsersController {
         }
         return -1;
     }
+
     async getRecommendations(req: IncomingMessage, res: ServerResponse) {
         assert(req.url);
         const parsedUrl = url.parse(req.url, true);
@@ -382,4 +388,9 @@ export class UsersController {
         res.end(JSON.stringify(songs));
     }
 
+    async getMostActiveUsers(req: IncomingMessage, res: ServerResponse) {
+        const users = await this.usersRepository.getMostActiveUsers(25);
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(users));
+    }
 }
