@@ -33,6 +33,8 @@ const loadFromDataMap = (filterMethod) => {
         songs = data.songs;
         artists = data.artists;
         translationId = data.translationId;
+    } else {
+        throw new Error("Error getting song data for method");
     }
 }
 
@@ -56,11 +58,28 @@ const addMoreCharts = () => {
     }
 };
 
-const addMoreChartsFirstTime = async () => {
+const removeAllAndAddMoreCharts = async () => {
+    showMoreButtonCharts.style.display = "block";
     while (chartsList.firstChild) {
         chartsList.removeChild(chartsList.firstChild);
     }
     await addMoreCharts();
+}
+
+const addFirstTime = async () => {
+    for (let i = 1; i <= 5; i++) {
+        const id = translationId[i - 1];
+        if (id === undefined) {
+            showMoreButtonCharts.style.display = "none";
+            break;
+        }
+        const newItem = document.getElementById(`item-${i}`);
+        newItem.innerHTML = `
+            <span class="song-number">${i}</span>
+            <span class="song-title"><a href="/song-page/${id}" style="color:black">${songs[i - 1]}</a></span>
+            <span class="song-author">${artists[i - 1]}</span>
+        `;
+    }
 }
 
 export async function loadCharts() {
@@ -75,21 +94,20 @@ export async function loadCharts() {
     newest.addEventListener('click', async function (e) {
         e.preventDefault();
         loadFromDataMap('newest');
-        await addMoreChartsFirstTime();
+        await removeAllAndAddMoreCharts();
     });
     mostCommented.addEventListener('click', async function (e) {
         e.preventDefault();
         loadFromDataMap('mostCommented');
-        await addMoreChartsFirstTime();
+        await removeAllAndAddMoreCharts();
     });
     mostViewed.addEventListener('click', async function (e) {
         e.preventDefault();
         loadFromDataMap('mostViewed');
-        await addMoreChartsFirstTime();
+        await removeAllAndAddMoreCharts();
     });
 
     // default
     loadFromDataMap('newest');
-    addMoreChartsFirstTime()
-        .then();
+    await addFirstTime();
 }

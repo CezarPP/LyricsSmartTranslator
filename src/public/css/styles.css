@@ -23,6 +23,11 @@ body {
 
 /* styling of the nav bar */
 
+#navbar-container {
+    height: 80px;
+}
+
+
 body.no-scroll {
     overflow: hidden;
     background-color: var(--background-color);
