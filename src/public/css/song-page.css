@@ -277,5 +277,6 @@ a.song-page-button:hover {
 }
 
 #lyrics-paragraphs {
+    min-height: 1000px;
     white-space: pre-line;
 }
