@@ -111,12 +111,13 @@ const addFirstTime = async () => {
             showMoreButtonCharts.style.display = "none";
             break;
         }
-        const newItem = document.getElementById(`item-${i}`);
-        newItem.innerHTML = `
-            <span class="song-number">${i}</span>
-            <span class="song-title"><a href="/song-page/${id}" style="color:black">${songs[i - 1]}</a></span>
-            <span class="song-author">${artists[i - 1]}</span>
-        `;
+        const number = document.getElementById('song-number-' + i);
+        const title = document.getElementById('song-title-' + i);
+        const author = document.getElementById('song-author-' + i);
+        number.textContent = i.toString();
+        title.href = `/song-page/${id}`;
+        title.textContent = songs[i - 1];
+        author.textContent = artists[i - 1];
     }
 }
 
