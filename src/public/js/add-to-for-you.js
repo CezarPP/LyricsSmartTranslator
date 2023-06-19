@@ -1,46 +1,42 @@
 const showMoreButtonForYou = document.querySelector('#for-you-container .show-more-button');
 const forYouList = document.querySelector('#for-you-container .for-you-list');
 
-const forYouSongs = [];
-const forYouArtists = [];
-const translationIds = [];
+let forYouData = [];
 
 const getForYouSongsData = async () => {
-    forYouSongs.length = 0;
-    forYouArtists.length = 0;
-    await fetch('/api/user/recommendations', {method: 'GET'})
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(song => {
-                forYouSongs.push(song.title);
-                forYouArtists.push(song.artist);
-                translationIds.push(song.primary_translation);
-            });
+    try {
+        const response = await fetch('/api/user/recommendations', {method: 'GET'});
+        const data = await response.json();
 
-        })
-        .catch(err => console.log('Error getting the songs for you ' + err));
-}
+        forYouData = data.map(song => ({
+            title: song.title,
+            artist: song.artist,
+            primary_translation: song.primary_translation,
+        }));
+
+    } catch (error) {
+        console.error('Error fetching song data: ', error);
+    }
+};
+
 const addMoreForYou = () => {
-    for (let i = 1; i <= 5; i++) {
+    const childrenLength = forYouList.children.length;
+
+    for (let i = 1; i <= 5 && childrenLength + i <= forYouData.length; i++) {
+        const songData = forYouData[childrenLength + i - 1];
         const newItem = document.createElement('li');
-        const index = forYouList.children.length + 1;
-        const song = forYouSongs[index - 1];
-        if (song === undefined) {
-            showMoreButtonForYou.style.display = "none";
-            break;
-        }
+
         newItem.innerHTML = `
-      <span class="song-number">${index}</span>
-      <span class="song-title"><a href="/song-page/${translationIds[index - 1]}" style="color:black">${song}</a></span>
-      <span class="song-author">${forYouArtists[index - 1]}</span>
-    `;
+            <span class="song-number">${childrenLength + i}</span>
+            <span class="song-title"><a href="/song-page/${songData.primary_translation}" style="color:black">${songData.title}</a></span>
+            <span class="song-author">${songData.artist}</span>
+        `;
+
         forYouList.appendChild(newItem);
-        if (forYouList.children.length > 20)
-            showMoreButtonForYou.style.display = "none";
+        if (childrenLength + i >= 20) showMoreButtonForYou.style.display = "none";
     }
-    if (forYouList.children.length === 0) {
-        document.getElementById("for-you-container").style.display = "none";
-    }
+
+    if (childrenLength === 0) document.getElementById("for-you-container").style.display = "none";
 };
 
 export async function addMoreForYouFirstTime() {

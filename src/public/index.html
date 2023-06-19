@@ -5,18 +5,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> PoST </title>
+    <link rel="preconnect" href="https://storage.googleapis.com">
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/main-page.css">
-    <link rel="stylesheet" href="/css/searchBar.css">
+    <link rel="stylesheet" href="/css/search-bar.css">
     <link rel="stylesheet" href="/css/preloader.css">
     <script type="module" src="/js/loadNavbar.js" defer></script>
     <script type="module" src="/js/loadFooter.js" defer></script>
-    <script async type="module" src="/js/searchScript.js" defer></script>
+    <script async type="module" src="/js/searchScript.js"></script>
     <script type="module" src="/js/load-index.js" defer></script>
 </head>
 <body>
 <div id="preloader">
-    <img src="/img/equalizer.svg" alt="Loading..." loading="lazy"/>
+    <img src="/img/equalizer.svg" alt="Loading..." width="200" height="200"/>
 </div>
 
 <header id="navbar-container"></header>
@@ -26,6 +27,34 @@
         <h2 class="featured-title">FEATURED</h2>
         <div class="news-container">
             <div class="news-content">
+                <div class="news-card" id="news-card-1">
+                    <a href="#">
+                        <img src="#" alt="Album cover" width="360" height="360">
+                    </a>
+                    <p class="news-title"></p>
+                    <p class="news-author"></p>
+                </div>
+                <div class="news-card" id="news-card-2">
+                    <a href="#">
+                        <img src="#" alt="Album cover" width="360" height="360">
+                    </a>
+                    <p class="news-title"></p>
+                    <p class="news-author"></p>
+                </div>
+                <div class="news-card" id="news-card-3">
+                    <a href="#">
+                        <img src="#" alt="Album cover" width="640" height="360">
+                    </a>
+                    <p class="news-title"></p>
+                    <p class="news-author"></p>
+                </div>
+                <div class="news-card" id="news-card-4">
+                    <a href="#">
+                        <img src="#" alt="Album cover" width="640" height="360">
+                    </a>
+                    <p class="news-title"></p>
+                    <p class="news-author"></p>
+                </div>
             </div>
         </div>
     </div>
@@ -52,6 +81,31 @@
             </div>
         </div>
         <ul class="charts-list">
+            <li id="item-1">
+                <span class="song-number" id="song-number-1"></span>
+                <span class="song-title"><a id="song-title-1" href="" style="color:black"></a></span>
+                <span class="song-author" id="song-author-1"></span>
+            </li>
+            <li id="item-2">
+                <span class="song-number" id="song-number-2"></span>
+                <span class="song-title"><a id="song-title-2" href="" style="color:black"></a></span>
+                <span class="song-author" id="song-author-2"></span>
+            </li>
+            <li id="item-3">
+                <span class="song-number" id="song-number-3"></span>
+                <span class="song-title"><a id="song-title-3" href="" style="color:black"></a></span>
+                <span class="song-author" id="song-author-3"></span>
+            </li>
+            <li id="item-4">
+                <span class="song-number" id="song-number-4"></span>
+                <span class="song-title"><a id="song-title-4" href="" style="color:black"></a></span>
+                <span class="song-author" id="song-author-4"></span>
+            </li>
+            <li id="item-5">
+                <span class="song-number" id="song-number-5"></span>
+                <span class="song-title"><a id="song-title-5" href="" style="color:black"></a></span>
+                <span class="song-author" id="song-author-5"></span>
+            </li>
         </ul>
         <button class="show-more-button">Show More</button>
     </section>

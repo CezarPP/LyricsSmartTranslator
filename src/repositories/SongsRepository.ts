@@ -4,6 +4,7 @@ import fs from "fs";
 
 export class SongsRepository {
     private db: Pool;
+    private cache: any;
 
     constructor() {
         this.db = new Pool({
@@ -16,7 +17,13 @@ export class SongsRepository {
                 rejectUnauthorized: false
             }
         });
+        this.cache = {};
     }
+
+    invalidateCache() {
+        this.cache = {};
+    }
+
 
     // returns the song id of the inserted song
     /**
@@ -24,6 +31,7 @@ export class SongsRepository {
      * @param song the song to be added, it doesn't add it with a primary_translation fk
      */
     async addSongNoFk(song: Song): Promise<number> {
+        this.invalidateCache();
         const query =
             'INSERT INTO songs(artist, title, image_id, link) VALUES($1, $2, $3, $4) RETURNING id';
         const values = [
@@ -43,6 +51,8 @@ export class SongsRepository {
     }
 
     async updatePrimaryTranslation(songId: number, primaryTranslationId: number): Promise<void> {
+        this.invalidateCache();
+
         const query = 'UPDATE songs SET primary_translation = $1 WHERE id = $2';
         const values = [primaryTranslationId, songId];
 
@@ -101,6 +111,8 @@ export class SongsRepository {
     }
 
     async deleteSong(songId: number) {
+        this.invalidateCache();
+
         try {
             await this.db.query('DELETE FROM songs WHERE id = $1', [songId]);
             console.log('Song deleted successfully');
@@ -110,6 +122,8 @@ export class SongsRepository {
     }
 
     async updateSong(songId: Number, newArtist: string, newTitle: string, newLink: string) {
+        this.invalidateCache();
+
         try {
             await this.db.query('UPDATE Songs SET artist = $1, title = $2, link = $3 WHERE id = $4', [newArtist, newTitle, newLink, songId]);
             console.log('Song updated successfully');
@@ -118,30 +132,60 @@ export class SongsRepository {
         }
     }
 
-    async getNewest(maxRows: number) {
+    async getNewest(maxRows: number): Promise<Song[]> {
+        const cacheKey = `newest-${maxRows}`;
+
+        if (this.cache[cacheKey]) {
+            return this.cache[cacheKey];
+        }
+
         try {
             const result = await this.db.query('SELECT * FROM get_newest_songs($1);', [maxRows]);
-            return await this.getSongsFromResult(result);
+            const songs = await this.getSongsFromResult(result);
+
+            this.cache[cacheKey] = songs;
+
+            return songs;
         } catch (err) {
             console.error('Error executing query for newest songs', err);
             return [];
         }
     }
 
-    async getMostCommented(maxRows: number) {
+    async getMostCommented(maxRows: number): Promise<Song[]> {
+        const cacheKey = `mostCommented-${maxRows}`;
+
+        if (this.cache[cacheKey]) {
+            return this.cache[cacheKey];
+        }
+
         try {
             const result = await this.db.query('SELECT * FROM get_most_commented_songs($1);', [maxRows]);
-            return await this.getSongsFromResult(result);
+            const songs = await this.getSongsFromResult(result);
+
+            this.cache[cacheKey] = songs;
+
+            return songs;
         } catch (err) {
             console.error('Error executing query for most commented songs', err);
             return [];
         }
     }
 
-    async getMostViewed(maxRows: number) {
+    async getMostViewed(maxRows: number): Promise<Song[]> {
+        const cacheKey = `mostViewed-${maxRows}`;
+
+        if (this.cache[cacheKey]) {
+            return this.cache[cacheKey];
+        }
+
         try {
             const result = await this.db.query('SELECT * FROM get_most_viewed_songs($1);', [maxRows]);
-            return await this.getSongsFromResult(result);
+            const songs = await this.getSongsFromResult(result);
+
+            this.cache[cacheKey] = songs;
+
+            return songs;
         } catch (err) {
             console.error('Error executing query for most viewed songs', err);
             return [];

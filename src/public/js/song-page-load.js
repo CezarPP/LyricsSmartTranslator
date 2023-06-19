@@ -14,23 +14,6 @@ async function getTranslation() {
         })
 }
 
-/*async function setUserTranslation(userId) {
-    fetch(`/api/user/${userId}`, {method: 'GET'})
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`
-                    + `error is ${response.json()}`);
-            }
-            return response.json();
-        })
-        .then(user => {
-            document.getElementById('by-user').textContent = user.username;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-}*/
-
 async function setTranslationLanguages(songId) {
     // get all translation for this song
     fetch(`/api/translations?songId=${songId}`, {method: 'GET'})
@@ -58,14 +41,9 @@ async function setTranslationLanguages(songId) {
 
 async function loadTranslation(translationData) {
     const songId = translationData.songId;
-    setTranslationLanguages(songId)
-        .then();
     const addTranslationButton = document.getElementById('add-translation-link');
     addTranslationButton.href = `/add-translation/${songId}`;
 
-    const userId = translationData.userId;
-    /*    setUserTranslation(userId)
-            .then();*/
     const language = translationData.language;
     const description = translationData.description;
     const lyrics = translationData.lyrics;
@@ -81,7 +59,8 @@ async function loadTranslation(translationData) {
         hour12: true,
     });
 
-    await setTranslationElements(lyrics, description, no_views, time);
+    await setTranslationElements(lyrics, description, no_views, time, language);
+    await setTranslationLanguages(songId);
 }
 
 async function loadSong(songId) {
@@ -114,13 +93,13 @@ async function setDescription(description) {
     document.getElementById('about-content').innerText = description;
 }
 
-async function setTranslationElements(lyrics, description, no_views, time) {
+async function setTranslationElements(lyrics, description, no_views, time, language) {
     document.getElementById('about-content').textContent = description;
-    setDescription(description)
-        .then();
+    document.getElementById('song-language').textContent = language;
     document.getElementById('lyrics-paragraphs').textContent = lyrics;
     document.getElementById('no-views').textContent = no_views;
     document.getElementById('song-date').textContent = time;
+    await setDescription(description);
 }
 
 async function setSongElements(link, imageId, artist, title) {
@@ -150,8 +129,10 @@ async function setImage(imageId) {
 
 document.addEventListener('DOMContentLoaded', async () => {
     const translation = await getTranslation();
-    await loadTranslation(translation);
-    await loadSong(translation.songId);
+    loadTranslation(translation)
+        .then();
+    loadSong(translation.songId)
+        .then();
     const preloader = document.getElementById('preloader');
     preloader.style.display = 'none';
 });

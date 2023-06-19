@@ -5,11 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> Song Title | Lyrit </title>
+    <link rel="preconnect" href="https://storage.googleapis.com">
+    <link rel="stylesheet" href="/css/preloader.css">
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/song-page.css">
     <link rel="stylesheet" href="/css/song-page-comments.css">
     <link rel="stylesheet" href="/css/song-page-annotations.css">
-    <link rel="stylesheet" href="/css/preloader.css">
     <script src="/js/loadNavbar.js" defer></script>
     <script src="/js/loadFooter.js" defer></script>
     <script type="module" src="/js/song-page-annotations.js" defer></script>
@@ -18,7 +19,7 @@
 </head>
 <body>
 <div id="preloader">
-    <img src="/img/equalizer.svg" alt="Loading..."/>
+    <img src="/img/equalizer.svg" alt="Loading..." width="200" height="200"/>
 </div>
 
 <header id="navbar-container"></header>
@@ -44,7 +45,7 @@
                     <i id="song-date">
                     </i>
                 </p>
-                <p>By: <span id="by-user">Ionut Padurariu</span></p>
+                <p>Language: <span id="song-language"></span></p>
                 <div class="add-translation-button" id="add-translation-button">
                     <a class="song-page-button"
                        id="add-translation-link">Add translation</a>
@@ -110,7 +111,7 @@
             <p id="about-content"></p>
         </div>
         <div class="youtube-song">
-            <iframe id='song-link' class="clip" src="https://www.youtube.com/embed/YR5ApYxkU-U"></iframe>
+            <iframe id='song-link' class="clip" src=""></iframe>
         </div>
     </div>
 </div>

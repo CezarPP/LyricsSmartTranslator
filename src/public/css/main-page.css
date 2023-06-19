@@ -1,4 +1,4 @@
-.content-container {
+.content-container, #charts-container, #community-container, #for-you-container {
     max-width: 1200px;
     width: 90%;
     margin: 0 auto;
@@ -10,13 +10,18 @@
     margin-bottom: 30px;
 }
 
-.featured-title {
+.featured-title, .charts-title, .community-title, .for-you-title {
     font-family: Programme, Arial, sans-serif;
     font-size: 40px;
     font-weight: bold;
     text-transform: uppercase;
+    margin-top: 40px;
     margin-bottom: 20px;
     text-align: left;
+}
+
+.news-container, .charts-list, .community-list, .for-you-list {
+    font-family: Programme, Arial, sans-serif;
 }
 
 .news-container {
@@ -37,7 +42,6 @@
 
 .news-container .news-content .news-card {
     flex: 1;
-    /*border-right: 2px solid black;*/
     padding: 0 30px;
     align-self: normal;
     margin-bottom: 20px;
@@ -68,43 +72,7 @@
     color: gray;
 }
 
-@media screen and (max-width: 767px) {
-    .news-container .news-content {
-        flex-direction: column;
-    }
-
-    .news-container .news-content .news-card {
-        padding: 0;
-        border-right: 0;
-    }
-}
-
-@media screen and (min-width: 768px) {
-    .news-container .news-content .news-card {
-        margin-bottom: 0;
-    }
-}
-
-
-/* Charts */
-#charts-container {
-    margin-bottom: 30px;
-}
-
-.charts-title {
-    font-family: Programme, Arial, sans-serif;
-    font-size: 40px;
-    font-weight: bold;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-.charts-list {
-    font-family: Programme, Arial, sans-serif;
-}
-
-.charts-list li {
+.charts-list li, .community-list li, .for-you-list li {
     display: flex;
     justify-content: space-between;
     font-size: 18px;
@@ -112,23 +80,11 @@
     border-bottom: 1px solid #ccc;
 }
 
-.charts-list .song-number {
-    width: 10%;
-}
-
-.charts-list .song-title {
-    width: 30%;
-}
-
-.charts-list .song-author {
-    width: 20%;
-}
-
 .dropdown {
     display: inline-block;
 }
 
-.dropbtn {
+.dropbtn, .show-more-button {
     background-color: var(--background-color);
     color: white;
     font-family: Programme, Arial, sans-serif;
@@ -138,7 +94,7 @@
     cursor: pointer;
 }
 
-.dropbtn:hover, .dropbtn:focus {
+.dropbtn:hover, .dropbtn:focus, .show-more-button:hover {
     background-color: var(--background-lighter);
 }
 
@@ -162,11 +118,7 @@
     background-color: #f1f1f1;
 }
 
-.dropdown:hover .dropdown-content {
-    display: block;
-}
-
-.dropdown:focus-within .dropdown-content {
+.dropdown:hover .dropdown-content, .dropdown:focus-within .dropdown-content {
     display: block;
 }
 
@@ -177,95 +129,18 @@
     justify-content: space-between;
 }
 
-/*COMMUNITY*/
-#community-container {
-    margin-bottom: 30px;
-}
+@media screen and (max-width: 767px) {
+    .news-container .news-content {
+        flex-direction: column;
+    }
 
-.community-title {
-    font-family: Programme, Arial, sans-serif;
-    font-size: 40px;
-    font-weight: bold;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-    text-align: left;
+    .news-container .news-content .news-card {
+        padding: 0;
+        border-right: 0;
+    }
 }
-
-.community-list {
-    font-family: Programme, Arial, sans-serif;
-}
-
-.community-list li {
-    display: flex;
-    justify-content: space-between;
-    font-size: 18px;
-    padding: 8px 0;
-    border-bottom: 1px solid #ccc;
-}
-
-.community-list .community-number {
-    width: 10%;
-}
-
-.community-list .community-name {
-    width: 30%;
-}
-
-.community-list .community-activity {
-    width: 20%;
-}
-
-/*FOR YOU*/
-#for-you-container {
-    margin-bottom: 30px;
-}
-
-.for-you-title {
-    font-family: Programme, Arial, sans-serif;
-    font-size: 40px;
-    font-weight: bold;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-.for-you-list {
-    font-family: Programme, Arial, sans-serif;
-}
-
-.for-you-list li {
-    display: flex;
-    justify-content: space-between;
-    font-size: 18px;
-    padding: 8px 0;
-    border-bottom: 1px solid #ccc;
-}
-
-.for-you-list .song-number {
-    width: 10%;
-}
-
-.for-you-list .song-title {
-    width: 30%;
-}
-
-.for-you-list .song-author {
-    width: 20%;
-}
-
 
 .show-more-button {
     display: block;
     margin: 20px auto;
-    background-color: var(--background-color);
-    color: white;
-    font-family: Programme, Arial, sans-serif;
-    font-size: 1rem;
-    padding: 5px 10px;
-    border: none;
-    cursor: pointer;
-}
-
-.show-more-button:hover {
-    background-color: var(--background-lighter);
 }
