@@ -3,7 +3,7 @@ CREATE OR REPLACE FUNCTION generate_rss_feed()
 $$
 DECLARE
     rss_feed  XML;
-    base_link TEXT := 'https://post-dtw6.onrender.com';
+    base_link TEXT := 'https://www.lyricssmarttranslator.com/';
 BEGIN
     WITH rss_data AS (SELECT s.title                            AS title,
                              s.artist                           AS author,
