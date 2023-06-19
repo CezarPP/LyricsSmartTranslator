@@ -9,7 +9,7 @@ export class ExportController {
 
     private wordpressClientId = '87363';
     private wordpressClientSecret = 'MlsIF37Dyx6ONg6TxMCRc6F5YYf8V0R3ZK7pqZq7cW0gigFAhTUaxyRrJBnq1a9E';
-    private wordpressRedirectUri = 'https://1fc6-2a02-2f0e-561a-6f00-50dc-f374-e972-b52d.ngrok-free.app/export-data/wordpress';
+    private wordpressRedirectUri = 'https://lyricssmarttranslator.com/export-data/wordpress';
 
     static postTitle = '';
     static postContent = '';
