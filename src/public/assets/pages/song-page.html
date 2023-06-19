@@ -114,10 +114,14 @@
             <p id="about-content"></p>
         </div>
         <div class="youtube-song">
-            <iframe id='song-link' class="clip" src=""></iframe>
+            <div id="youtube-facade" onclick="loadYoutubeVideo()">
+                <img src="/img/youtube.svg" alt="YouTube Video Placeholder" width="200" height="200"/>
+            </div>
+            <iframe id='song-link' class="clip" style="display: none;"></iframe>
         </div>
     </div>
 </div>
+
 <section class="comments-container">
     <h2>Comments</h2>
     <div class="input-container">

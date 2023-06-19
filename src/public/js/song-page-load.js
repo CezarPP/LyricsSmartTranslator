@@ -102,13 +102,23 @@ async function setTranslationElements(lyrics, description, no_views, time, langu
     await setDescription(description);
 }
 
+let linkGlobal = ''
+
 async function setSongElements(link, imageId, artist, title) {
-    document.getElementById('song-link').src = link;
+    linkGlobal = link;
+    // document.getElementById('song-link').src = link;
     document.getElementById('song-author').textContent = artist;
     document.getElementById('song-title').textContent = title;
     document.getElementById('lyrics-song-title').textContent = title;
     await setImage(imageId);
 }
+
+function loadYoutubeVideo() {
+    document.getElementById('song-link').style.display = 'block';
+    document.getElementById('song-link').src = linkGlobal;
+    document.getElementById('youtube-facade').style.display = 'none';
+}
+
 
 async function setImage(imageId) {
     fetch(`/api/images/${imageId}`, {method: 'GET'})
