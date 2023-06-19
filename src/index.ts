@@ -10,6 +10,7 @@ import {AnnotationsController} from "./controllers/AnnotationsController";
 import {sendMessage} from "./util/sendMessage";
 import {RecoverController} from "./controllers/RecoverController";
 import {sendUpdatesPage} from "./util/sendUpdatesPage";
+import {sendRecoveriesPage} from "./util/sendRecoveriesPage";
 import {ExportController} from "./controllers/ExportController"
 
 const http = require('http');
@@ -86,10 +87,13 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     } else if (method === 'POST' && url == '/logout') {
         userController.logoutUser(req, res)
             .then();
-    } else if (method === 'GET' && url === '/updates') {
+    } else if (method === 'GET' && (url === '/updates' || url === '/updates.html')) {
         sendUpdatesPage(req, res)
             .then();
-    } else if (method == 'POST' && url == '/export/tumblr') {
+    } else if (method === 'GET' && (url === '/recoveries' || url === '/recoveries.html')){
+        sendRecoveriesPage(req, res)
+            .then();
+    }else if (method == 'POST' && url == '/export/tumblr') {
         exportController.handleTumblrExport(req, res);
     } else if(method == 'GET' && url.startsWith('/export-data/tumblr')) {
         exportController.handleTumblrExportData(req, res);
