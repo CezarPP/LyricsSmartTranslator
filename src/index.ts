@@ -10,6 +10,7 @@ import {AnnotationsController} from "./controllers/AnnotationsController";
 import {sendMessage} from "./util/sendMessage";
 import {RecoverController} from "./controllers/RecoverController";
 import {sendUpdatesPage} from "./util/sendUpdatesPage";
+import {ExportController} from "./controllers/ExportController"
 
 const http = require('http');
 
@@ -20,6 +21,7 @@ const translationsController = new TranslationsController();
 const commentsController = new CommentsController();
 const annotationsController = new AnnotationsController();
 const recoverController = new RecoverController();
+const exportController = new ExportController();
 
 const server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
     if (req.url === undefined || req.method === undefined) {
@@ -87,6 +89,14 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     } else if (method === 'GET' && url === '/updates') {
         sendUpdatesPage(req, res)
             .then();
+    } else if (method == 'POST' && url == '/export/tumblr') {
+        exportController.handleTumblrExport(req, res);
+    } else if(method == 'GET' && url.startsWith('/export-data/tumblr')) {
+        exportController.handleTumblrExportData(req, res);
+    } else if(method == 'POST' && url == '/export/wordpress') {
+        exportController.handleWordpressExport(req, res);
+    } else if(method == 'GET' && url.startsWith('/export-data/wordpress')) {
+        exportController.handleWordpressExportData(req, res);
     } else if (method === 'GET') {
         sendStaticFile(req, res)
             .then()
