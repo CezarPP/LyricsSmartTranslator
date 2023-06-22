@@ -144,12 +144,12 @@ export class UsersController {
                 }
                 const existingUsername = await this.usersRepository.getUserByName(username);
                 if (existingUsername) {
-                    sendMessage(res, 400, 'User already exists');
+                    sendMessage(res, 409, 'User already exists');
                     return;
                 }
                 const existingUserMail = await this.usersRepository.getUserByEmail(email);
                 if (existingUserMail) {
-                    sendMessage(res, 400, 'User with this email already exists');
+                    sendMessage(res, 409, 'User with this email already exists');
                     return;
                 }
                 //I need to encrypt the password:
@@ -216,8 +216,13 @@ export class UsersController {
                 return;
             }
             const users: User[] = await this.usersRepository.getMostActiveUsers(limit);
+            const usersData = users.map((user) => ({
+                username: user.username,
+                img_id: user.img_id,
+                email: user.email
+            }));
             res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify(users));
+            res.end(JSON.stringify(usersData));
         } catch (error) {
             sendMessage(res, 500, 'Internal server error')
         }
