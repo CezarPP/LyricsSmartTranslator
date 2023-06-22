@@ -19,12 +19,10 @@ const secretKey = 'ionut';
 export class UsersController {
     private usersRepository: UsersRepository;
     private recoverRepository: RecoverRepository;
-
     constructor() {
         this.usersRepository = new UsersRepository();
         this.recoverRepository = new RecoverRepository();
     }
-
     async handleApiRequest(req: IncomingMessage, res: ServerResponse) {
         if (!req.url) {
             sendMessage(res, 500, 'Internal server error');
@@ -77,7 +75,6 @@ export class UsersController {
         }
         sendMessage(res, 405, `Method not allowed for path ${req.url}`);
     }
-
     async loginUser(req: IncomingMessage, res: ServerResponse) {
         try {
             let body = '';
@@ -117,7 +114,6 @@ export class UsersController {
             sendMessage(res, 500, 'Internal server error');
         }
     }
-
     async logoutUser(req: IncomingMessage, res: ServerResponse) {
         const user = await this.getLoggedUser(req, res);
         if (!user)
@@ -127,15 +123,12 @@ export class UsersController {
             sendMessage(res, 200, 'Logout successful');
         }
     }
-
     async registerUser(req: IncomingMessage, res: ServerResponse) {
         try {
             let body = '';
-
             req.on('data', (chunk) => {
                 body += chunk.toString();
             });
-
             req.on('end', async () => {
                 const parsedData = JSON.parse(body);
                 const username = parsedData.username as string;
@@ -145,19 +138,20 @@ export class UsersController {
                     sendMessage(res, 400, 'Invalid input data');
                     return;
                 }
-
+                if(username === 'login' || username === 'register' || username === 'recommendations'){
+                    sendMessage(res, 400, 'Invalid username');
+                    return;
+                }
                 const existingUsername = await this.usersRepository.getUserByName(username);
                 if (existingUsername) {
                     sendMessage(res, 400, 'User already exists');
                     return;
                 }
-
                 const existingUserMail = await this.usersRepository.getUserByEmail(email);
                 if (existingUserMail) {
                     sendMessage(res, 400, 'User with this email already exists');
                     return;
                 }
-
                 //I need to encrypt the password:
                 const saltRounds = 10;
                 const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -170,7 +164,6 @@ export class UsersController {
             sendMessage(res, 500, 'Internal server error');
         }
     }
-
     async getUserStats(req: IncomingMessage, res: ServerResponse, username: String) {
         try {
             const user = await this.usersRepository.getUserByName(username);
@@ -195,7 +188,6 @@ export class UsersController {
             sendMessage(res, 500, 'Internal server error');
         }
     }
-
     async getAllUserStats(req: IncomingMessage, res: ServerResponse) {
         try {
             const users = await this.usersRepository.getAllUsers();
@@ -211,7 +203,6 @@ export class UsersController {
             sendMessage(res, 500, 'Internal server error');
         }
     }
-
     async getAllUserStatsFiltering(req: IncomingMessage, res: ServerResponse){
         assert(req.url);
         try {
@@ -237,7 +228,6 @@ export class UsersController {
             req.on('data', chunk => {
                 body += chunk.toString();
             });
-
             req.on('end', async () => {
                 const parsedData = JSON.parse(body);
                 const newUsername = parsedData.newUsername as string;
@@ -292,7 +282,6 @@ export class UsersController {
             sendMessage(res, 500, 'Internal server error');
         }
     }
-
     async deleteUser(req: IncomingMessage, res: ServerResponse, username: String) {
         try {
             const user = await this.usersRepository.getUserByName(username);
@@ -317,7 +306,33 @@ export class UsersController {
             sendMessage(res, 500, 'Internal server error');
         }
     }
+    async getRecommendations(req: IncomingMessage, res: ServerResponse) {
+        assert(req.url);
+        const parsedUrl = url.parse(req.url, true);
+        const parameters = parsedUrl.query;
+        let limitString = parameters["limit"] as string;
+        if (limitString === undefined) {
+            limitString = "30";
+        }
+        let limit = parseInt(limitString);
+        if (isNaN(limit)) {
+            sendMessage(res, 500, 'Invalid request');
+            return;
+        }
 
+        const user = await this.getLoggedUser(req, res);
+
+        if (user === null) {
+            sendMessage(res, 401, 'Not logged in');
+            return;
+        }
+
+        const songs: Song[] = await this.usersRepository.getRecommendations(user.id, limit);
+        console.log("Songs for user are " + songs);
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(songs));
+    }
     async getUserProfilePage(req: IncomingMessage, res: ServerResponse) {
         try {
             if (!req.url) {
@@ -346,7 +361,6 @@ export class UsersController {
             sendMessage(res, 500, 'Internal server error');
         }
     }
-
     async getLoggedUsersInfo(req: IncomingMessage, res: ServerResponse) {
         try {
             const user = await this.getLoggedUser(req, res);
@@ -361,12 +375,10 @@ export class UsersController {
             sendMessage(res, 500, 'Internal server error');
         }
     }
-
     async getLoggedUser(req: IncomingMessage, res: ServerResponse) {
         const userId = this.authenticateUser(req);
         return await this.usersRepository.getUserById(userId);
     }
-
     authenticateUser(req: IncomingMessage): number {
         const cookies = req.headers.cookie;
         console.log(cookies);
@@ -385,39 +397,5 @@ export class UsersController {
             }
         }
         return -1;
-    }
-
-    async getRecommendations(req: IncomingMessage, res: ServerResponse) {
-        assert(req.url);
-        const parsedUrl = url.parse(req.url, true);
-        const parameters = parsedUrl.query;
-        let limitString = parameters["limit"] as string;
-        if (limitString === undefined) {
-            limitString = "30";
-        }
-        let limit = parseInt(limitString);
-        if (isNaN(limit)) {
-            sendMessage(res, 500, 'Invalid request');
-            return;
-        }
-
-        const user = await this.getLoggedUser(req, res);
-
-        if (user === null) {
-            sendMessage(res, 401, 'Not logged in');
-            return;
-        }
-
-        const songs: Song[] = await this.usersRepository.getRecommendations(user.id, limit);
-        console.log("Songs for user are " + songs);
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify(songs));
-    }
-
-    async getMostActiveUsers(req: IncomingMessage, res: ServerResponse) {
-        const users = await this.usersRepository.getMostActiveUsers(25);
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify(users));
     }
 }
