@@ -106,7 +106,7 @@ export class UsersController {
                     } else {
                         this.recoverRepository.deleteRecoverRequestUserId(user.id).then();
                         const token = jwt.sign({userId: user.id}, secretKey, {expiresIn: '20d'});
-                        res.setHeader('Set-Cookie', `jwt=${token}; Path=/; HttpOnly; SameSite=Strict`);
+                        res.setHeader('Set-Cookie', `jwt=${token}; Path=/; HttpOnly; SameSite=Strict; Secure`);
                         sendMessage(res, 200, 'Login successful');
                     }
                 } else {
