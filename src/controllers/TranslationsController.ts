@@ -5,6 +5,7 @@ import {sendMessage} from "../util/sendMessage";
 import assert from "assert";
 import url from "url";
 import {BaseController} from "./BaseController";
+import {getUTCDate} from "../util/getUTCDate";
 
 export class TranslationsController extends BaseController {
     private nrViews: Map<number, number> = new Map();
@@ -110,18 +111,12 @@ export class TranslationsController extends BaseController {
 
             const user = await this.usersController.getLoggedUser(req, res);
             if (user === null) {
-                res.statusCode = 401;
-                const data = {
-                    message: 'You need to be authenticated to submit a translation',
-                    redirectPage: '/not-auth.html',
-                    translationId: 0
-                }
-                res.end(JSON.stringify(data));
+                sendMessage(res, 401, 'You need to be authenticated to submit a translation');
                 return;
             }
 
             translation = new Translation(0, songId, user.id,
-                language, description, lyrics, 0, new Date());
+                language, description, lyrics, 0, getUTCDate());
 
             console.log("Preparing to add translation to repo");
             const translationId = await this.translationRepository.addTranslation(translation);
@@ -130,7 +125,6 @@ export class TranslationsController extends BaseController {
             res.statusCode = 200;
             const data = {
                 message: 'Translation added successfully!',
-                redirectPage: '/submit-translation.html',
                 songId: songId,
                 translationId: translationId
             }
