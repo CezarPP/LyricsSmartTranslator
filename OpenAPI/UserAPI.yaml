@@ -48,13 +48,12 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
       security:
         - cookieAuth: []
+
   /api/user/logout:
     post:
       summary: Log out a user
       tags:
         - users
-      security:
-        - cookieAuth: []
       responses:
         '200':
           description: Logout successful
@@ -68,6 +67,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - cookieAuth: []
+
   /api/user/register:
     post:
       summary: Register a new user
@@ -104,6 +106,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
   /api/user/{username}:
     get:
       summary: Get user statistics by username
@@ -135,7 +138,95 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update user profile
+      tags:
+        - users
+      parameters:
+        - name: username
+          in: path
+          description: Username of the user to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+      responses:
+        '200':
+          description: User profile updated successfuly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Invalid input datea
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - cookieAuth: [ ]
 
+    delete:
+      summary: Delete a user
+      tags:
+        - users
+      parameters:
+        - name: username
+          in: path
+          description: Username of the user to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - cookieAuth: [ ]
   /api/user:
     get:
       summary: Get user statistics with optional filtering
@@ -174,6 +265,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /api/user/recommendations:
+    get:
+      summary: Get recommendations for the current logged in user
+      tags:
+        - users
+      parameters:
+        - name: limit
+          in: query
+          description: Limit the number of results
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Song'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - cookieAuth: []
 
 components:
   schemas:
@@ -218,6 +345,21 @@ components:
           type: string
       required:
         - message
+    Song:
+      type: object
+      properties:
+        id:
+          type: number
+        primary_translation:
+          type: number
+        imageId:
+          type: number
+        artist:
+          type: string
+        title:
+          type: string
+        link:
+          type: string
     ErrorResponse:
       type: object
       properties:
@@ -249,6 +391,22 @@ components:
           type: string
         activity:
           type: integer
+    UserUpdateRequest:
+      type: object
+      properties:
+        newUsername:
+          type: string
+        newImgId:
+          type: integer
+        newPassword:
+          type: string
+        newEmail:
+          type: string
+      required:
+        - newUsername
+        - newImgId
+        - newPassword
+        - newEmail
   securitySchemes:
     cookieAuth:
       type: apiKey
