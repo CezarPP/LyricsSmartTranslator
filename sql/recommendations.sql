@@ -85,25 +85,25 @@ CREATE OR REPLACE FUNCTION get_song_recommendations_by_lyrics(p_user_id INT, n I
                 image_id            INT,
                 artist              VARCHAR(255),
                 title               VARCHAR(255),
-                link                TEXT,
-                common_words        INT
+                link                TEXT
             )
 AS
 $$
 BEGIN
     RETURN QUERY
-        SELECT s.*, count_common_words(t2.lyrics, t.lyrics) AS common_words
+        SELECT DISTINCT ON (s.id) s.id, s.primary_translation, s.image_id, s.artist, s.title, s.link
         FROM Songs s
                  JOIN Translations t ON s.primary_translation = t.id
                  JOIN Translations t2 ON t2.user_id = p_user_id
         WHERE count_common_words(t2.lyrics, t.lyrics) > 0
           AND t.user_id <> p_user_id
-        GROUP BY s.id, s.artist, s.title, t2.lyrics, t.lyrics
-        ORDER BY common_words DESC
+        GROUP BY s.id, s.primary_translation, s.image_id, s.artist, s.title, s.link, t2.lyrics, t.lyrics
+        ORDER BY s.id, count_common_words(t2.lyrics, t.lyrics) DESC
         LIMIT n;
 
 END;
 $$ LANGUAGE plpgsql;
+
 
 
 CREATE OR REPLACE FUNCTION get_combined_recommendations(p_user_id INT, n INT)
@@ -128,6 +128,7 @@ DECLARE
     artist_has_more          BOOLEAN := TRUE;
     comments_has_more        BOOLEAN := TRUE;
     lyrics_has_more          BOOLEAN := TRUE;
+    random_num               INT;
 BEGIN
     OPEN rec_by_artist FOR SELECT * FROM get_song_recommendations_by_artist(p_user_id, 3 * n);
     OPEN rec_by_comments FOR SELECT * FROM get_song_recommendations_by_comments_annotations(p_user_id, 3 * n);
@@ -137,8 +138,9 @@ BEGIN
         EXIT WHEN counter = n OR NOT (artist_has_more OR comments_has_more OR lyrics_has_more);
 
         -- Randomly select a cursor
-        CASE (random() * 3)::INT
-            WHEN 0 THEN IF artist_has_more THEN
+        random_num := (random() * 3)::INT;
+        IF random_num = 0 THEN
+            IF artist_has_more THEN
                 FETCH NEXT FROM rec_by_artist INTO combined_recommendations;
                 IF NOT FOUND THEN
                     artist_has_more := FALSE;
@@ -147,7 +149,8 @@ BEGIN
             ELSE
                 CONTINUE;
             END IF;
-            WHEN 1 THEN IF comments_has_more THEN
+        ELSIF random_num = 1 THEN
+            IF comments_has_more THEN
                 FETCH NEXT FROM rec_by_comments INTO combined_recommendations;
                 IF NOT FOUND THEN
                     comments_has_more := FALSE;
@@ -156,7 +159,8 @@ BEGIN
             ELSE
                 CONTINUE;
             END IF;
-            ELSE IF lyrics_has_more THEN
+        ELSE
+            IF lyrics_has_more THEN
                 FETCH NEXT FROM rec_by_lyrics INTO combined_recommendations;
                 IF NOT FOUND THEN
                     lyrics_has_more := FALSE;
@@ -165,7 +169,8 @@ BEGIN
             ELSE
                 CONTINUE;
             END IF;
-            END CASE;
+        END IF;
+
 
         -- Skip if this song has already been recommended
         IF combined_recommendations.song_id = ANY (already_recommended) THEN
