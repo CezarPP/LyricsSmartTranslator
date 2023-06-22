@@ -284,6 +284,28 @@ document.addEventListener('DOMContentLoaded', () => {
         btnShare.addEventListener('click', () => {
             textArea.readOnly = true;
             alert("VLAD");// TODO(Vlad)
+
+            const postData = {
+                postTitle: "New annotation",
+                postText: textArea.value,
+                songId: extractSongIdFromUrl()
+            }
+
+            fetch('/export/wordpress', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(postData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    //console.log(data.message);
+                    window.location.href = data.message;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
         });
 
         const btnDelete = document.createElement('button');
