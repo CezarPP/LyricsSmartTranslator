@@ -1,6 +1,7 @@
 import {IncomingMessage, ServerResponse} from 'http';
 import {ImagesRepository} from '../repositories/ImagesRepository';
 import assert from "assert";
+import {sendMessage} from "../util/sendMessage";
 
 export class ImagesController {
     private imagesRepository: ImagesRepository;
@@ -20,8 +21,7 @@ export class ImagesController {
         } else if (req.method == 'POST') {
             await this.handlePost(req, res);
         } else {
-            res.statusCode = 405;
-            res.end(`Method not allowed for path ${req.url}`);
+            sendMessage(res, 405, `Method not allowed for path ${req.url}`);
         }
     }
 
@@ -37,22 +37,18 @@ export class ImagesController {
             try {
                 bodyObject = JSON.parse(body);
             } catch (e) {
-                console.log('Error parsing image json ' + e);
-                res.statusCode = 400;
-                res.end('Invalid JSON');
+                sendMessage(res, 400, 'Invalid JSON');
                 return;
             }
             if (bodyObject.image === undefined) {
-                res.statusCode = 400;
-                res.end('Invalid JSON');
+                sendMessage(res, 400, 'Invalid JSON');
                 return;
             }
             const imageBuffer = Buffer.from(bodyObject.image, 'base64');
 
             const image = await this.imagesRepository.addImage(imageBuffer);
             if (image == null) {
-                res.writeHead(500, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({message: 'Not a valid image'}));
+                sendMessage(res, 500, 'Not a valid image');
                 return;
             }
 
@@ -65,24 +61,19 @@ export class ImagesController {
     }
 
     async handleGetById(req: IncomingMessage, res: ServerResponse) {
-        if (!req.url) {
-            res.writeHead(400, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({message: 'Invalid URL'}));
-            return;
-        }
+        assert(req.url);
+
         const id: number = parseInt(req.url.split('/')[3]);
 
         if (isNaN(id)) {
-            res.writeHead(400, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({message: 'Invalid image id'}));
+            sendMessage(res, 400, 'Invalid image id');
             return;
         }
 
         const image = await this.imagesRepository.getImageById(id);
 
         if (image === null) {
-            res.writeHead(404, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({message: 'Image not found'}));
+            sendMessage(res, 404, 'Image not found');
             return;
         }
         res.writeHead(200, {'Content-Type': 'application/json'});

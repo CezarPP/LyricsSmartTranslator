@@ -83,12 +83,7 @@ export class SongsController extends BaseController {
 
             const user = await this.usersController.getLoggedUser(req, res);
             if (user === null) {
-                res.statusCode = 401;
-                const data = {
-                    message: 'You need to be authenticated to submit a song',
-                    redirectPage: '/not-auth.html',
-                }
-                res.end(JSON.stringify(data));
+                sendMessage(res, 401, 'You need to be authenticated to submit a song.');
                 return;
             }
 
@@ -123,7 +118,6 @@ export class SongsController extends BaseController {
         assert(req.url);
         const songId = parseInt(req.url.split('/')[3]);
         if (isNaN(songId)) {
-            console.log("Song id is nan");
             sendMessage(res, 400, 'Invalid song id');
             return;
         }
@@ -151,12 +145,7 @@ export class SongsController extends BaseController {
 
             const user = await this.usersController.getLoggedUser(req, res);
             if (user === null) {
-                res.statusCode = 401;
-                const data = {
-                    message: 'You need to be authenticated to update a song',
-                    redirectPage: '/not-auth.html',
-                }
-                res.end(JSON.stringify(data));
+                sendMessage(res, 401, 'You need to be authenticated to update a song.');
                 return;
             }
 
@@ -185,10 +174,7 @@ export class SongsController extends BaseController {
     }
 
     async handleGetById(req: IncomingMessage, res: ServerResponse) {
-        if (!req.url) {
-            sendMessage(res, 500, 'Server error');
-            return;
-        }
+        assert(req.url);
         const songId: number = parseInt(req.url.split('/')[3]);
 
         if (isNaN(songId)) {
@@ -212,7 +198,6 @@ export class SongsController extends BaseController {
         const songId: number = parseInt(req.url.split('/')[3]);
 
         if (isNaN(songId)) {
-            console.log("Song id is nan");
             sendMessage(res, 400, 'Invalid song id');
             return;
         }

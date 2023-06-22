@@ -114,7 +114,6 @@ export class AnnotationsController extends BaseController {
                 new Annotation(0, user.id, translationId, beginPos, endPos, content, false);
 
             annotation.id = await this.annotationsRepository.addAnnotation(annotation);
-            console.log("Annotation added with id " + annotation.id);
 
             res.statusCode = 201;
             res.setHeader('Content-Type', 'application/json');
@@ -181,7 +180,6 @@ export class AnnotationsController extends BaseController {
             return;
         }
         await this.annotationsRepository.deleteAnnotation(annotation.id);
-        console.log("Annotation with id " + annotation.id + " deleted successfully")
 
         sendMessage(res, 200, 'Annotation deleted successfully!');
     }

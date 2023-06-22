@@ -17,14 +17,11 @@ export class TranslationsController extends BaseController {
     }
 
     async handleGetById(req: IncomingMessage, res: ServerResponse) {
-        if (!req.url) {
-            sendMessage(res, 500, 'Server error');
-            return;
-        }
+        assert(req.url);
+
         const translationId = parseInt(req.url.split('/')[3]);
 
         if (isNaN(translationId)) {
-            console.log("Translation id is nan");
             sendMessage(res, 400, 'Invalid translation id');
             return;
         }
@@ -139,10 +136,7 @@ export class TranslationsController extends BaseController {
         });
 
         req.on('end', async () => {
-            if (!req.url) {
-                sendMessage(res, 500, 'Server error');
-                return;
-            }
+            assert(req.url);
 
             const postData = JSON.parse(body);
             const lyrics = postData.lyrics as string;
@@ -177,10 +171,8 @@ export class TranslationsController extends BaseController {
     }
 
     async handleDelete(req: IncomingMessage, res: ServerResponse) {
-        if (!req.url) {
-            sendMessage(res, 500, 'Server error');
-            return;
-        }
+        assert(req.url);
+
         const translationId: number = parseInt(req.url.split('/')[3]);
 
         if (isNaN(translationId)) {
