@@ -283,10 +283,9 @@ document.addEventListener('DOMContentLoaded', () => {
         btnShare.textContent = 'Share';
         btnShare.addEventListener('click', () => {
             textArea.readOnly = true;
-            alert("VLAD");// TODO(Vlad)
 
             const postData = {
-                postTitle: "New annotation",
+                postTitle: "New annotation from: " + window.location.href,
                 postText: textArea.value,
                 songId: extractSongIdFromUrl()
             }
