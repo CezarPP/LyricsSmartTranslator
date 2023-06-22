@@ -1,12 +1,15 @@
 ------------------ COMMUNITY
 
+DROP FUNCTION get_most_active_users;
+
 CREATE OR REPLACE FUNCTION get_most_active_users(max_rows INT)
     RETURNS TABLE
             (
                 user_id        INT,
                 img_id         INT,
                 username       VARCHAR,
-                activity_count BIGINT
+                activity_count BIGINT,
+                email           VARCHAR
             )
     LANGUAGE plpgsql
 AS
@@ -16,7 +19,8 @@ BEGIN
         SELECT u.id                                                                          AS user_id,
                u.img_id                                                                      AS img_id,
                u.username                                                                    AS username,
-               (COUNT(DISTINCT t.id) * 10 + COUNT(DISTINCT a.id) * 5 + COUNT(DISTINCT c.id)) AS activity_count
+               (COUNT(DISTINCT t.id) * 10 + COUNT(DISTINCT a.id) * 5 + COUNT(DISTINCT c.id)) AS activity_count,
+               u.email                                                                       AS email
         FROM users u
                  LEFT JOIN translations t ON u.id = t.user_id
                  LEFT JOIN annotations a ON u.id = a.user_id
