@@ -14,6 +14,10 @@ async function getTranslation() {
         })
 }
 
+function getCapitalized(s) {
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 async function setTranslationLanguages(songId) {
     // get all translation for this song
     fetch(`/api/translations?songId=${songId}`, {method: 'GET'})
@@ -29,7 +33,7 @@ async function setTranslationLanguages(songId) {
             for (const translation of translations) {
                 const language = document.createElement('a');
                 language.href = `/song-page/${translation.id}`;
-                language.textContent = translation.language.charAt(0).toUpperCase() + translation.language.slice(1);
+                language.textContent = getCapitalized(translation.language);
                 languageOptions.appendChild(language);
             }
         })
@@ -44,7 +48,7 @@ async function loadTranslation(translationData) {
     const addTranslationButton = document.getElementById('add-translation-link');
     addTranslationButton.href = `/add-translation/${songId}`;
 
-    const language = translationData.language;
+    const language = getCapitalized(translationData.language);
     const description = translationData.description;
     const lyrics = translationData.lyrics;
     const no_views = translationData.no_views;
