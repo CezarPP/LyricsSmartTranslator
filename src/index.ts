@@ -12,6 +12,8 @@ import {RecoverController} from "./controllers/RecoverController";
 import {sendUpdatesPage} from "./util/sendUpdatesPage";
 import {sendRecoveriesPage} from "./util/sendRecoveriesPage";
 import {ExportController} from "./controllers/ExportController"
+import {ExportAllSongsController} from "./controllers/ExportAllSongsController"
+
 
 const http = require('http');
 
@@ -23,6 +25,7 @@ const commentsController = new CommentsController();
 const annotationsController = new AnnotationsController();
 const recoverController = new RecoverController();
 const exportController = new ExportController();
+const exportAllSongsController = new ExportAllSongsController();
 
 const server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
     if (req.url === undefined || req.method === undefined) {
@@ -101,7 +104,10 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         exportController.handleWordpressExport(req, res);
     } else if(method == 'GET' && url.startsWith('/export-data/wordpress')) {
         exportController.handleWordpressExportData(req, res);
-    } else if (method === 'GET') {
+    } else if(method == 'GET' && url == '/all-songs') {
+        exportAllSongsController.exportAllSongs(req, res);
+    }
+    else if (method === 'GET') {
         sendStaticFile(req, res)
             .then()
             .catch(() => console.log("Error sending static file"));
