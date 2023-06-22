@@ -5,6 +5,7 @@ import {sendMessage} from "../util/sendMessage";
 import assert from "assert";
 import url from "url";
 import {BaseController} from "./BaseController";
+import {getUTCDate} from "../util/getUTCDate";
 
 export class TranslationsController extends BaseController {
     private nrViews: Map<number, number> = new Map();
@@ -121,7 +122,7 @@ export class TranslationsController extends BaseController {
             }
 
             translation = new Translation(0, songId, user.id,
-                language, description, lyrics, 0, new Date());
+                language, description, lyrics, 0, getUTCDate());
 
             console.log("Preparing to add translation to repo");
             const translationId = await this.translationRepository.addTranslation(translation);

@@ -5,6 +5,7 @@ import assert from "assert";
 import {UsersController} from "./UsersController";
 import {isYoutubeLink} from "../util/validation";
 import {sendMessage} from "../util/sendMessage";
+import {getUTCDate} from "../util/getUTCDate";
 import url from "url";
 import {BaseController} from "./BaseController";
 
@@ -97,9 +98,9 @@ export class SongsController extends BaseController {
             const songId = await this.songRepository.addSongNoFk(song);
             console.log("Added song to repo with id " + songId);
 
-            const translation = new Translation(0, songId, user.id,
-                language, description, lyrics, 0, new Date());
             console.log("Preparing to add translation to repo");
+            const translation = new Translation(0, songId, user.id,
+                language, description, lyrics, 0, getUTCDate());
             const translationId = await this.translationRepository.addTranslation(translation);
             console.log("Added translation to repo with id " + translationId);
 
