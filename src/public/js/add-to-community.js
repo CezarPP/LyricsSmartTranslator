@@ -10,7 +10,7 @@ const getUsersData = async () => {
         .then(data => {
             data.forEach(user => {
                 users.push(user.username);
-                contrib.push(user.password);
+                contrib.push(user.activity);
             });
 
         })
