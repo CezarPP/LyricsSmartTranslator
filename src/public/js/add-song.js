@@ -47,8 +47,13 @@ function sendFormToServer() {
                     .then(response => {
                         if (response.ok) {
                             window.location.href = '/submit-song.html';
-                        } else
-                            alert('Failed to add song');
+                        } else {
+                            return response.json();
+                        }
+                    })
+                    .then(data => {
+                        alert('Failed to add song: ' + data.message);
+                        loader.style.display = 'none';
                     })
                     .catch(error => console.error(error));
             }
