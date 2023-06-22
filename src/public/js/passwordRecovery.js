@@ -15,7 +15,7 @@ document.querySelector('.form-container form').addEventListener('submit', functi
    })
        .then(response => {
            if(response.ok){
-                alert('good');
+                window.location.href = "/passwordRecoveryRequest.html";
            }
            else{
                alert('Failed to send recover password request');

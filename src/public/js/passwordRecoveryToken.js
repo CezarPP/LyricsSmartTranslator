@@ -18,7 +18,7 @@ document.querySelector('.form-container form').addEventListener('submit', functi
     })
         .then(response => {
             if(response.ok){
-                window.location.href = '/login.html';
+                window.location.href = '/passwordRecoverySuccess.html';
             } else {
                 alert('Failed to change password');
             }
