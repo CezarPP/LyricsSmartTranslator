@@ -56,8 +56,6 @@ export class ImagesController {
                 return;
             }
 
-            console.log("Image link is " + image.link);
-
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(JSON.stringify({
                 message: 'Image added successfully',
@@ -73,7 +71,6 @@ export class ImagesController {
             return;
         }
         const id: number = parseInt(req.url.split('/')[3]);
-        console.log("Image id for getImage " + id);
 
         if (isNaN(id)) {
             res.writeHead(400, {'Content-Type': 'application/json'});
