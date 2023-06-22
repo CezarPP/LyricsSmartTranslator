@@ -54,8 +54,8 @@
 }
 
 .news-container .news-content .news-card img {
-    width: 10vh;
-    height: 10vh;
+    width: 18vh;
+    height: 18vh;
     object-fit: cover;
     object-position: center;
 }
