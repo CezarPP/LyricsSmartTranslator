@@ -3,7 +3,7 @@ const forYouList = document.querySelector('#for-you-container .for-you-list');
 
 let forYouData = [];
 
-const getForYouSongsData = async () => {
+const fetchAndRenderSongs = async () => {
     try {
         const response = await fetch('/api/user/recommendations', {method: 'GET'});
         const data = await response.json();
@@ -14,33 +14,46 @@ const getForYouSongsData = async () => {
             primary_translation: song.primary_translation,
         }));
 
+        renderSongs();
     } catch (error) {
-        console.error('Error fetching song data: ', error);
+        // If user is not logged in, do not display
+        document.getElementById("for-you-container").style.display = "none";
     }
 };
 
-const addMoreForYou = () => {
-    const childrenLength = forYouList.children.length;
+const createSongItem = (songData, index) => {
+    const newItem = document.createElement('li');
 
-    for (let i = 1; i <= 5 && childrenLength + i <= forYouData.length; i++) {
-        const songData = forYouData[childrenLength + i - 1];
-        const newItem = document.createElement('li');
+    newItem.innerHTML = `
+        <span class="song-number">${index + 1}</span>
+        <span class="song-title"><a href="/song-page/${songData.primary_translation}" class="song-link" style="color:black">${songData.title}</a></span>
+        <span class="song-author">${songData.artist}</span>
+    `;
 
-        newItem.innerHTML = `
-            <span class="song-number">${childrenLength + i}</span>
-            <span class="song-title"><a href="/song-page/${songData.primary_translation}" style="color:black">${songData.title}</a></span>
-            <span class="song-author">${songData.artist}</span>
-        `;
-
-        forYouList.appendChild(newItem);
-        if (childrenLength + i >= 20) showMoreButtonForYou.style.display = "none";
-    }
-
-    if (childrenLength === 0) document.getElementById("for-you-container").style.display = "none";
+    return newItem;
 };
 
-export async function addMoreForYouFirstTime() {
-    showMoreButtonForYou.addEventListener('click', addMoreForYou);
-    await getForYouSongsData();
-    await addMoreForYou();
+const renderSongs = () => {
+    const fragment = document.createDocumentFragment();
+    const start = forYouList.children.length;
+    const end = start + 5 <= forYouData.length ? start + 5 : forYouData.length;
+
+    for (let i = start; i < end; i++) {
+        fragment.appendChild(createSongItem(forYouData[i], i));
+    }
+
+    forYouList.appendChild(fragment);
+
+    if (end >= 20 || end === forYouData.length) {
+        showMoreButtonForYou.style.display = "none";
+    }
+
+    if (end === 0) {
+        document.getElementById("for-you-container").style.display = "none";
+    }
+};
+
+export async function initializeSongs() {
+    showMoreButtonForYou.addEventListener('click', renderSongs);
+    await fetchAndRenderSongs();
 }
