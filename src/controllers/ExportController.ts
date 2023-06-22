@@ -1,16 +1,25 @@
 import { IncomingMessage, ServerResponse } from "http";
 import crypto from "crypto";
-//import fetch from "node-fetch";
-//import axios, { AxiosResponse } from 'axios';
+const OAuth = require('oauth').OAuth;
+const url = require('url');
+
+const consumerKey = "w7039aUAapFyfPT8oiVX2gSXDqFrLX2CWDDBuDTKPl0vcYqkge";
+const consumerSecret = "ny2z39xvevJh5EmymH2Fzaqoi6GJiW2hpS11xtzkxYt92mOO8R";
+
+const tumblrOAuth = new OAuth(
+    "https://www.tumblr.com/oauth/request_token",
+    "https://www.tumblr.com/oauth/access_token",
+    consumerKey,
+    consumerSecret,
+    "1.0A",
+    "https://123b-2a02-2f0e-561a-6f00-50dc-f374-e972-b52d.ngrok-free.app/export-data/tumblr",
+    "HMAC-SHA1"
+);
 
 export class ExportController {
-    static tumblrTemporaryOauthToken = '';
-    static tumblrTemporaryOauthTokenSecret = '';
-
     private wordpressClientId = '87363';
     private wordpressClientSecret = 'MlsIF37Dyx6ONg6TxMCRc6F5YYf8V0R3ZK7pqZq7cW0gigFAhTUaxyRrJBnq1a9E';
     private wordpressRedirectUri = 'https://lyricssmarttranslator.com/export-data/wordpress';
-
     static postTitle = '';
     static postContent = '';
     static songId = '';
@@ -18,221 +27,97 @@ export class ExportController {
     async handleTumblrExport(req: IncomingMessage, res: ServerResponse) {
         console.log("Exporting to Tumblr...");
         try {
-            let body = '';
-            req.on('data', (chunk) => {
+            let body = "";
+            req.on("data", (chunk) => {
                 body += chunk;
             });
 
-            req.on('end', async () => {
+            req.on("end", async () => {
                 const postData = JSON.parse(body);
-                ExportController.postTitle = postData.postTitle;
-                ExportController.postContent = postData.postText;
-                ExportController.songId = postData.songId;
+                // Handle postData as needed
 
-                const temporaryCredentials = await this.getOAuthTemporaryCredentials();
-                //console.log(temporaryCredentials);
-                ExportController.tumblrTemporaryOauthToken = temporaryCredentials.oauthToken;
-                ExportController.tumblrTemporaryOauthTokenSecret = temporaryCredentials.oauthTokenSecret;
+                tumblrOAuth.getOAuthRequestToken((error: string, oauthToken: string) => {
+                    if (error) {
+                        console.error("Error obtaining temporary OAuth credentials:", error);
+                        res.writeHead(500, { "Content-Type": "application/json" });
+                        res.write(
+                            JSON.stringify({ error: "Failed to obtain temporary OAuth credentials." })
+                        );
+                        res.end();
+                        return;
+                    }
 
+                    const authorizationUrl = `https://www.tumblr.com/oauth/authorize?oauth_token=${oauthToken}`;
+                    console.log("Authorize the application by visiting the following URL: " + authorizationUrl);
 
-                const authorizationUrl = `https://www.tumblr.com/oauth/authorize?oauth_token=${temporaryCredentials.oauthToken}`;
-                //console.log("Authorize the application by visiting the following URL: " + authorizationUrl);
-
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify({message: authorizationUrl}));
-                res.end();
+                    res.writeHead(200, { "Content-Type": "application/json" });
+                    res.write(JSON.stringify({ message: authorizationUrl }));
+                    res.end();
+                });
             });
         } catch (error) {
-            console.error("Error in handleTumblrExport function from ExportController.ts: ", error);
+            console.error("Error in handleTumblrExport function:", error);
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.write(JSON.stringify({ error: "Failed to export to Tumblr." }));
+            res.end();
         }
     }
 
+
     async handleTumblrExportData(req: IncomingMessage, res: ServerResponse) {
-        const blogIdentifier = "proiectweb";
-        const consumerKey = "sRw63z7tFWa3bLWqJiaRu8zolYpxa7Nk5gqHhIe9oKnwgjSYvu";
-        const consumerSecret = "AGhpwp3PR1gM3gUCs335HQxH7fKDCgsZYet9VrqSbpPAsW7jLm";
+        console.log("AAA");
+        const query = url.parse(req.url, true).query;
+        const oauthToken = query.oauth_token;
+        const oauthVerifier = query.oauth_verifier;
+        const blogIdentifier = "ionutpadurariu2";
 
+        console.log(oauthToken);
+        console.log(oauthVerifier);
+        tumblrOAuth.getOAuthAccessToken(oauthToken, null, oauthVerifier, (error: string, oauthAccessToken: string, oauthAccessTokenSecret: string) => {
+            if (error) {
+                console.error("Error obtaining OAuth access tokens:", error);
+                res.writeHead(500, {'Content-Type': 'application/json'});
+                res.write(JSON.stringify({ error: "Failed to obtain OAuth access tokens." }));
+                res.end();
+                return;
+            }
 
-        const url = req.url || '';
-        const searchParams = new URLSearchParams(url.split('?')[1]);
-        const oauthToken = searchParams.get('oauth_token') || '';
-        const oauthVerifier = searchParams.get('oauth_verifier') || '';
-
-        console.log('oauth_token:', oauthToken);
-        console.log('oauth_verifier:', oauthVerifier);
-        console.log('this.tumblrTemporaryOauthToken:', ExportController.tumblrTemporaryOauthToken);
-        console.log('this.tumblrTemporaryOauthTokenSecret:', ExportController.tumblrTemporaryOauthTokenSecret);
-
-        const oauthNonce = crypto.randomBytes(16).toString("hex");
-        const oauthTimestamp = Math.floor(Date.now() / 1000).toString();
-        const tokenCredentials = await this.getOAuthAccessTokens(ExportController.tumblrTemporaryOauthToken, ExportController.tumblrTemporaryOauthTokenSecret,
-            oauthVerifier, consumerKey, consumerSecret);
-        console.log(tokenCredentials);
-
-        // Continue with the export process using the permanent access tokens
-        const response = await fetch(
-            `https://api.tumblr.com/v2/blog/${blogIdentifier}/post`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `OAuth oauth_consumer_key="${encodeURIComponent(consumerKey)}", oauth_token="${encodeURIComponent(tokenCredentials.oauthToken)}", oauth_signature_method="HMAC-SHA1", oauth_timestamp="${encodeURIComponent(oauthTimestamp)}", oauth_nonce="${encodeURIComponent(oauthNonce)}", oauth_version="1.0a", oauth_signature="${encodeURIComponent(tokenCredentials.oauthTokenSecret + '&' + consumerSecret)}"`,
-                },
-                body: JSON.stringify({
+            tumblrOAuth.post(
+                `https://api.tumblr.com/v2/blog/${blogIdentifier}/post`,
+                oauthAccessToken,
+                oauthAccessTokenSecret,
+                {
                     type: "text",
                     title: "My Exported Page",
                     body: "This is my exported page on Tumblr!",
-                }),
-            }
-        );
+                },
+                (error: string, data: string) => {
+                    if (error) {
+                        console.error("Error posting to Tumblr:", error);
+                        res.writeHead(500, {'Content-Type': 'application/json'});
+                        res.write(JSON.stringify({ error: "Failed to post to Tumblr." }));
+                        res.end();
+                        return;
+                    }
 
+                    const responseData = JSON.parse(data);
+                    console.log(responseData);
+                    console.log("Post ID:", responseData.response.id);
 
-        const data = await response.json();
-        console.log(data);
-        console.log("Post ID:", data.response.id);
-
-        const redirectURL = '/song-page/' + ExportController.songId;
-        res.writeHead(302, { 'Location': redirectURL });
-        res.end();
-    }
-
-    async getOAuthTemporaryCredentials() {
-        const consumerKey = "sRw63z7tFWa3bLWqJiaRu8zolYpxa7Nk5gqHhIe9oKnwgjSYvu";
-        const consumerSecret = "AGhpwp3PR1gM3gUCs335HQxH7fKDCgsZYet9VrqSbpPAsW7jLm";
-
-        try {
-            const oauthNonce = crypto.randomBytes(16).toString("hex");
-            const oauthTimestamp = Math.floor(Date.now() / 1000).toString();
-
-            const oauthSignatureMethod = "HMAC-SHA1";
-            const oauthVersion = "1.0a";
-
-            const signatureBaseString = this.generateSignatureBaseString(
-                "POST",
-                "https://www.tumblr.com/oauth/request_token",
-                {
-                    oauth_consumer_key: consumerKey,
-                    oauth_nonce: oauthNonce,
-                    oauth_signature_method: oauthSignatureMethod,
-                    oauth_timestamp: oauthTimestamp,
-                    oauth_version: oauthVersion,
+                    const redirectURL = '/song-page/' + ExportController.songId;
+                    res.writeHead(302, { 'Location': redirectURL });
+                    res.end();
                 }
             );
-            const signingKey = `${encodeURIComponent(consumerSecret)}&`;
-            const oauthSignature = this.generateHmacSha1Signature(
-                signatureBaseString,
-                signingKey
-            );
-
-            const authorizationHeader = this.generateOAuthAuthorizationHeader({
-                oauth_consumer_key: consumerKey,
-                oauth_nonce: oauthNonce,
-                oauth_signature: oauthSignature,
-                oauth_signature_method: oauthSignatureMethod,
-                oauth_timestamp: oauthTimestamp,
-                oauth_version: oauthVersion,
-            });
-
-            const response = await fetch(
-                "https://www.tumblr.com/oauth/request_token",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                        Authorization: authorizationHeader,
-                    },
-                }
-            );
-
-            const data = await response.text();
-            const responseParams = new URLSearchParams(data);
-            const oauthToken = responseParams.get("oauth_token");
-            const oauthTokenSecret = responseParams.get("oauth_token_secret");
-
-            return {
-                oauthToken: oauthToken as string,
-                oauthTokenSecret: oauthTokenSecret as string,
-            };
-        } catch (error) {
-            console.error("Failed to obtain OAuth temporary credentials:", error);
-            throw error;
-        }
+        });
     }
 
-    async getOAuthAccessTokens(temporaryToken: string, temporaryTokenSecret: string, oauthVerifier: string, consumerKey: string, consumerSecret: string) {
-        try {
-            const oauthNonce = crypto.randomBytes(16).toString("hex");
-            const oauthTimestamp = Math.floor(Date.now() / 1000).toString();
-            const oauthSignatureMethod = "HMAC-SHA1";
-            const oauthVersion = "1.0a";
 
-            const signatureBaseString = this.generateSignatureBaseString(
-                "POST",
-                "https://www.tumblr.com/oauth/access_token",
-                {
-                    oauth_consumer_key: consumerKey,
-                    oauth_nonce: oauthNonce,
-                    oauth_signature_method: oauthSignatureMethod,
-                    oauth_timestamp: oauthTimestamp,
-                    oauth_token: temporaryToken,
-                    oauth_verifier: oauthVerifier,
-                    oauth_version: oauthVersion,
-                }
-            );
-            const signingKey = `${encodeURIComponent(consumerSecret)}&${encodeURIComponent(temporaryTokenSecret)}`;
-            const oauthSignature = this.generateHmacSha1Signature(
-                signatureBaseString,
-                signingKey
-            );
 
-            const authorizationHeader = this.generateOAuthAuthorizationHeader({
-                oauth_consumer_key: consumerKey,
-                oauth_nonce: oauthNonce,
-                oauth_signature: oauthSignature,
-                oauth_signature_method: oauthSignatureMethod,
-                oauth_timestamp: oauthTimestamp,
-                oauth_token: temporaryToken,
-                oauth_verifier: oauthVerifier,
-                oauth_version: oauthVersion,
-            });
 
-            const response = await fetch(
-                "https://www.tumblr.com/oauth/access_token",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                        Authorization: authorizationHeader,
-                    },
-                }
-            );
 
-            const data = await response.text();
-            const responseParams = new URLSearchParams(data);
-            const oauthToken = responseParams.get("oauth_token");
-            const oauthTokenSecret = responseParams.get("oauth_token_secret");
 
-            return {
-                oauthToken: oauthToken as string,
-                oauthTokenSecret: oauthTokenSecret as string,
-            };
-        } catch (error) {
-            console.error("Failed to obtain OAuth access tokens:", error);
-            throw error;
-        }
-    }
 
-    generateSignatureBaseString(httpMethod: string, url: string, baseParams: Record<string, string>) {
-        const encodedParams = encodeURIComponent(Object.keys(baseParams).sort().map((key) => `${key}=${baseParams[key]}`).join("&"));
-        return `${httpMethod.toUpperCase()}&${encodeURIComponent(url)}&${encodedParams}`;
-    }
-    generateHmacSha1Signature(signatureBaseString: string, signingKey: string) {
-        return crypto.createHmac("sha1", signingKey).update(signatureBaseString).digest("base64");
-    }
-    generateOAuthAuthorizationHeader(params: Record<string, string>) {
-        const encodedParams = Object.keys(params).sort().map((key) => `${key}="${encodeURIComponent(params[key])}"`).join(", ");
-        return `OAuth ${encodedParams}`;
-    }
 
 
 
