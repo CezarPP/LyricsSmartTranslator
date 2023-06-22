@@ -275,7 +275,7 @@ export class UsersController {
                         }
                         const status = await this.usersRepository.updateUser(user.id, newUsername, goodPassword, newEmail, newImgId);
                         if (status) {
-                            sendMessage(res, 200, 'User succesfully updated');
+                            sendMessage(res, 200, 'User successfully updated');
                         } else {
                             sendMessage(res, 500, 'Failed to update user');
                         }
