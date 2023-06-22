@@ -164,15 +164,15 @@ BEGIN
 
 
         -- Skip if this song has already been recommended
-        IF combined_recommendations.song_id = ANY (already_recommended) THEN
+        IF combined_recommendations.id = ANY (already_recommended) THEN
             CONTINUE;
         END IF;
 
         -- Add this song to the list of recommended songs
-        already_recommended := array_append(already_recommended, combined_recommendations.song_id);
+        already_recommended := array_append(already_recommended, combined_recommendations.id);
 
         -- Return the fetched record
-        song_id := combined_recommendations.song_id;
+        song_id := combined_recommendations.id;
         primary_translation := combined_recommendations.primary_translation;
         image_id := combined_recommendations.image_id;
         artist := combined_recommendations.artist;
