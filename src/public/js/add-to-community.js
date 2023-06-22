@@ -5,7 +5,7 @@ const users = []
 const contrib = []
 
 const getUsersData = async () => {
-    await fetch('/api/user/mostActive', {method: 'GET'})
+    await fetch('/api/user?filter=mostActive', {method: 'GET'})
         .then(response => response.json())
         .then(data => {
             data.forEach(user => {
@@ -17,7 +17,7 @@ const getUsersData = async () => {
         .catch(err => console.log('Error getting most active users ' + err));
 }
 const addMoreCommunity = () => {
-    for (let i = 1; i <= 4; i++) {
+    for (let i = 1; i <= 5; i++) {
         const newItem = document.createElement('li');
         const index = communityList.children.length + 1;
         const user = users[index - 1];
