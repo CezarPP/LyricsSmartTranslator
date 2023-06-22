@@ -3,12 +3,12 @@ CREATE OR REPLACE FUNCTION generate_rss_feed()
 $$
 DECLARE
     rss_feed  XML;
-    base_link TEXT := 'https://www.lyricssmarttranslator.com/';
+    base_link TEXT := 'https://www.lyricssmarttranslator.com';
 BEGIN
     WITH rss_data AS (SELECT s.title                            AS title,
                              s.artist                           AS author,
                              u.username                         AS posted_by,
-                             t.time                             AS pubDate,
+                             t.time AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Bucharest' AS pubDate,
                              'Check out this amazing new song!' AS description,
                              s.primary_translation              AS primary_translation
                       FROM songs s
