@@ -78,32 +78,23 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION get_song_recommendations_by_lyrics(p_user_id INT, n INT)
-    RETURNS TABLE
-            (
-                song_id             INT,
-                primary_translation INT,
-                image_id            INT,
-                artist              VARCHAR(255),
-                title               VARCHAR(255),
-                link                TEXT
-            )
+    RETURNS SETOF Songs
 AS
 $$
 BEGIN
     RETURN QUERY
-        SELECT DISTINCT ON (s.id) s.id, s.primary_translation, s.image_id, s.artist, s.title, s.link
+        SELECT DISTINCT ON (s.id) s.*
         FROM Songs s
                  JOIN Translations t ON s.primary_translation = t.id
                  JOIN Translations t2 ON t2.user_id = p_user_id
         WHERE count_common_words(t2.lyrics, t.lyrics) > 0
           AND t.user_id <> p_user_id
-        GROUP BY s.id, s.primary_translation, s.image_id, s.artist, s.title, s.link, t2.lyrics, t.lyrics
+        GROUP BY s.id, t2.lyrics, t.lyrics
         ORDER BY s.id, count_common_words(t2.lyrics, t.lyrics) DESC
         LIMIT n;
 
 END;
 $$ LANGUAGE plpgsql;
-
 
 
 CREATE OR REPLACE FUNCTION get_combined_recommendations(p_user_id INT, n INT)
