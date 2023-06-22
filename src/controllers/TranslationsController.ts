@@ -111,13 +111,7 @@ export class TranslationsController extends BaseController {
 
             const user = await this.usersController.getLoggedUser(req, res);
             if (user === null) {
-                res.statusCode = 401;
-                const data = {
-                    message: 'You need to be authenticated to submit a translation',
-                    redirectPage: '/not-auth.html',
-                    translationId: 0
-                }
-                res.end(JSON.stringify(data));
+                sendMessage(res, 401, 'You need to be authenticated to submit a translation');
                 return;
             }
 
@@ -131,7 +125,6 @@ export class TranslationsController extends BaseController {
             res.statusCode = 200;
             const data = {
                 message: 'Translation added successfully!',
-                redirectPage: '/submit-translation.html',
                 songId: songId,
                 translationId: translationId
             }

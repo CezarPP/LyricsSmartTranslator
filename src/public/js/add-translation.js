@@ -57,14 +57,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             body: JSON.stringify(formData)
         })
-            .then(response => response.json())
-            .then(data => {
-                // Redirect the user to a success page
-                if (data.translationId !== undefined) {
-                    window.location.href = data.redirectPage;
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/submit-translation.html';
                 } else {
-                    alert('Failed to add translation');
+                    return response.json();
                 }
+            })
+            .then(data => {
+                loader.style.display = 'none';
+                alert('Failed to add translation: ' + data.message);
             })
             .catch((error) => {
                 console.error('Error:', error);

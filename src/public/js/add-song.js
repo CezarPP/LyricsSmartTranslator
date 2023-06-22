@@ -52,8 +52,8 @@ function sendFormToServer() {
                         }
                     })
                     .then(data => {
-                        alert('Failed to add song: ' + data.message);
                         loader.style.display = 'none';
+                        alert('Failed to add song: ' + data.message);
                     })
                     .catch(error => console.error(error));
             }
