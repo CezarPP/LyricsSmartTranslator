@@ -48,6 +48,19 @@ export class TranslationsRepository {
         }
     }
 
+    async getTranslationsByUsername(username: string): Promise<Translation[]> {
+        const query = 'SELECT * FROM get_user_translations($1)';
+        const values = [username];
+
+        try {
+            const result = await this.db.query(query, values);
+            return await this.getAllTranslationsFromResult(result);
+        } catch (error) {
+            console.error(`Failed to fetch translations by username: ${error}`);
+            throw error;
+        }
+    }
+
     async getTranslationByNameAndLanguage(songName: string, language: string): Promise<Translation | null> {
         const query = `SELECT t.*
                        FROM translations t

@@ -62,16 +62,46 @@ export class TranslationsController extends BaseController {
         const parsedUrl = url.parse(req.url, true);
         const parameters = parsedUrl.query;
         const songIdString = parameters["songId"] as string;
-        const songId = (songIdString === undefined) ? 0 : parseInt(songIdString);
-        if (songIdString === undefined || isNaN(songId)) {
+        const username = parameters["username"] as string;
+
+        // If neither songId nor username parameters are provided, send an error response
+        if (songIdString === undefined && username === undefined) {
             sendMessage(res, 400, 'Invalid request parameters');
             return;
         }
 
-        const translations: Translation[] = await this.translationRepository.getAllBySongId(songId);
+        // If both songId and username parameters are provided, send an error response
+        if (songIdString !== undefined && username !== undefined) {
+            sendMessage(res, 400, 'Invalid request parameters. You can filter by songId or username, not both at the same time.');
+            return;
+        }
 
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify(translations));
+        // Filter by songId
+        if (songIdString !== undefined) {
+            const songId = parseInt(songIdString);
+            if (isNaN(songId)) {
+                sendMessage(res, 400, 'Invalid songId parameter');
+                return;
+            }
+
+            const translations: Translation[] = await this.translationRepository.getAllBySongId(songId);
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(translations));
+            return;
+        }
+
+        // Filter by username
+        if (username !== undefined) {
+            const translations: Translation[] = await this.translationRepository.getTranslationsByUsername(username);
+            if (translations.length === 0) {
+                sendMessage(res, 404, 'No translations found for this user');
+                return;
+            }
+
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(translations));
+            return;
+        }
     }
 
     async handlePost(req: IncomingMessage, res: ServerResponse) {
