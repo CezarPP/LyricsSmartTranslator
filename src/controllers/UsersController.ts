@@ -12,6 +12,7 @@ import bcrypt from 'bcrypt';
 import {isEmailValid} from "../util/validation";
 import {sendNotFound} from "../util/sendNotFound"
 import {RecoverRepository} from "../repositories/RecoverRepository";
+import {User} from "../models/User";
 
 const secretKey = 'ionut';
 
@@ -45,13 +46,20 @@ export class UsersController {
             }
         } else if (req.method === 'GET') {
             if (parsedURL.length === 3) {
-                await this.getAllUserStats(req, res);
-                return;
+                // test if it has parameters
+                assert(req.url);
+                const separatedURL = url.parse(req.url, true);
+                const hasParameters = Object.keys(separatedURL.query).length > 0;
+                if(!hasParameters) {
+                    await this.getAllUserStats(req, res);
+                    return;
+                } else {
+                    await this.getAllUserStatsFiltering(req, res);
+                    return;
+                }
             } else if (parsedURL.length === 4) {
                 if (parsedURL[3].startsWith('recommendations'))
                     await this.getRecommendations(req, res);
-                else if (parsedURL[3].startsWith("mostActive"))
-                    await this.getMostActiveUsers(req, res);
                 else
                     await this.getUserStats(req, res, parsedURL[3]);
                 return;
@@ -204,6 +212,25 @@ export class UsersController {
         }
     }
 
+    async getAllUserStatsFiltering(req: IncomingMessage, res: ServerResponse){
+        assert(req.url);
+        try {
+            const parsedUrl = url.parse(req.url, true);
+            const parameters = parsedUrl.query;
+            const filter = parameters["filter"] as string;
+            const limitString = parameters["limit"] as string;
+            const limit = (limitString === undefined) ? 30 : parseInt(limitString);
+            if (filter === undefined || isNaN(limit) || limit < 0 || filter !== "mostActive") {
+                sendMessage(res, 400, 'Invalid request parameters');
+                return;
+            }
+            const users: User[] = await this.usersRepository.getMostActiveUsers(limit);
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify(users));
+        } catch (error) {
+            sendMessage(res, 500, 'Internal server error')
+        }
+    }
     async updateUserProfile(req: IncomingMessage, res: ServerResponse, username: String) {
         try {
             let body = '';
