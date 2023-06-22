@@ -174,39 +174,19 @@ export class SongsController extends BaseController {
     }
 
     async handleGetById(req: IncomingMessage, res: ServerResponse) {
-        assert(req.url);
-        const songId: number = parseInt(req.url.split('/')[3]);
-
-        if (isNaN(songId)) {
-            sendMessage(res, 400, 'Invalid song id');
+        const song = await this._getSongFromRequest(req, res);
+        if (song === null)
             return;
-        }
 
-        const song: Song | null = await this.songRepository.getSongById(songId);
-
-        if (song === null) {
-            sendMessage(res, 404, 'Song not found');
-            return;
-        }
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(song.toObject()));
     }
 
     async handleDelete(req: IncomingMessage, res: ServerResponse) {
-        assert(req.url);
-        const songId: number = parseInt(req.url.split('/')[3]);
-
-        if (isNaN(songId)) {
-            sendMessage(res, 400, 'Invalid song id');
+        const song = await this._getSongFromRequest(req, res);
+        if (song === null)
             return;
-        }
-
-        const song: Song | null = await this.songRepository.getSongById(songId);
-        if (song === null) {
-            sendMessage(res, 404, 'Song not found');
-            return;
-        }
 
         const user = await this.usersController.getLoggedUser(req, res);
         if (user === null) {
@@ -224,9 +204,28 @@ export class SongsController extends BaseController {
             sendMessage(res, 403, 'Only the user that added the song can delete it');
             return;
         }
+
         // Cascade delete will happen because of trigger in db
-        await this.songRepository.deleteSong(songId);
+        await this.songRepository.deleteSong(song.id);
 
         sendMessage(res, 200, 'Song deleted successfully!');
+    }
+
+    private async _getSongFromRequest(req: IncomingMessage, res: ServerResponse) {
+        assert(req.url);
+        const songId: number = parseInt(req.url.split('/')[3]);
+
+        if (isNaN(songId)) {
+            sendMessage(res, 400, 'Invalid song id');
+            return null;
+        }
+
+        const song: Song | null = await this.songRepository.getSongById(songId);
+        if (song === null) {
+            sendMessage(res, 404, 'Song not found');
+            return null;
+        }
+
+        return song;
     }
 }
