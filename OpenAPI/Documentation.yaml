@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: API
-  version: 1.0-oas3
+  version: 1.0.1
 servers:
   - url: https://lyricssmarttranslator.com/api
 paths:
@@ -61,6 +61,8 @@ paths:
           $ref: '#/components/responses/UnprocessableEntity'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      security:
+        - cookieAuth: [ ]
   /songs/{id}:
     parameters:
       - name: id
@@ -108,6 +110,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      security:
+        - cookieAuth: [ ]
     delete:
       tags:
         - Songs
@@ -125,6 +129,8 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      security:
+        - cookieAuth: [ ]
   /images:
     get:
       tags:
@@ -139,31 +145,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ImageModel'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-  /{id}:
-    get:
-      tags:
-        - Images
-      summary: Retrieves an image by ID
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
-          description: The ID of the image.
-      responses:
-        '200':
-          description: The image
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ImageModel'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
     post:
@@ -190,6 +171,31 @@ paths:
                 $ref: '#/components/schemas/ImageModel'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /images/{id}:
+    get:
+      tags:
+        - Images
+      summary: Retrieves an image by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the image.
+      responses:
+        '200':
+          description: The image
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageModel'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -244,6 +250,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+      security:
+        - cookieAuth: [ ]
     delete:
       tags:
         - Translations
@@ -266,7 +274,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-
+      security:
+        - cookieAuth: [ ]
   /translations:
     get:
       tags:
@@ -315,6 +324,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '409':
           $ref: '#/components/responses/ConflictError'
+      security:
+        - cookieAuth: [ ]
 
   /annotations:
     get:
@@ -330,7 +341,8 @@ paths:
         - in: query
           name: reviewed
           schema:
-            type: boolean
+            type: integer
+            enum: [ 0, 1 ]
           description: "Filter annotations by reviewed status"
       responses:
         '200':
@@ -368,6 +380,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '409':
           $ref: '#/components/responses/ConflictError'
+      security:
+        - cookieAuth: [ ]
 
   /annotations/{id}:
     parameters:
@@ -418,6 +432,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+      security:
+        - cookieAuth: [ ]
     delete:
       tags:
         - Annotations
@@ -431,9 +447,575 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+      security:
+        - cookieAuth: [ ]
 
+  /user/login:
+    post:
+      summary: Log in a user and return the authentication cookie
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          headers:
+            Set-Cookie:
+              description: The authentication cookie
+              schema:
+                type: string
+                example: jwt=eyJh9.eyJ1c.j1pAi; Path=/; Secure; HttpOnly;
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /user/logout:
+    post:
+      summary: Log out a user
+      tags:
+        - Users
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+        - cookieAuth: []
+
+  /user/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /user/{username}:
+    get:
+      summary: Get user statistics by username
+      tags:
+        - Users
+      parameters:
+        - name: username
+          in: path
+          description: Username of the user
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStats'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      summary: Update user profile
+      tags:
+        - Users
+      parameters:
+        - name: username
+          in: path
+          description: Username of the user to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - cookieAuth: [ ]
+
+    delete:
+      summary: Delete a user
+      tags:
+        - Users
+      parameters:
+        - name: username
+          in: path
+          description: Username of the user to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - cookieAuth: [ ]
+  /user:
+    get:
+      summary: Get user statistics with optional filtering
+      tags:
+        - Users
+      parameters:
+        - name: filter
+          in: query
+          description: Filter option for active users (e.g., "mostActive")
+          schema:
+            type: string
+            enum: [ mostActive ]
+        - name: limit
+          in: query
+          description: Limit the number of results
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserInfo'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /user/recommendations:
+    get:
+      summary: Get recommendations for the current logged in user
+      tags:
+        - Users
+      parameters:
+        - name: limit
+          in: query
+          description: Limit the number of results
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Song'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - cookieAuth: []
+
+
+  /recover:
+    post:
+      summary: Request password recovery
+      tags:
+        - Recover
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecoverRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    get:
+      summary: Get all password recovery requests
+      tags:
+        - Recover
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recover'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      security:
+        - cookieAuth: [ ]
+
+    put:
+      summary: Recover password
+      tags:
+        - Recover
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecoverPasswordRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+        500:
+          $ref: '#/components/responses/InternalServerError'
+
+  /recover/{id}:
+    delete:
+      summary: Delete password recovery request
+      tags:
+        - Recover
+      parameters:
+        - name: id
+          in: path
+          description: Id of the password recovery request
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - cookieAuth: [ ]
+
+
+  /comments:
+    get:
+      summary: Get all comments
+      tags:
+        - Comments
+      parameters:
+        - name: translationId
+          in: query
+          description: Optional. ID of the translation to filter comments by
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: Create a new comment
+      tags:
+        - Comments
+      requestBody:
+        description: Comment object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequestBody'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentPostResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - cookieAuth: [ ]
+
+  /comments/{id}:
+    get:
+      summary: Get comment by ID
+      tags:
+        - Comments
+      parameters:
+        - name: id
+          in: path
+          description: ID of the comment
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      summary: Update a comment
+      tags:
+        - Comments
+      parameters:
+        - name: id
+          in: path
+          description: ID of the comment
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Updated comment content
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentPutRequestBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - cookieAuth: [ ]
+
+    delete:
+      summary: Delete a comment by ID
+      tags:
+        - Comments
+      parameters:
+        - name: id
+          in: path
+          description: ID of the comment
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+      security:
+        - cookieAuth: [ ]
 components:
   schemas:
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        translationId:
+          type: integer
+        content:
+          type: string
+    CommentRequestBody:
+      type: object
+      properties:
+        translationId:
+          type: integer
+        content:
+          type: string
+      required:
+        - translationId
+        - content
+    CommentPostResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        id:
+          type: integer
+    CommentPutRequestBody:
+      type: object
+      properties:
+        newContent:
+          type: string
+      required:
+        - newContent
+    RecoverRequest:
+      type: object
+      properties:
+        email:
+          type: string
+      required:
+        - email
+    Recover:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        email:
+          type: string
+        token:
+          type: string
+    RecoverPasswordRequest:
+      type: object
+      properties:
+        token:
+          type: string
+        newPassword:
+          type: string
+      required:
+        - token
+        - newPassword
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - email
+        - password
+    RegisterResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        id:
+          type: integer
+          format: int64
+      required:
+        - message
+        - id
+    UserStats:
+      type: object
+      properties:
+        username:
+          type: string
+        img_id:
+          type: string
+        email:
+          type: string
+        translationsCount:
+          type: number
+        annotationsCount:
+          type: number
+        commentsCount:
+          type: number
+    UserInfo:
+      type: object
+      properties:
+        username:
+          type: string
+        img_id:
+          type: integer
+        email:
+          type: string
+        activity:
+          type: integer
+    UserUpdateRequest:
+      type: object
+      properties:
+        newUsername:
+          type: string
+        newImgId:
+          type: integer
+        newPassword:
+          type: string
+        newEmail:
+          type: string
+      required:
+        - newUsername
+        - newImgId
+        - newPassword
+        - newEmail
     Song:
       type: object
       properties:
@@ -619,3 +1201,8 @@ components:
             properties:
               message:
                 type: string
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: jwt

@@ -1,0 +1,268 @@
+openapi: 3.0.3
+info:
+  title: Comments API
+  description: API for managing comments related operations
+  version: 1.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/GEORGEALEXDUMITRESCU/RecoverAPI/1.0.0
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/GEORGEALEXDUMITRESCU/TW_API/1.0.0
+  - url: https://www.lyricssmarttranslator.com
+paths:
+    /api/comments:
+      get:
+        summary: Get all comments
+        tags:
+          - comments
+        parameters:
+          - name: translationId
+            in: query
+            description: Optional. ID of the translation to filter comments by
+            required: false
+            schema:
+              type: integer
+        responses:
+          '200':
+            description: Successful operation
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Comment'
+          '500':
+            description: Internal server error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+
+      post:
+        summary: Create a new comment
+        tags:
+          - comments
+        requestBody:
+          description: Comment object
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentRequestBody'
+        responses:
+          '200':
+            description: Successful operation
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/CommentPostResponse'
+          '400':
+            description: Invalid request parameters
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '401':
+            description: User not logged in
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '404':
+            description: Translation not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '500':
+            description: Internal server error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - cookieAuth: [ ]
+
+    /api/comments/{id}:
+      get:
+        summary: Get comment by ID
+        tags:
+          - comments
+        parameters:
+          - name: id
+            in: path
+            description: ID of the comment
+            required: true
+            schema:
+              type: integer
+        responses:
+          '200':
+            description: Successful operation
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Comment'
+          '400':
+            description: Invalid comment ID
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '404':
+            description: Comment not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '500':
+            description: Internal server error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+      put:
+        summary: Update a comment
+        tags:
+          - comments
+        parameters:
+          - name: id
+            in: path
+            description: ID of the comment
+            required: true
+            schema:
+              type: integer
+        requestBody:
+          description: Updated comment content
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentPutRequestBody'
+        responses:
+          '200':
+            description: Successful operation
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/MessageResponse'
+          '400':
+            description: Invalid request parameters
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '401':
+            description: Unauthorized
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '404':
+            description: Comment not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '500':
+            description: Internal server error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        security:
+          - cookieAuth: [ ]
+
+      delete:
+        summary: Delete a comment by ID
+        tags:
+          - comments
+        parameters:
+          - name: id
+            in: path
+            description: ID of the comment
+            required: true
+            schema:
+              type: integer
+        responses:
+          '200':
+            description: Successful operation
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/MessageResponse'
+          '401':
+            description: Unauthorized
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '404':
+            description: Comment not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+          '500':
+            description: Internal server error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+
+        security:
+          - cookieAuth: [ ]
+components:
+  schemas:
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        translationId:
+          type: integer
+        content:
+          type: string
+    CommentRequestBody:
+      type: object
+      properties:
+        translationId:
+          type: integer
+        content:
+          type: string
+      required:
+        - translationId
+        - content
+    CommentPostResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        id:
+          type: integer
+    CommentPutRequestBody:
+      type: object
+      properties:
+        newContent:
+          type: string
+      required:
+        - newContent
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: jwt
