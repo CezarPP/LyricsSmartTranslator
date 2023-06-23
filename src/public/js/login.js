@@ -50,6 +50,8 @@ document.querySelector('.sign-up-container form').addEventListener('submit', fun
     };
 
     // Send the form data as JSON to the server
+    const loader = document.getElementById('preloader');
+    loader.style.display = 'flex';
     fetch('/api/user/register', {
         method: 'POST',
         headers: {

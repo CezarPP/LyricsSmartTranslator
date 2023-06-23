@@ -51,4 +51,8 @@ async function setImage(img_id) {
             console.error("Error: " + error);
         })
 }
+
+const loader = document.getElementById('preloader');
+loader.style.display = 'flex';
 getUserInfo().then(() => console.log("Got data from server"));
+loader.style.display = 'none';
