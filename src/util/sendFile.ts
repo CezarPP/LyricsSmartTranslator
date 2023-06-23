@@ -21,7 +21,10 @@ export const sendFile = async (req: IncomingMessage, res: ServerResponse, filePa
             if (contentType === 'test/javascript') {
                 res.writeHead(200, {'Cache-Control': 'public, max-age=0'});
             } else {
-                res.writeHead(200, {'Content-Type': contentType});
+                res.writeHead(200, {
+                    'Content-Type': contentType,
+                    'Access-Control-Allow-Origin': '*'
+                });
                 // res.writeHead(200, {'Content-Type': contentType, 'Cache-Control': 'public, max-age=31536000'});
             }
             res.end(content, 'utf-8');
