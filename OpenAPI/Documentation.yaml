@@ -15,7 +15,7 @@ paths:
           name: filter
           schema:
             type: string
-            enum: [newest, mostCommented, mostViewed]
+            enum: [ newest, mostCommented, mostViewed ]
           description: Optional filter to apply on the songs.
         - in: query
           name: limit
@@ -206,38 +206,44 @@ paths:
           required: true
           description: "Unique ID of the translation"
       responses:
-        200:
+        '200':
           description: "Translation retrieved"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Translation"
-        400:
-          description: "Invalid translation ID"
-        404:
-          description: "Translation not found"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
     put:
       tags:
         - Translations
-      summary: "Update a translation by its ID"
+      summary: "Update an existing translation"
       parameters:
         - in: path
           name: id
+          required: true
           schema:
             type: integer
-          required: true
-          description: "Unique ID of the translation"
+          description: "ID of the translation"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TranslationUpdate"
       responses:
-        200:
-          description: "Translation updated successfully"
-        400:
-          description: "Invalid request"
-        401:
-          description: "You need to be authenticated in order to update a translation"
-        403:
-          description: "Only the user that added the translation can update it"
-        404:
-          description: "Translation not found"
+        '200':
+          description: "Translation updated"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
     delete:
       tags:
         - Translations
@@ -250,16 +256,16 @@ paths:
           required: true
           description: "Unique ID of the translation"
       responses:
-        200:
+        '200':
           description: "Translation deleted successfully"
-        400:
-          description: "Invalid translation ID"
-        401:
-          description: "You need to be authenticated in order to delete a translation"
-        403:
-          description: "Only the user that added the translation can delete it"
-        404:
-          description: "Translation not found"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
   /translations:
     get:
@@ -278,7 +284,7 @@ paths:
             type: string
           description: "Filter translations by username"
       responses:
-        200:
+        '200':
           description: "A list of translations"
           content:
             application/json:
@@ -286,10 +292,10 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Translation"
-        400:
-          description: "Invalid request parameters. You can filter by songId or username, not both at the same time."
-        404:
-          description: "No translations found for this filter"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
     post:
       tags:
         - Translations
@@ -301,14 +307,14 @@ paths:
             schema:
               $ref: "#/components/schemas/Translation"
       responses:
-        200:
-          description: "Translation added successfully"
-        400:
-          description: "Invalid request"
-        401:
-          description: "You need to be authenticated to submit a translation"
-        409:
-          description: "There exists a translation in this language for this song"
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/ConflictError'
 
   /annotations:
     get:
@@ -327,7 +333,7 @@ paths:
             type: boolean
           description: "Filter annotations by reviewed status"
       responses:
-        200:
+        '200':
           description: "A list of annotations"
           content:
             application/json:
@@ -335,10 +341,10 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Annotation"
-        400:
-          description: "Invalid request parameters"
-        404:
-          description: "No annotations found for this filter"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
     post:
       tags:
         - Annotations
@@ -350,18 +356,18 @@ paths:
             schema:
               $ref: "#/components/schemas/Annotation"
       responses:
-        201:
+        '201':
           description: "Annotation created"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Annotation"
-        400:
-          description: "Invalid request parameters"
-        401:
-          description: "Unauthorized"
-        409:
-          description: "Annotation overlaps another one"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/ConflictError'
 
   /annotations/{id}:
     parameters:
@@ -376,46 +382,55 @@ paths:
         - Annotations
       summary: "Get a single annotation by ID"
       responses:
-        200:
+        '200':
           description: "A single annotation"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Annotation"
-        404:
-          description: "Annotation not found"
+        '404':
+          $ref: '#/components/responses/NotFound'
     put:
       tags:
         - Annotations
       summary: "Update an existing annotation"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: "ID of the annotation"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Annotation"
+              $ref: "#/components/schemas/AnnotationUpdate"
       responses:
-        200:
-          description: "Annotation updated"
-        400:
-          description: "Invalid request parameters"
-        401:
-          description: "Unauthorized"
-        403:
-          description: "Only the user that added the annotation can update it"
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
     delete:
       tags:
         - Annotations
       summary: "Delete an existing annotation"
       responses:
-        200:
-          description: "Annotation deleted"
-        401:
-          description: "Unauthorized"
-        403:
-          description: "Only the user that added the annotation can delete it"
-        404:
-          description: "Annotation not found"
+        '200':
+          $ref: '#/components/responses/Success'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
 components:
   schemas:
@@ -439,6 +454,15 @@ components:
         time:
           type: string
           format: date-time
+    TranslationUpdate:
+      type: object
+      properties:
+        lyrics:
+          type: string
+          description: "The updated lyrics of the song translation"
+        description:
+          type: string
+          description: "The updated description of the translation"
     Song:
       type: object
       properties:
@@ -513,7 +537,25 @@ components:
           type: string
         reviewed:
           type: boolean
+    AnnotationUpdate:
+      type: object
+      properties:
+        content:
+          type: string
+          description: "The updated content of the annotation"
+        reviewed:
+          type: boolean
+          description: "Whether the annotation is reviewed. Only an admin user can set this to true. If user is not an admin, this will be automatically set to false, regardless of the provided value."
   responses:
+    Success:
+      description: Operation Successfully Completed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
     BadRequest:
       description: Bad request
       content:
@@ -561,6 +603,15 @@ components:
                 type: string
     InternalServerError:
       description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+    ConflictError:
+      description: Conflict Error
       content:
         application/json:
           schema:
