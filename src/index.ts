@@ -14,7 +14,6 @@ import {sendRecoveriesPage} from "./util/sendRecoveriesPage";
 import {ExportController} from "./controllers/ExportController"
 import {ExportAllSongsController} from "./controllers/ExportAllSongsController"
 
-
 const http = require('http');
 
 const imagesController = new ImagesController();
@@ -82,7 +81,8 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
             '../public/assets/pages/add-translation.html', 'text/html')
             .then();
     } else if (method === 'POST' && url == '/login') {
-        userController.loginUser(req, res)
+        userController
+            .loginUser(req, res)
             .then();
     } else if (method === 'POST' && url == '/register') {
         userController.registerUser(req, res)
@@ -93,21 +93,30 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     } else if (method === 'GET' && (url === '/updates' || url === '/updates.html')) {
         sendUpdatesPage(req, res)
             .then();
-    } else if (method === 'GET' && (url === '/recoveries' || url === '/recoveries.html')){
+    } else if (method === 'GET' && (url === '/recoveries' || url === '/recoveries.html')) {
         sendRecoveriesPage(req, res)
             .then();
-    }else if (method == 'POST' && url == '/export/tumblr') {
-        exportController.handleTumblrExport(req, res);
-    } else if(method == 'GET' && url.startsWith('/export-data/tumblr')) {
-        exportController.handleTumblrExportData(req, res);
-    } else if(method == 'POST' && url == '/export/wordpress') {
-        exportController.handleWordpressExport(req, res);
-    } else if(method == 'GET' && url.startsWith('/export-data/wordpress')) {
-        exportController.handleWordpressExportData(req, res);
-    } else if(method == 'GET' && url == '/all-songs') {
-        exportAllSongsController.exportAllSongs(req, res);
-    }
-    else if (method === 'GET') {
+    } else if (method == 'POST' && url == '/export/tumblr') {
+        exportController
+            .handleTumblrExport(req, res)
+            .then();
+    } else if (method == 'GET' && url.startsWith('/export-data/tumblr')) {
+        exportController
+            .handleTumblrExportData(req, res)
+            .then();
+    } else if (method == 'POST' && url == '/export/wordpress') {
+        exportController
+            .handleWordpressExport(req, res)
+            .then();
+    } else if (method == 'GET' && url.startsWith('/export-data/wordpress')) {
+        exportController
+            .handleWordpressExportData(req, res)
+            .then();
+    } else if (method == 'GET' && url == '/all-songs') {
+        exportAllSongsController
+            .exportAllSongs(req, res)
+            .then();
+    } else if (method === 'GET') {
         sendStaticFile(req, res)
             .then()
             .catch(() => console.log("Error sending static file"));
