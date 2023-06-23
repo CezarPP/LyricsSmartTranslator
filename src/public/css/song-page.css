@@ -199,6 +199,12 @@ a.song-page-button:hover {
     align-items: center;
 }
 
+.svg-tumblr {
+    margin: auto 5px;
+    height: 1rem;
+    width: 1rem;
+}
+
 .svg-wordpress {
     margin: auto 5px;
     height: 1rem;
