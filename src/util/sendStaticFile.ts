@@ -33,7 +33,7 @@ export const sendStaticFile = async (req: IncomingMessage, res: ServerResponse) 
         '.ttf': 'application/font-ttf',
         '.eot': 'application/vnd.ms-fontobject',
         '.otf': 'application/font-otf',
-        '.yaml': 'application/x-yaml'
+        '.yaml': 'text/yaml'
     };
 
     let filePath: string = '';
