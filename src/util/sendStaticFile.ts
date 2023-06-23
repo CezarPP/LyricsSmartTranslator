@@ -26,7 +26,14 @@ export const sendStaticFile = async (req: IncomingMessage, res: ServerResponse) 
         '.jpg': 'image/jpg',
         '.gif': 'image/gif',
         '.svg': 'image/svg+xml',
-        '.xml': 'application/xml'
+        '.xml': 'application/xml',
+        '.wav': 'audio/wav',
+        '.mp4': 'video/mp4',
+        '.woff': 'application/font-woff',
+        '.ttf': 'application/font-ttf',
+        '.eot': 'application/vnd.ms-fontobject',
+        '.otf': 'application/font-otf',
+        '.yaml': 'application/x-yaml'
     };
 
     let filePath: string = '';
@@ -42,6 +49,8 @@ export const sendStaticFile = async (req: IncomingMessage, res: ServerResponse) 
         ext = '.html';
     } else if (url.startsWith('/img/')) {
         filePath = join(baseDir, 'assets' + url);
+    } else if(ext == '.yaml') {
+        filePath = join(baseDir, 'assets/open-api' + url);
     }
 
     filePath = resolve(filePath);
