@@ -114,8 +114,8 @@ export class UsersRepository {
     async updateUser(id: number, newUsername: string, newPassword: string, newEmail: string, newImgId: number): Promise<boolean> {
         this.invalidateCache();
 
-        const query = 'UPDATE users SET username = $1, password = $2, img_id = $3 WHERE id = $4';
-        const values = [newUsername, newPassword, newImgId, id];
+        const query = 'UPDATE users SET username = $1, password = $2, img_id = $3, email = $4 WHERE id = $5';
+        const values = [newUsername, newPassword, newImgId, newEmail, id];
         try {
             const result = await this.db.query(query, values);
             return result.rowCount > 0; // Returns true if at least one row was affected
