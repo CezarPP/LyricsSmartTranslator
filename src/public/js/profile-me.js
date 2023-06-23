@@ -3,7 +3,7 @@ let imageId = null;
 async function getUserInfo(username) {
     fetch(`/api/user/${username}`, {method: 'GET'})
         .then(response => {
-            if(!response.ok){
+            if (!response.ok) {
                 throw new Error(`Error getting user info from server status: ${response.status}`
                     + `error is ${response.json()}`);
             }
@@ -12,12 +12,12 @@ async function getUserInfo(username) {
         .then(userData => {
             setUserData(userData);
         })
-        .catch(error =>{
+        .catch(error => {
             console.error("Error: ", error);
         })
 }
 
-async function setUserData(userData){
+async function setUserData(userData) {
     const username = userData.username;
     const img_id = userData.img_id;
     const translationsCount = userData.translationsCount;
@@ -36,7 +36,6 @@ async function setUserData(userData){
 }
 
 async function setImage(img_id) {
-    // o sa pun o constanta aici
     fetch(`/api/images/${img_id}`, {method: 'GET'})
         .then(response => {
             if (!response.ok) {
@@ -52,10 +51,8 @@ async function setImage(img_id) {
             console.error("Error: " + error);
         })
 }
-document.addEventListener("DOMContentLoaded", function () {
-    const loader = document.getElementById('preloader');
-    loader.style.display = 'flex';
 
+document.addEventListener("DOMContentLoaded", function () {
     const currentURL = window.location.href;
     const parts = currentURL.split('/');
     const username = parts[parts.length - 1];
@@ -71,39 +68,39 @@ document.addEventListener("DOMContentLoaded", function () {
     logoutBtn.addEventListener("click", event => logout(event));
     removeAccountBtn.addEventListener("click", event => removeAccount(event));
 
-    getUserInfo(username).then(() => console.log("userData loaded"));
+    getUserInfo(username)
+        .then();
 
     function logout(event) {
         event.preventDefault();
-        fetch('/api/user/logout', { method: 'POST' })
+        fetch('/api/user/logout', {method: 'POST'})
             .then(response => {
-                if(!response.ok){
+                if (!response.ok) {
                     throw new Error(`Error logging user out from server status: ${response.status}`
                         + `error is ${response.json()}`);
-                }
-                else
+                } else
                     window.location.href = '/'; // Redirect to the main page after logout
             })
             .catch(error => {
                 console.error("Error logging out:", error);
             });
     }
+
     function removeAccount(event) {
         event.preventDefault();
         const confirmDelete
             = window.confirm("Are you sure you want to delete your account");
 
-        if(confirmDelete) {
+        if (confirmDelete) {
             fetch(`/api/user/${username}`, {method: 'DELETE'})
                 .then(response => {
-                    if(!response.ok){
+                    if (!response.ok) {
                         throw new Error(`Error deleting user from server status: ${response.status}`
                             + `error is ${response.json()}`);
-                    }
-                    else
+                    } else
                         window.location.href = '/';
                 })
-                .catch(error =>{
+                .catch(error => {
                     console.error("Error: ", error);
                 })
         }
@@ -117,24 +114,24 @@ document.addEventListener("DOMContentLoaded", function () {
         const newPassword = document.getElementById('password').value;
         const newEmail = document.getElementById('email').value.trim();
 
-       if(newUsername === ''){
-           alert('Username field cannot be empty');
-           return;
-       }
+        if (newUsername === '') {
+            alert('Username field cannot be empty');
+            return;
+        }
 
-       if(newEmail === ''){
-           alert('Email cannot be empty');
-           return;
-       }
+        if (newEmail === '') {
+            alert('Email cannot be empty');
+            return;
+        }
 
-       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-       if(!emailPattern.test(newEmail)){
-           alert('Invalid email format');
-           return;
-       }
+        if (!emailPattern.test(newEmail)) {
+            alert('Invalid email format');
+            return;
+        }
 
-        if(imageId === null) {
+        if (imageId === null) {
             reader.onloadend = function () {
                 const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
                 // Send the image to the server
@@ -185,13 +182,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
                 body: JSON.stringify({newUsername, newImgId, newPassword, newEmail})
             }).then(response => {
-                if(!response.ok)
+                if (!response.ok)
                     alert('Failed to change user data');
-                else{
+                else {
                     const newUsername = document.getElementById('username').value;
                     window.location.href = '/profile/' + newUsername;
                 }
-            }).catch(error =>{
+            }).catch(error => {
                 console.error("Error: " + error);
             })
         }
@@ -290,9 +287,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 }
             });
+            const loader = document.getElementById('preloader');
+            loader.style.display = 'none';
         })
         .catch(error => {
             console.log("Error: " + error);
         });
-    loader.style.display = 'none';
 });

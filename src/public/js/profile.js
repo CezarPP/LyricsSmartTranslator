@@ -3,7 +3,7 @@ async function getUserInfo() {
     const username = path.split('/')[2];
     fetch(`/api/user/${username}`, {method: 'GET'})
         .then(response => {
-            if(!response.ok){
+            if (!response.ok) {
                 throw new Error(`Error getting user info from server status: ${response.status}`
                     + `error is ${response.json()}`);
             }
@@ -12,12 +12,12 @@ async function getUserInfo() {
         .then(userData => {
             setUserData(userData);
         })
-        .catch(error =>{
+        .catch(error => {
             console.error("Error: ", error);
         })
 }
 
-async function setUserData(userData){
+async function setUserData(userData) {
     const username = userData.username;
     const img_id = userData.img_id;
     const email = userData.email;
@@ -35,8 +35,7 @@ async function setUserData(userData){
 }
 
 async function setImage(img_id) {
-    // o sa pun o constanta aici
-    fetch( `/api/images/${imd_id}`, {method:'GET'})
+    fetch(`/api/images/${img_id}`, {method: 'GET'})
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`
@@ -52,7 +51,7 @@ async function setImage(img_id) {
         })
 }
 
-const loader = document.getElementById('preloader');
-loader.style.display = 'flex';
-getUserInfo().then(() => console.log("Got data from server"));
-loader.style.display = 'none';
+getUserInfo().then(() => {
+    const loader = document.getElementById('preloader');
+    loader.style.display = 'none';
+});
