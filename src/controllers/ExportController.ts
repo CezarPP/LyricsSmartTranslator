@@ -12,7 +12,7 @@ const tumblrOAuth = new OAuth(
     consumerKey,
     consumerSecret,
     "1.0A",
-    "https://32a0-2a02-2f0e-561a-6f00-7d2b-89d7-5a08-3db2.ngrok-free.app/export-data/tumblr",
+    "https://www.lyricssmarttranslator.com/export-data/tumblr",
     "HMAC-SHA1"
 );
 
@@ -55,8 +55,6 @@ export class ExportController {
                     ExportController.tumblrOauthTokenSecret = oauthTokenSecret;
                     const authorizationUrl = `https://www.tumblr.com/oauth/authorize?oauth_token=${oauthToken}`;
                     console.log("Authorize the application by visiting the following URL: " + authorizationUrl);
-
-                    // Store the oauthTokenSecret securely for later use
 
                     res.writeHead(200, { "Content-Type": "application/json" });
                     res.write(JSON.stringify({ message: authorizationUrl }));
@@ -308,12 +306,3 @@ export class ExportController {
             });
     }
 }
-
-/*
-const clientId = '87363';
-const clientSecret = 'MlsIF37Dyx6ONg6TxMCRc6F5YYf8V0R3ZK7pqZq7cW0gigFAhTUaxyRrJBnq1a9E';
-const username = 'nechitavladmihai';
-const password = '0M%iWIfjCfT3gEOzd%hYg@Rx';
-const blog_url = 'proiectweb7.wordpress.com';
-const redirectUri = 'https://85b4-2a02-2f0e-5103-6000-64fd-eb2a-bf89-ddb2.ngrok-free.app';
-*/
