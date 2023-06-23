@@ -194,7 +194,8 @@ export class UsersController {
             const usersData = users.map((user) => ({
                 username: user.username,
                 img_id: user.img_id,
-                email: user.email
+                email: user.email,
+                activity: 0
             }));
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.write(JSON.stringify(usersData));
@@ -219,7 +220,8 @@ export class UsersController {
             const usersData = users.map((user) => ({
                 username: user.username,
                 img_id: user.img_id,
-                email: user.email
+                email: user.email,
+                activity: user.password
             }));
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify(usersData));
@@ -273,7 +275,7 @@ export class UsersController {
                         }
                         const status = await this.usersRepository.updateUser(user.id, newUsername, goodPassword, newEmail, newImgId);
                         if (status) {
-                            sendMessage(res, 200, 'User succesfully updated');
+                            sendMessage(res, 200, 'User successfully updated');
                         } else {
                             sendMessage(res, 500, 'Failed to update user');
                         }

@@ -1,0 +1,207 @@
+openapi: 3.0.3
+info:
+  title: Recover API
+  description: API for managing password recovery operations
+  version: 1.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/GEORGEALEXDUMITRESCU/RecoverAPI/1.0.0
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/GEORGEALEXDUMITRESCU/TW_API/1.0.0
+  - url: https://www.lyricssmarttranslator.com
+paths:
+  /api/recover:
+    post:
+      summary: Request password recovery
+      tags:
+        - recover
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecoverRequest'
+      responses:
+        '200':
+          description: Recovery request registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No user with this email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Recovery request already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      summary: Get all password recovery reequests
+      tags:
+        - recover
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recover'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - cookieAuth: [ ]
+
+    put:
+      summary: Recover password
+      tags:
+        - recover
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecoverPasswordRequest'
+      responses:
+        '200':
+          description: Password successfully recovered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+        '400':
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/recover/{id}:
+    delete:
+      summary: Delete password recovery request
+      tags:
+        - recover
+      parameters:
+        - name: id
+          in: path
+          description: Id of the password recovey request
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Recover request successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Recover request not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - cookieAuth: [ ]
+
+components:
+  schemas:
+    RecoverRequest:
+      type: object
+      properties:
+        email:
+          type: string
+      required:
+        - email
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    Recover:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        email:
+          type: string
+        token:
+          type: string
+    RecoverPasswordRequest:
+      type: object
+      properties:
+        token:
+          type: string
+        newPassword:
+          type: string
+      required:
+        - token
+        - newPassword
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: jwt

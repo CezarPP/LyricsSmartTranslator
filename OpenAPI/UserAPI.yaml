@@ -1,0 +1,414 @@
+openapi: 3.0.0
+info:
+  title: User API
+  description: API for managing user-related operations
+  version: 1.0.0
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/GEORGEALEXDUMITRESCU/TW_API/1.0.0
+  - url: https://www.lyricssmarttranslator.com
+paths:
+  /api/user/login:
+    post:
+      summary: Log in a user and return the authentication cookie
+      tags:
+        - users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          headers:
+            Set-Cookie:
+              description: The authentication cookie
+              schema:
+                type: string
+                example: jwt=eyJh9.eyJ1c.j1pAi; Path=/; Secure; HttpOnly;
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - cookieAuth: []
+
+  /api/user/logout:
+    post:
+      summary: Log out a user
+      tags:
+        - users
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '404':
+          description: No user is logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - cookieAuth: []
+
+  /api/user/register:
+    post:
+      summary: Register a new user
+      tags:
+        - users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+        '400':
+          description: Invalid input data or username
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: User already exists or user with this email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/user/{username}:
+    get:
+      summary: Get user statistics by username
+      tags:
+        - users
+      parameters:
+        - name: username
+          in: path
+          description: Username of the user
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStats'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update user profile
+      tags:
+        - users
+      parameters:
+        - name: username
+          in: path
+          description: Username of the user to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+      responses:
+        '200':
+          description: User profile updated successfuly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Invalid input datea
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - cookieAuth: [ ]
+
+    delete:
+      summary: Delete a user
+      tags:
+        - users
+      parameters:
+        - name: username
+          in: path
+          description: Username of the user to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - cookieAuth: [ ]
+  /api/user:
+    get:
+      summary: Get user statistics with optional filtering
+      tags:
+        - users
+      parameters:
+        - name: filter
+          in: query
+          description: Filter option for active users (e.g., "mostActive")
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Limit the number of results
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserInfo'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/user/recommendations:
+    get:
+      summary: Get recommendations for the current logged in user
+      tags:
+        - users
+      parameters:
+        - name: limit
+          in: query
+          description: Limit the number of results
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Song'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - cookieAuth: []
+
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - email
+        - password
+    RegisterResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        id:
+          type: integer
+          format: int64
+      required:
+        - message
+        - id
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+    Song:
+      type: object
+      properties:
+        id:
+          type: number
+        primary_translation:
+          type: number
+        imageId:
+          type: number
+        artist:
+          type: string
+        title:
+          type: string
+        link:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    UserStats:
+      type: object
+      properties:
+        username:
+          type: string
+        img_id:
+          type: string
+        email:
+          type: string
+        translationsCount:
+          type: number
+        annotationsCount:
+          type: number
+        commentsCount:
+          type: number
+    UserInfo:
+      type: object
+      properties:
+        username:
+          type: string
+        img_id:
+          type: integer
+        email:
+          type: string
+        activity:
+          type: integer
+    UserUpdateRequest:
+      type: object
+      properties:
+        newUsername:
+          type: string
+        newImgId:
+          type: integer
+        newPassword:
+          type: string
+        newEmail:
+          type: string
+      required:
+        - newUsername
+        - newImgId
+        - newPassword
+        - newEmail
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: jwt
