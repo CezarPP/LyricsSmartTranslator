@@ -53,6 +53,8 @@ async function setImage(img_id) {
         })
 }
 document.addEventListener("DOMContentLoaded", function () {
+    const loader = document.getElementById('preloader');
+    loader.style.display = 'flex';
 
     const currentURL = window.location.href;
     const parts = currentURL.split('/');
@@ -292,5 +294,5 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => {
             console.log("Error: " + error);
         });
-
+    loader.style.display = 'none';
 });
