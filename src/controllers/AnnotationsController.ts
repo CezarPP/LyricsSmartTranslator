@@ -3,18 +3,16 @@ import assert from "assert";
 import {AnnotationsRepository} from "../repositories/AnnotationsRepository";
 import {sendMessage} from "../util/sendMessage";
 import {Annotation} from "../models/Annotation";
-import {UsersController} from "./UsersController";
 import * as url from "url";
 import {BaseController} from "./BaseController";
+import {getLoggedUser} from "../util/getLoggedUser";
 
 export class AnnotationsController extends BaseController {
     private annotationsRepository: AnnotationsRepository;
-    private usersController: UsersController;
 
     constructor() {
         super();
         this.annotationsRepository = new AnnotationsRepository();
-        this.usersController = new UsersController();
     }
 
     async handleGetById(req: IncomingMessage, res: ServerResponse) {
@@ -92,7 +90,7 @@ export class AnnotationsController extends BaseController {
                 return;
             }
 
-            const user = await this.usersController.getLoggedUser(req, res);
+            const user = await getLoggedUser(req);
             if (user === null) {
                 sendMessage(res, 401, 'You need to be authenticated to post an annotation');
                 return;
@@ -141,7 +139,7 @@ export class AnnotationsController extends BaseController {
             const annotation = await this._getAnnotationFromRequest(req, res);
             if (annotation === null)
                 return;
-            const user = await this.usersController.getLoggedUser(req, res);
+            const user = await getLoggedUser(req);
             if (user === null) {
                 sendMessage(res, 401, 'You need to be authenticated to update an annotation');
                 return;
@@ -169,7 +167,7 @@ export class AnnotationsController extends BaseController {
         if (annotation === null)
             return;
 
-        const user = await this.usersController.getLoggedUser(req, res);
+        const user = await getLoggedUser(req);
         if (user === null) {
             sendMessage(res, 401, 'You need to be authenticated to delete an annotation');
             return;

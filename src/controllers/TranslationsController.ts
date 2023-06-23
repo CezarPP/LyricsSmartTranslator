@@ -1,19 +1,17 @@
 import {IncomingMessage, ServerResponse} from "http";
 import {Translation} from "../models/Translation";
-import {UsersController} from "./UsersController";
 import {sendMessage} from "../util/sendMessage";
 import assert from "assert";
 import url from "url";
 import {BaseController} from "./BaseController";
 import {getUTCDate} from "../util/getUTCDate";
+import {getLoggedUser} from "../util/getLoggedUser";
 
 export class TranslationsController extends BaseController {
     private nrViews: Map<number, number> = new Map();
-    private usersController: UsersController;
 
     constructor() {
         super();
-        this.usersController = new UsersController();
     }
 
     async handleGetById(req: IncomingMessage, res: ServerResponse) {
@@ -136,7 +134,7 @@ export class TranslationsController extends BaseController {
                 return;
             }
 
-            const user = await this.usersController.getLoggedUser(req, res);
+            const user = await getLoggedUser(req);
             if (user === null) {
                 sendMessage(res, 401, 'You need to be authenticated to submit a translation');
                 return;
@@ -185,7 +183,7 @@ export class TranslationsController extends BaseController {
                 return;
             }
 
-            const user = await this.usersController.getLoggedUser(req, res);
+            const user = await getLoggedUser(req);
             if (user === null) {
                 sendMessage(res, 401, 'You need to be authenticated in order to update a translation');
                 return;
@@ -218,7 +216,7 @@ export class TranslationsController extends BaseController {
             return;
         }
 
-        const user = await this.usersController.getLoggedUser(req, res);
+        const user = await getLoggedUser(req);
         if (user === null) {
             sendMessage(res, 401, 'You need to be authenticated in order to delete a translation');
             return;

@@ -1,30 +1,31 @@
 import {IncomingMessage, ServerResponse} from "http";
 import {ImagesController} from './controllers/ImagesController';
 import {sendStaticFile} from "./util/sendStaticFile";
-import {UsersController} from "./controllers/UsersController";
 import {SongsController} from "./controllers/SongsController";
 import {TranslationsController} from "./controllers/TranslationsController";
 import {CommentsController} from "./controllers/CommentsController";
 import {sendFile} from "./util/sendFile";
 import {AnnotationsController} from "./controllers/AnnotationsController";
 import {sendMessage} from "./util/sendMessage";
-import {RecoverController} from "./controllers/RecoverController";
 import {sendUpdatesPage} from "./util/sendUpdatesPage";
 import {sendRecoveriesPage} from "./util/sendRecoveriesPage";
 import {ExportController} from "./controllers/ExportController"
 import {ExportAllSongsController} from "./controllers/ExportAllSongsController"
+import {forwardRequestAuth} from "./util/forwardRequestAuth";
+import {startAuthMicroservice} from "./util/startAuthMicroservice";
+
 
 const http = require('http');
 
 const imagesController = new ImagesController();
-const userController = new UsersController();
 const songsController = new SongsController();
 const translationsController = new TranslationsController();
 const commentsController = new CommentsController();
 const annotationsController = new AnnotationsController();
-const recoverController = new RecoverController();
 const exportController = new ExportController();
 const exportAllSongsController = new ExportAllSongsController();
+
+startAuthMicroservice();
 
 const server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
     if (req.url === undefined || req.method === undefined) {
@@ -42,9 +43,11 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         translationsController
             .handleApiRequest(req, res)
             .then();
-    } else if (url.startsWith('/api/user')) {
-        userController
-            .handleApiRequest(req, res)
+    } else if (url.startsWith('/api/user') ||
+        (method === 'GET' && url && url === '/api/me') ||
+        (method === 'GET' && url.startsWith('/profile')) ||
+        url.startsWith('/api/recover')) {
+        forwardRequestAuth(req, res)
             .then();
     } else if (url.startsWith('/api/images')) {
         imagesController
@@ -58,18 +61,6 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
         annotationsController
             .handleApiRequest(req, res)
             .then();
-    } else if (url.startsWith('/api/recover')) {
-        recoverController
-            .handleApiRequest(req, res)
-            .then();
-    } else if (method === 'GET' && url && url === '/api/me') {
-        userController
-            .getLoggedUsersInfo(req, res)
-            .then();
-    } else if (method === 'GET' && url.startsWith('/profile')) {
-        userController
-            .getUserProfilePage(req, res)
-            .then();
     } else if (method === 'GET' && url.startsWith("/css") ||
         url.startsWith("/js") || url === '/' && url.startsWith('/img/')) {
         // for main page, css, js
@@ -79,16 +70,6 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     } else if (method === 'GET' && url.startsWith('/add-translation/')) {
         sendFile(req, res,
             '../public/assets/pages/add-translation.html', 'text/html')
-            .then();
-    } else if (method === 'POST' && url == '/login') {
-        userController
-            .loginUser(req, res)
-            .then();
-    } else if (method === 'POST' && url == '/register') {
-        userController.registerUser(req, res)
-            .then();
-    } else if (method === 'POST' && url == '/logout') {
-        userController.logoutUser(req, res)
             .then();
     } else if (method === 'GET' && (url === '/updates' || url === '/updates.html')) {
         sendUpdatesPage(req, res)
@@ -126,5 +107,5 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
 });
 
 server.listen(8000, () => {
-    console.log('Server is running on port 3000');
+    console.log('Server is running on port 8000');
 });

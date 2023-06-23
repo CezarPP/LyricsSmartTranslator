@@ -1,44 +1,41 @@
 import {IncomingMessage, ServerResponse} from "http";
 import {CommentsRepository} from "../repositories/CommentsRepository";
 import {Comment} from "../models/Comment";
-import {UsersRepository} from "../repositories/UsersRepository";
-import {UsersController} from "./UsersController";
+import {UsersRepository} from "../auth-microservice/repositories/UsersRepository";
 import {TranslationsRepository} from "../repositories/TranslationsRepository";
 import {BaseController} from "./BaseController";
 import {sendMessage} from "../util/sendMessage";
 import url from "url";
+import {getLoggedUser} from "../util/getLoggedUser";
 
-export class CommentsController extends BaseController{
+export class CommentsController extends BaseController {
     private commentsRepository: CommentsRepository;
-    private usersRepository: UsersRepository;
-    private usersController: UsersController;
     private translationsRepository: TranslationsRepository;
+    private usersRepository: UsersRepository;
 
     constructor() {
         super();
         this.commentsRepository = new CommentsRepository();
-        this.usersRepository = new UsersRepository();
-        this.usersController = new UsersController();
         this.translationsRepository = new TranslationsRepository();
+        this.usersRepository = new UsersRepository();
     }
 
-    async handleGetById(req:IncomingMessage, res:ServerResponse){
-        if(!req.url){
+    async handleGetById(req: IncomingMessage, res: ServerResponse) {
+        if (!req.url) {
             sendMessage(res, 500, 'Internal server error');
             return;
         }
 
         const commentId = parseInt(req.url.split('/')[3]);
 
-        if(isNaN(commentId)){
-            console.log("Comment id is nan");
+        if (isNaN(commentId)) {
             sendMessage(res, 400, 'Invalid comment id');
             return;
         }
 
         const comment = await this.commentsRepository.getCommentById(commentId);
 
-        if(comment === null){
+        if (comment === null) {
             sendMessage(res, 404, 'Comment not found');
             return;
         }
@@ -47,7 +44,7 @@ export class CommentsController extends BaseController{
         res.end(JSON.stringify(comment.toObject()));
     }
 
-    async handleGetAll(req:IncomingMessage, res:ServerResponse){
+    async handleGetAll(req: IncomingMessage, res: ServerResponse) {
         try {
             const comments = await this.commentsRepository.getAllComments();
             res.writeHead(200, {'Content-Type': 'application/json'});
@@ -60,8 +57,8 @@ export class CommentsController extends BaseController{
         }
     }
 
-    async handleFiltering(req:IncomingMessage, res: ServerResponse){
-        if(!req.url){
+    async handleFiltering(req: IncomingMessage, res: ServerResponse) {
+        if (!req.url) {
             sendMessage(res, 500, 'Internal server error');
             return;
         }
@@ -71,14 +68,14 @@ export class CommentsController extends BaseController{
         const translationIdString = parameters["translationId"] as string;
         const translationId = (translationIdString === undefined) ? 0 : parseInt(translationIdString);
 
-        if(translationId === undefined || isNaN(translationId)){
+        if (translationId === undefined || isNaN(translationId)) {
             sendMessage(res, 500, 'Invalid Request parameters');
             return;
         }
 
         const translation = await this.translationsRepository.getTranslationById(translationId);
 
-        if(translation === null){
+        if (translation === null) {
             sendMessage(res, 404, 'Translation not found');
             return;
         }
@@ -88,6 +85,7 @@ export class CommentsController extends BaseController{
             let commentsData = [];
             for (let i = 0; i < comments.length; i++) {
                 const comment = comments[i];
+
                 const user = await this.usersRepository.getUserById(comment.userId);
                 if (user === null)
                     continue;
@@ -103,13 +101,13 @@ export class CommentsController extends BaseController{
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.write(JSON.stringify(commentsData));
             res.end();
-        } catch(error){
+        } catch (error) {
             sendMessage(res, 500, 'Internal server error');
             return;
         }
     }
 
-    async handlePost(req:IncomingMessage, res:ServerResponse) {
+    async handlePost(req: IncomingMessage, res: ServerResponse) {
         try {
             let body = '';
 
@@ -121,12 +119,13 @@ export class CommentsController extends BaseController{
                 const translationId = parsedData.translationId;
                 const content = parsedData.content;
 
-                if(!translationId || !content){
+                if (!translationId || !content) {
                     sendMessage(res, 400, 'Invalid request parameters');
                     return;
                 }
 
-                const user = await this.usersController.getLoggedUser(req, res);
+                const user = await getLoggedUser(req);
+
                 if (user === null) {
                     sendMessage(res, 401, 'You need to be logged in to comment');
                     return;
@@ -140,7 +139,7 @@ export class CommentsController extends BaseController{
                 }
 
                 const comment = new Comment(0, user.id, translation.id, content);
-                console.log(comment);
+
                 const commentId = await this.commentsRepository.addComment(comment);
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.write(JSON.stringify({message: 'Comment added successfully', id: commentId}));
@@ -160,7 +159,7 @@ export class CommentsController extends BaseController{
             });
 
             req.on('end', async () => {
-                if(!req.url){
+                if (!req.url) {
                     sendMessage(res, 500, 'Internal server error');
                     return;
                 }
@@ -168,8 +167,8 @@ export class CommentsController extends BaseController{
                 const parsedData = JSON.parse(body);
                 const newContent = parsedData.newContent;
 
-                if(!newContent){
-                    sendMessage(res, 400, 'Invalid reqest parameters');
+                if (!newContent) {
+                    sendMessage(res, 400, 'Invalid request parameters');
                     return;
                 }
 
@@ -180,7 +179,7 @@ export class CommentsController extends BaseController{
                     sendMessage(res, 404, 'Comment not found');
                     return;
                 } else {
-                    const loggedUser = await this.usersController.getLoggedUser(req, res);
+                    const loggedUser = await getLoggedUser(req);
                     if (loggedUser === null) {
                         sendMessage(res, 401, 'Unauthorized');
                     } else if (loggedUser.id === 1 || loggedUser.id === comment.userId) {
@@ -212,7 +211,7 @@ export class CommentsController extends BaseController{
             if (comment === null) {
                 sendMessage(res, 404, 'Comment not found');
             } else {
-                const loggedUser = await this.usersController.getLoggedUser(req, res);
+                const loggedUser = await getLoggedUser(req);
                 if (loggedUser === null) {
                     sendMessage(res, 401, 'Unauthorized');
                 } else if (loggedUser.id === 1 || loggedUser.id === comment.userId) {

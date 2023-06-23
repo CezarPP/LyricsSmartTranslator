@@ -2,19 +2,16 @@ import {Translation} from "../models/Translation";
 import {Song} from "../models/Song";
 import {IncomingMessage, ServerResponse} from "http";
 import assert from "assert";
-import {UsersController} from "./UsersController";
 import {isYoutubeLink} from "../util/validation";
 import {sendMessage} from "../util/sendMessage";
 import {getUTCDate} from "../util/getUTCDate";
 import url from "url";
 import {BaseController} from "./BaseController";
+import {getLoggedUser} from "../util/getLoggedUser";
 
 export class SongsController extends BaseController {
-    private usersController: UsersController;
-
     constructor() {
         super();
-        this.usersController = new UsersController();
     }
 
     async handleGetAll(req: IncomingMessage, res: ServerResponse) {
@@ -81,7 +78,7 @@ export class SongsController extends BaseController {
             // Link has to be embedded, otherwise it won't load
             link = link.replace('/watch?v=', '/embed/');
 
-            const user = await this.usersController.getLoggedUser(req, res);
+            const user = await getLoggedUser(req);
             if (user === null) {
                 sendMessage(res, 401, 'You need to be authenticated to submit a song.');
                 return;
@@ -143,7 +140,7 @@ export class SongsController extends BaseController {
             // Link has to be embedded, otherwise it won't load
             link = link.replace('/watch?v=', '/embed/');
 
-            const user = await this.usersController.getLoggedUser(req, res);
+            const user = await getLoggedUser(req);
             if (user === null) {
                 sendMessage(res, 401, 'You need to be authenticated to update a song.');
                 return;
@@ -188,7 +185,7 @@ export class SongsController extends BaseController {
         if (song === null)
             return;
 
-        const user = await this.usersController.getLoggedUser(req, res);
+        const user = await getLoggedUser(req);
         if (user === null) {
             sendMessage(res, 401, 'You need to be authenticated to delete a song');
             return;

@@ -1,15 +1,14 @@
 import {IncomingMessage, ServerResponse} from "http";
-import {UsersController} from "../controllers/UsersController";
 import {sendNotFound} from "./sendNotFound";
 import {sendFile} from "./sendFile";
+import {authenticateUser} from "./authenticateUser";
 
 export const sendUpdatesPage = async (req: IncomingMessage, res: ServerResponse) => {
     if (!req.url) {
         return;
     }
-    const usersController = new UsersController();
 
-    const user = usersController.authenticateUser(req);
+    const user = authenticateUser(req);
     if (user !== 1) {
         await sendNotFound(req, res)
         return;
