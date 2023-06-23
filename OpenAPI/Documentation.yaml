@@ -434,35 +434,6 @@ paths:
 
 components:
   schemas:
-    Translation:
-      type: object
-      properties:
-        id:
-          type: integer
-        songId:
-          type: integer
-        userId:
-          type: integer
-        language:
-          type: string
-        description:
-          type: string
-        lyrics:
-          type: string
-        no_views:
-          type: integer
-        time:
-          type: string
-          format: date-time
-    TranslationUpdate:
-      type: object
-      properties:
-        lyrics:
-          type: string
-          description: "The updated lyrics of the song translation"
-        description:
-          type: string
-          description: "The updated description of the translation"
     Song:
       type: object
       properties:
@@ -520,6 +491,35 @@ components:
         - id
         - link
         - ext
+    Translation:
+      type: object
+      properties:
+        id:
+          type: integer
+        songId:
+          type: integer
+        userId:
+          type: integer
+        language:
+          type: string
+        description:
+          type: string
+        lyrics:
+          type: string
+        no_views:
+          type: integer
+        time:
+          type: string
+          format: date-time
+    TranslationUpdate:
+      type: object
+      properties:
+        lyrics:
+          type: string
+          description: "The updated lyrics of the song translation"
+        description:
+          type: string
+          description: "The updated description of the translation"
     Annotation:
       type: object
       properties:
