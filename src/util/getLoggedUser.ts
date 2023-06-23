@@ -12,7 +12,7 @@ export async function getLoggedUser(req: IncomingMessage): Promise<User | null> 
     });
 
     try {
-        const response = await fetch('http://localhost:3000/api/me', {
+        const response = await fetch('http://localhost:8001/api/me', {
             method: 'GET',
             headers: headers
         });

@@ -4,7 +4,7 @@ import http from 'http';
 export async function forwardRequestAuth(req: IncomingMessage, res: ServerResponse) {
     const options = {
         hostname: 'localhost',
-        port: 3000,
+        port: 8001,
         path: req.url,
         method: req.method,
         headers: req.headers
