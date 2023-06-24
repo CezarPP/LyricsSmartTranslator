@@ -25,8 +25,6 @@ const annotationsController = new AnnotationsController();
 const exportController = new ExportController();
 const exportAllSongsController = new ExportAllSongsController();
 
-startAuthMicroservice();
-
 const server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
     if (req.url === undefined || req.method === undefined) {
         console.log("Undefined url or method");
@@ -106,6 +104,10 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
     }
 });
 
-server.listen(8000, () => {
-    console.log('Server is running on port 8000');
-});
+(async () => {
+    await startAuthMicroservice();
+
+    server.listen(8000, () => {
+        console.log('Server is running on port 8000');
+    });
+})();
