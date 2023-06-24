@@ -3,7 +3,7 @@ document.getElementById("tumblr-icon").addEventListener("click", function(){
     if(popupOpen == true) return;
 
     popupOpen = true;
-// Create the pop-up window container
+    // Create the pop-up window container
     const popupContainer = document.createElement("div");
     popupContainer.classList.add("popup-container");
 
