@@ -11,10 +11,9 @@ document.querySelector('.login-container form').addEventListener('submit', funct
         password: formData.get('password')
     };
 
-    console.log(jsonData.username);
-    console.log(jsonData.password);
-
     // Send the form data as JSON to the server
+    const loader = document.getElementById('preloader');
+    loader.style.display = 'flex';
     fetch('/api/user/login', {
         method: 'POST',
         headers: {
@@ -27,8 +26,12 @@ document.querySelector('.login-container form').addEventListener('submit', funct
                 window.location.href = "/";
             }
             else{
-                alert('Failed to log in');
+                return response.json();
             }
+        })
+        .then(data => {
+            loader.style.display = 'none';
+            alert('Failed to log in: ' + data.message);
         })
         .catch(error => {
             console.error('Error logging in:', error);
@@ -64,8 +67,12 @@ document.querySelector('.sign-up-container form').addEventListener('submit', fun
                 window.location.href = "/register-page.html";
             }
             else{
-                alert('Failed to register');
+                return response.json();
             }
+        })
+        .then(data => {
+            loader.style.display = 'none';
+            alert('Failed to register: ' + data.message);
         })
         .catch(error => {
             console.error('Error registering:', error);
