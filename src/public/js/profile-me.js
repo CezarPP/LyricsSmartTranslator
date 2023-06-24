@@ -130,6 +130,8 @@ document.addEventListener("DOMContentLoaded", function () {
             alert('Invalid email format');
             return;
         }
+        const loader = document.getElementById('postloader');
+        loader.style.display = 'flex';
 
         if (imageId === null) {
             reader.onloadend = function () {
@@ -162,12 +164,16 @@ document.addEventListener("DOMContentLoaded", function () {
                         });
                     })
                     .then(response => {
-                        if (!response.ok) {
-                            alert('Failed to change user data');
-                        } else {
+                        if(response.ok) {
                             const newUsername = document.getElementById('username').value;
                             window.location.href = '/profile/' + newUsername;
+                        } else {
+                            return response.json();
                         }
+                    })
+                    .then(data =>{
+                        loader.style.display = 'none';
+                        alert('Failed to change user data: ' + data.message);
                     })
                     .catch(error => console.error(error));
             }
@@ -182,13 +188,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
                 body: JSON.stringify({newUsername, newImgId, newPassword, newEmail})
             }).then(response => {
-                if (!response.ok)
-                    alert('Failed to change user data');
-                else {
+                if (response.ok){
                     const newUsername = document.getElementById('username').value;
                     window.location.href = '/profile/' + newUsername;
+                } else {
+                    return response.json();
                 }
-            }).catch(error => {
+            })
+                .then(data => {
+                    loader.style.display = 'none';
+                    alert('Failed to change user data: ' + data.message);
+                })
+                .catch(error => {
                 console.error("Error: " + error);
             })
         }
