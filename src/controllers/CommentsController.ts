@@ -115,7 +115,14 @@ export class CommentsController extends BaseController {
                 body += chunk.toString();
             });
             req.on('end', async () => {
-                const parsedData = JSON.parse(body);
+                let parsedData;
+                try {
+                    parsedData = JSON.parse(body);
+                } catch (error) {
+                    sendMessage(res, 400, 'Invalid JSON payload');
+                    return;
+                }
+
                 const translationId = parsedData.translationId;
                 const content = parsedData.content;
 

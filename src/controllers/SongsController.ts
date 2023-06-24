@@ -53,7 +53,13 @@ export class SongsController extends BaseController {
         });
 
         req.on('end', async () => {
-            const postData = JSON.parse(body);
+            let postData;
+            try {
+                postData = JSON.parse(body);
+            } catch (error) {
+                sendMessage(res, 400, 'Invalid JSON payload');
+                return;
+            }
             const title = postData.title as string;
             const artist = postData.artist as string;
             const lyrics = postData.lyrics as string;
@@ -125,7 +131,13 @@ export class SongsController extends BaseController {
         });
 
         req.on('end', async () => {
-            const postData = JSON.parse(body);
+            let postData;
+            try {
+                postData = JSON.parse(body);
+            } catch (error) {
+                sendMessage(res, 400, 'Invalid JSON payload');
+                return;
+            }
 
             const title = postData.title as string;
             const artist = postData.artist as string;

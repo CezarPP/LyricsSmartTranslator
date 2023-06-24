@@ -29,7 +29,7 @@ async function addComment(username, imageId, content) {
     comment.classList.add("comment");
 
     const infAuthor = document.createElement("img");
-    const imgLink = await fetch(`/api/images/${imageId}`, {method: 'GET'})
+    infAuthor.src = await fetch(`/api/images/${imageId}`, {method: 'GET'})
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`
@@ -43,7 +43,6 @@ async function addComment(username, imageId, content) {
         .catch(error => {
             console.error('Error: ' + error);
         });
-    infAuthor.src = imgLink;
     infAuthor.alt = "Avatar Image";
     comment.appendChild(infAuthor);
 
@@ -67,14 +66,14 @@ async function handleComments() {
     getCommentsFromServer().then(() => console.log("Got comments from the server"));
 
     let meResponse;
-    try{
+    try {
         meResponse = await fetch('/api/me', {method: 'GET'});
-        if(!meResponse.ok){
+        if (!meResponse.ok) {
             document.querySelector('.input-container').style.display = 'none';
             document.getElementById('add-translation-button').style.display = 'none';
             return;
         }
-    } catch(error){
+    } catch (error) {
         document.querySelector('.input-container').style.display = 'none';
         document.getElementById('add-translation-button').style.display = 'none';
         return;
@@ -92,6 +91,7 @@ async function handleComments() {
     const commentInput = document.getElementById("comment-input");
 
     submitCommentBtn.addEventListener("click", () => {
+        document.getElementById('preloader-hidden').style.display = 'flex';
         const commentText = commentInput.value.trim();
         if (commentText) {
             const path = window.location.pathname;
@@ -110,7 +110,7 @@ async function handleComments() {
                             + `error is ${response.json()}`);
                     } else window.location.href = path;
                 })
-                .catch(error => {
+                .catch(() => {
                     console.error("Error adding comment");
                 });
         }

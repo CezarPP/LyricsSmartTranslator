@@ -8,6 +8,8 @@ document.querySelector('.form-container form').addEventListener('submit', functi
         token,
         newPassword: formData.get('newPassword'),
     };
+    const loader = document.getElementById('preloader');
+    loader.style.display = 'flex';
 
     fetch('/api/recover',{
         method: 'PUT',
@@ -20,8 +22,12 @@ document.querySelector('.form-container form').addEventListener('submit', functi
             if(response.ok){
                 window.location.href = '/passwordRecoverySuccess.html';
             } else {
-                alert('Failed to change password');
+                return response.json();
             }
+        })
+        .then(data =>{
+            loader.style.display = 'none';
+            alert('Failed to change password: ' + data.message);
         })
         .catch(error => {
             console.error(error);

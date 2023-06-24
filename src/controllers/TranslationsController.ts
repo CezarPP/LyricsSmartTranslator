@@ -91,10 +91,6 @@ export class TranslationsController extends BaseController {
         // Filter by username
         if (username !== undefined) {
             const translations: Translation[] = await this.translationRepository.getTranslationsByUsername(username);
-            if (translations.length === 0) {
-                sendMessage(res, 404, 'No translations found for this user');
-                return;
-            }
 
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify(translations));
@@ -109,7 +105,14 @@ export class TranslationsController extends BaseController {
         });
 
         req.on('end', async () => {
-            const postData = JSON.parse(body);
+            let postData;
+            try {
+                postData = JSON.parse(body);
+            } catch (error) {
+                sendMessage(res, 400, 'Invalid JSON payload');
+                return;
+            }
+
             const songId = postData.songId as number;
             const lyrics = postData.lyrics as string;
             let language = postData.language as string;
@@ -166,7 +169,14 @@ export class TranslationsController extends BaseController {
         req.on('end', async () => {
             assert(req.url);
 
-            const postData = JSON.parse(body);
+            let postData;
+            try {
+                postData = JSON.parse(body);
+            } catch (error) {
+                sendMessage(res, 400, 'Invalid JSON payload');
+                return;
+            }
+
             const lyrics = postData.lyrics as string;
             const description = postData.description as string;
             const translationId: number = parseInt(req.url.split('/')[3]);
