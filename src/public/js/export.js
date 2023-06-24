@@ -1,4 +1,8 @@
+let popupOpen = false;
 document.getElementById("tumblr-icon").addEventListener("click", function(){
+    if(popupOpen == true) return;
+
+    popupOpen = true;
 // Create the pop-up window container
     const popupContainer = document.createElement("div");
     popupContainer.classList.add("popup-container");
@@ -80,6 +84,9 @@ document.getElementById("tumblr-icon").addEventListener("click", function(){
     document.body.appendChild(popupContainer);
 });
 document.getElementById("wordpress-icon").addEventListener("click", function() {
+        if(popupOpen == true) return;
+
+        popupOpen = true;
         // Create the pop-up window container
         const popupContainer = document.createElement("div");
         popupContainer.classList.add("popup-container");
