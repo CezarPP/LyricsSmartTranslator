@@ -1,7 +1,9 @@
-import { IncomingMessage, ServerResponse } from "http";
+import {IncomingMessage, ServerResponse} from "http";
+
 const OAuth = require('oauth').OAuth;
 const url = require('url');
 import crypto from "crypto";
+import {sendMessage} from "../util/sendMessage";
 
 const consumerKey = "sRw63z7tFWa3bLWqJiaRu8zolYpxa7Nk5gqHhIe9oKnwgjSYvu";
 const consumerSecret = "AGhpwp3PR1gM3gUCs335HQxH7fKDCgsZYet9VrqSbpPAsW7jLm";
@@ -35,7 +37,14 @@ export class ExportController {
             });
 
             req.on("end", async () => {
-                const postData = JSON.parse(body);
+                let postData;
+                try {
+                    postData = JSON.parse(body);
+                } catch (error) {
+                    sendMessage(res, 400, 'Invalid JSON payload');
+                    return;
+                }
+
                 ExportController.postTitle = postData.postTitle;
                 ExportController.postContent = postData.postText;
                 ExportController.tumblrBlogName = postData.blogName;
@@ -44,9 +53,9 @@ export class ExportController {
                 tumblrOAuth.getOAuthRequestToken((error: string, oauthToken: string, oauthTokenSecret: string) => {
                     if (error) {
                         console.error("Error obtaining temporary OAuth credentials:", error);
-                        res.writeHead(500, { "Content-Type": "application/json" });
+                        res.writeHead(500, {"Content-Type": "application/json"});
                         res.write(
-                            JSON.stringify({ error: "Failed to obtain temporary OAuth credentials." })
+                            JSON.stringify({error: "Failed to obtain temporary OAuth credentials."})
                         );
                         res.end();
                         return;
@@ -56,15 +65,15 @@ export class ExportController {
                     const authorizationUrl = `https://www.tumblr.com/oauth/authorize?oauth_token=${oauthToken}`;
                     console.log("Authorize the application by visiting the following URL: " + authorizationUrl);
 
-                    res.writeHead(200, { "Content-Type": "application/json" });
-                    res.write(JSON.stringify({ message: authorizationUrl }));
+                    res.writeHead(200, {"Content-Type": "application/json"});
+                    res.write(JSON.stringify({message: authorizationUrl}));
                     res.end();
                 });
             });
         } catch (error) {
             console.error("Error in handleTumblrExport function:", error);
-            res.writeHead(500, { "Content-Type": "application/json" });
-            res.write(JSON.stringify({ error: "Failed to export to Tumblr." }));
+            res.writeHead(500, {"Content-Type": "application/json"});
+            res.write(JSON.stringify({error: "Failed to export to Tumblr."}));
             res.end();
         }
     }
@@ -82,7 +91,7 @@ export class ExportController {
             if (error) {
                 console.error("Error obtaining OAuth access tokens:", error);
                 res.writeHead(500, {'Content-Type': 'application/json'});
-                res.write(JSON.stringify({ error: "Failed to obtain OAuth access tokens." }));
+                res.write(JSON.stringify({error: "Failed to obtain OAuth access tokens."}));
                 res.end();
                 return;
             }
@@ -131,7 +140,7 @@ export class ExportController {
                 });
 
             const redirectURL = '/song-page/' + ExportController.songId;
-            res.writeHead(302, { 'Location': redirectURL });
+            res.writeHead(302, {'Location': redirectURL});
             res.end();
         });
     }
@@ -139,6 +148,7 @@ export class ExportController {
     generateNonce() {
         return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 32);
     }
+
     generateSignature(url: string, method: string, oauthParams: Record<string, string>, consumerSecret: string, tokenSecret: string) {
 
         const baseString = method.toUpperCase() + '&' + encodeURIComponent(url) + '&' + encodeURIComponent(this.buildParameterString(oauthParams));
@@ -147,27 +157,16 @@ export class ExportController {
 
         return signature;
     }
+
     buildParameterString(params: Record<string, string>) {
         const sortedParams = Object.keys(params).sort().map(key => encodeURIComponent(key) + '=' + encodeURIComponent(params[key]));
         return sortedParams.join('&');
     }
+
     buildAuthHeader(oauthParams: Record<string, string>) {
         const authParams = Object.keys(oauthParams).sort().map(key => key + '="' + oauthParams[key] + '"');
         return 'OAuth ' + authParams.join(', ');
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     async handleWordpressExport(req: IncomingMessage, res: ServerResponse) {
@@ -179,7 +178,14 @@ export class ExportController {
         });
 
         req.on('end', async () => {
-            const postData = JSON.parse(body);
+            let postData;
+            try {
+                postData = JSON.parse(body);
+            } catch (error) {
+                sendMessage(res, 400, 'Invalid JSON payload');
+                return;
+            }
+
             ExportController.postTitle = postData.postTitle;
             ExportController.postContent = postData.postText;
             ExportController.songId = postData.songId;
@@ -195,8 +201,7 @@ export class ExportController {
         });
     }
 
-    async handleWordpressExportData (req: IncomingMessage, res: ServerResponse)
-    {
+    async handleWordpressExportData(req: IncomingMessage, res: ServerResponse) {
         const url = req.url || '';
         const searchParams = new URLSearchParams(url.split('?')[1]);
         const code = searchParams.get('code') || '';
@@ -210,7 +215,7 @@ export class ExportController {
         //this.printAllPosts(accessToken, blogId);
 
 
-        res.writeHead(302, { 'Location': '/song-page/' + ExportController.songId });
+        res.writeHead(302, {'Location': '/song-page/' + ExportController.songId});
         res.end();
     }
 
@@ -240,6 +245,7 @@ export class ExportController {
                 throw error;
             });
     }
+
     async getBlogId(accessToken: string, blogUrl: string) {
         const apiUrl = 'https://public-api.wordpress.com/rest/v1.1/sites/' + blogUrl;
 
@@ -265,7 +271,7 @@ export class ExportController {
             Authorization: 'Bearer ' + accessToken,
         };
 
-        fetch(apiUrl, { headers })
+        fetch(apiUrl, {headers})
             .then(response => response.json())
             .then(data => {
                 // Handle the API response here
@@ -275,6 +281,7 @@ export class ExportController {
                 console.error(error);
             });
     }
+
     makeNewPost(accessToken: string, blogId: string, postTitle: string, postContent: string) {
         const apiUrl = 'https://public-api.wordpress.com/rest/v1.1/sites/' + blogId + '/posts/new';
         const headers = {

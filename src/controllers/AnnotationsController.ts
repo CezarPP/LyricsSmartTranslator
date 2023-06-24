@@ -78,7 +78,14 @@ export class AnnotationsController extends BaseController {
         });
 
         req.on('end', async () => {
-            const postData = JSON.parse(body);
+            let postData;
+            try {
+                postData = JSON.parse(body);
+            } catch (error) {
+                sendMessage(res, 400, 'Invalid JSON payload');
+                return;
+            }
+
             const translationId = postData.translationId as number;
             const beginPos = postData.beginPos as number;
             const endPos = postData.endPos as number;
@@ -128,7 +135,14 @@ export class AnnotationsController extends BaseController {
         });
 
         req.on('end', async () => {
-            const putData = JSON.parse(body);
+            let putData;
+            try {
+                putData = JSON.parse(body);
+            } catch (error) {
+                sendMessage(res, 400, 'Invalid JSON payload');
+                return;
+            }
+
             const content = putData.content as string;
             let reviewed = putData.reviewed as boolean;
             if (content === undefined || reviewed === undefined) {
