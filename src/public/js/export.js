@@ -1,4 +1,8 @@
+let popupOpen = false;
 document.getElementById("tumblr-icon").addEventListener("click", function(){
+    if(popupOpen == true) return;
+
+    popupOpen = true;
 // Create the pop-up window container
     const popupContainer = document.createElement("div");
     popupContainer.classList.add("popup-container");
@@ -58,11 +62,13 @@ document.getElementById("tumblr-icon").addEventListener("click", function(){
             .catch(error => {
                 console.error('Error:', error);
             });
+        popupOpen = false;
     });
 
     // Add event listener to handle the "Cancel" button click
     cancelButton.addEventListener("click", function() {
         document.body.removeChild(popupContainer);
+        popupOpen = false;
     });
 
     // Add all the elements to the pop-up container
@@ -80,6 +86,9 @@ document.getElementById("tumblr-icon").addEventListener("click", function(){
     document.body.appendChild(popupContainer);
 });
 document.getElementById("wordpress-icon").addEventListener("click", function() {
+        if(popupOpen == true) return;
+
+        popupOpen = true;
         // Create the pop-up window container
         const popupContainer = document.createElement("div");
         popupContainer.classList.add("popup-container");
@@ -133,11 +142,13 @@ document.getElementById("wordpress-icon").addEventListener("click", function() {
                 .catch(error => {
                     console.error('Error:', error);
                 });
+            popupOpen = false;
         });
 
         // Add event listener to handle the "Cancel" button click
         cancelButton.addEventListener("click", function() {
             document.body.removeChild(popupContainer);
+            popupOpen = false;
         });
 
         // Add all the elements to the pop-up container
