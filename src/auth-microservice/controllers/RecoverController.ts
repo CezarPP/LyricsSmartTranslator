@@ -57,13 +57,20 @@ export class RecoverController {
     async postRecoverPassword(req: IncomingMessage, res: ServerResponse) {
         try {
             let body = '';
+
             req.on('data', chunk => {
                 body += chunk.toString();
             });
 
             req.on('end', async () => {
-                const parsedData = JSON.parse(body);
-                const email = parsedData.email as string;
+                let postData;
+                try {
+                    postData = JSON.parse(body);
+                } catch (error) {
+                    sendMessage(res, 400, 'Invalid JSON payload');
+                    return;
+                }
+                const email = postData.email as string;
 
                 if (!email || !isEmailValid(email)) {
                     sendMessage(res, 400, 'Invalid input data');
@@ -133,9 +140,15 @@ export class RecoverController {
             });
 
             req.on('end', async () => {
-                const parsedData = JSON.parse(body);
-                const token = parsedData.token;
-                const newPassword = parsedData.newPassword;
+                let putData;
+                try {
+                    putData = JSON.parse(body);
+                } catch (error) {
+                    sendMessage(res, 400, 'Invalid JSON payload');
+                    return;
+                }
+                const token = putData.token;
+                const newPassword = putData.newPassword;
 
                 console.log(token);
                 console.log(newPassword);

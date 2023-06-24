@@ -85,9 +85,15 @@ export class UsersController {
             });
 
             req.on('end', async () => {
-                const parsedData = JSON.parse(body);
-                const username = parsedData.username as string;
-                const password = parsedData.password as string;
+                let postData;
+                try {
+                    postData = JSON.parse(body);
+                } catch (error) {
+                    sendMessage(res, 400, 'Invalid JSON payload');
+                    return;
+                }
+                const username = postData.username as string;
+                const password = postData.password as string;
 
                 if (!username || !password) {
                     sendMessage(res, 400, 'Invalid request');
@@ -133,10 +139,16 @@ export class UsersController {
                 body += chunk.toString();
             });
             req.on('end', async () => {
-                const parsedData = JSON.parse(body);
-                const username = parsedData.username as string;
-                const email = parsedData.email as string;
-                const password = parsedData.password as string;
+                let postData;
+                try {
+                    postData = JSON.parse(body);
+                } catch (error) {
+                    sendMessage(res, 400, 'Invalid JSON payload');
+                    return;
+                }
+                const username = postData.username as string;
+                const email = postData.email as string;
+                const password = postData.password as string;
                 if (!username || !email || !password || !isEmailValid(email)) {
                     sendMessage(res, 400, 'Invalid input data');
                     return;
@@ -213,7 +225,7 @@ export class UsersController {
     async getAllUserStatsFiltering(req: IncomingMessage, res: ServerResponse) {
         assert(req.url);
         try {
-            const parsedUrl = url.parse(req.url, true);
+            const parsedUrl = url.parse(req.url, true)
             const parameters = parsedUrl.query;
             const filter = parameters["filter"] as string;
             const limitString = parameters["limit"] as string;
@@ -243,11 +255,17 @@ export class UsersController {
                 body += chunk.toString();
             });
             req.on('end', async () => {
-                const parsedData = JSON.parse(body);
-                const newUsername = parsedData.newUsername as string;
-                const newImgId = parsedData.newImgId as number;
-                const newPassword = parsedData.newPassword as string;
-                const newEmail = parsedData.newEmail as string;
+                let putData;
+                try {
+                    putData = JSON.parse(body);
+                } catch (error) {
+                    sendMessage(res, 400, 'Invalid JSON payload');
+                    return;
+                }
+                const newUsername = putData.newUsername as string;
+                const newImgId = putData.newImgId as number;
+                const newPassword = putData.newPassword as string;
+                const newEmail = putData.newEmail as string;
 
                 if (!newUsername || !newImgId || newPassword === undefined || !newEmail || !isEmailValid(newEmail)) {
                     sendMessage(res, 400, 'Invalid input data');
