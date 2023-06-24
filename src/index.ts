@@ -105,7 +105,9 @@ const server = http.createServer((req: IncomingMessage, res: ServerResponse) => 
 });
 
 (async () => {
+    console.log("Waiting auth microservice start...");
     await startAuthMicroservice();
+    console.log("Auth microservice started");
 
     server.listen(8000, () => {
         console.log('Server is running on port 8000');

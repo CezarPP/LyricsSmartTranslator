@@ -4,13 +4,12 @@ async function getTranslation() {
     return await fetch(`/api/translations/${translationId}`, {method: 'GET'})
         .then(response => {
             if (!response.ok) {
-                throw new Error(`Error getting translation from server status: ${response.status}`
-                    + `error is ${response.json()}`);
+                return null;
             }
             return response.json();
         })
-        .catch(error => {
-            console.error('Error:', error);
+        .catch(() => {
+            return null;
         })
 }
 
@@ -143,6 +142,9 @@ async function setImage(imageId) {
 
 document.addEventListener('DOMContentLoaded', async () => {
     const translation = await getTranslation();
+    if (translation === null) {
+        window.location = '/404.html';
+    }
     loadTranslation(translation)
         .then();
     loadSong(translation.songId)
