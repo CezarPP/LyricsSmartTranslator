@@ -91,10 +91,6 @@ export class TranslationsController extends BaseController {
         // Filter by username
         if (username !== undefined) {
             const translations: Translation[] = await this.translationRepository.getTranslationsByUsername(username);
-            if (translations.length === 0) {
-                sendMessage(res, 404, 'No translations found for this user');
-                return;
-            }
 
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify(translations));

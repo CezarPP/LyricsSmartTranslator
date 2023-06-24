@@ -303,8 +303,6 @@ paths:
                   $ref: "#/components/schemas/Translation"
         '400':
           $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
     post:
       tags:
         - Translations
