@@ -6,6 +6,8 @@ document.querySelector('.form-container form').addEventListener('submit', functi
        email: formData.get('email')
    };
 
+   const loader = document.getElementById('preloader');
+   loader.style.display = 'flex';
    fetch('/api/recover', {
        method: 'POST',
        headers: {
@@ -18,8 +20,12 @@ document.querySelector('.form-container form').addEventListener('submit', functi
                 window.location.href = "/passwordRecoveryRequest.html";
            }
            else{
-               alert('Failed to send recover password request');
+               return response.json();
            }
+       })
+       .then(data => {
+           loader.style.display = 'none';
+           alert('Failed to make password recovery request: ' + data.message);
        })
        .catch(error => {
            console.error(error);
