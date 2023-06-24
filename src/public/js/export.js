@@ -62,11 +62,13 @@ document.getElementById("tumblr-icon").addEventListener("click", function(){
             .catch(error => {
                 console.error('Error:', error);
             });
+        popupOpen = false;
     });
 
     // Add event listener to handle the "Cancel" button click
     cancelButton.addEventListener("click", function() {
         document.body.removeChild(popupContainer);
+        popupOpen = false;
     });
 
     // Add all the elements to the pop-up container
@@ -140,11 +142,13 @@ document.getElementById("wordpress-icon").addEventListener("click", function() {
                 .catch(error => {
                     console.error('Error:', error);
                 });
+            popupOpen = false;
         });
 
         // Add event listener to handle the "Cancel" button click
         cancelButton.addEventListener("click", function() {
             document.body.removeChild(popupContainer);
+            popupOpen = false;
         });
 
         // Add all the elements to the pop-up container
